@@ -101,6 +101,8 @@ public class RepositoryManager implements IRepositoryManager { // NO_UCD (use de
 	}
 
 	private boolean update(File robotsDir, Collection<File> devDirs, boolean force) {
+		long t0 = System.nanoTime();
+
 		final int prev = repository.getItems().size();
 
 		RootHandler.openHandlers();
@@ -115,6 +117,8 @@ public class RepositoryManager implements IRepositoryManager { // NO_UCD (use de
 		} finally {
 			RootHandler.closeHandlers();
 		}
+
+		Logger.logMessage((force ? "force " : "") + "update takes " + ((System.nanoTime() - t0) / 1000000000.0) + "s");
 
 		return prev != repository.getItems().size();
 	}

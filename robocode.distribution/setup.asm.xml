@@ -92,5 +92,9 @@
 			<source>../versions.md</source>
 			<lineEnding>lf</lineEnding> <!-- for Unix/Linux -->
 		</file>
+		<file>
+			<source>../robocode.content/target/classes/robocode.command</source>
+			<fileMode>0755</fileMode>
+		</file>
 	</files>
 </assembly>

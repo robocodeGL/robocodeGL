@@ -116,7 +116,7 @@ public final class ConsoleScrollPane extends JScrollPane {
 			model.fireTableRowsUpdated(n - 1, n - 1);
 		}
 		model.fireTableRowsInserted(n, lines.size() - 1);
-		
+
 		fitTextWidth(Math.max(0, n - 1), lines.size() - 1);
 	}
 
@@ -158,7 +158,7 @@ public final class ConsoleScrollPane extends JScrollPane {
 		col.setMinWidth(0);
 		col.setPreferredWidth(0);
 	}
-	
+
 	public void processStream(InputStream input) {
 		BufferedReader br = new BufferedReader(new InputStreamReader(input));
 		String line;

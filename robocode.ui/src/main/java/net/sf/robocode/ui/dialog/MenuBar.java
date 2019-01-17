@@ -17,7 +17,6 @@ import net.sf.robocode.settings.ISettingsListener;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.IWindowManagerExt;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
-import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
 
 import javax.swing.*;
 import javax.swing.event.MenuEvent;
@@ -26,6 +25,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
+import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
 
 
 /**
@@ -63,6 +64,7 @@ public class MenuBar extends JMenuBar {
 	private JMenu optionsMenu;
 	private JMenuItem optionsPreferencesMenuItem;
 	private JMenuItem optionsFitWindowMenuItem;
+	private JMenuItem optionsAdjustTPSMenuItem;
 	private JCheckBoxMenuItem optionsShowRankingCheckBoxMenuItem;
 	private JMenuItem optionsRecalculateCpuConstantMenuItem;
 	private JMenuItem optionsCleanRobotCacheMenuItem;
@@ -126,6 +128,8 @@ public class MenuBar extends JMenuBar {
 				optionsPreferencesActionPerformed();
 			} else if (source == mb.getOptionsFitWindowMenuItem()) {
 				optionsFitWindowActionPerformed();
+			} else if (source == mb.getOptionsAdjustTPSMenuItem()) {
+				optionsAdjustTPSActionPerformed();
 			} else if (source == mb.getOptionsShowRankingCheckBoxMenuItem()) {
 				optionsShowRankingActionPerformed();
 			} else if (source == mb.getOptionsRecalculateCpuConstantMenuItem()) {
@@ -705,6 +709,16 @@ public class MenuBar extends JMenuBar {
 		return optionsFitWindowMenuItem;
 	}
 
+	private JMenuItem getOptionsAdjustTPSMenuItem() {
+		if (optionsAdjustTPSMenuItem == null) {
+			optionsAdjustTPSMenuItem = new JMenuItem();
+			optionsAdjustTPSMenuItem.setText("Set TPS");
+			optionsAdjustTPSMenuItem.setMnemonic('T');
+			optionsAdjustTPSMenuItem.addActionListener(eventHandler);
+		}
+		return optionsAdjustTPSMenuItem;
+	}
+
 	public JCheckBoxMenuItem getOptionsShowRankingCheckBoxMenuItem() {
 		if (optionsShowRankingCheckBoxMenuItem == null) {
 			optionsShowRankingCheckBoxMenuItem = new JCheckBoxMenuItem();
@@ -745,6 +759,7 @@ public class MenuBar extends JMenuBar {
 			optionsMenu.setMnemonic('O');
 			optionsMenu.add(getOptionsPreferencesMenuItem());
 			optionsMenu.add(getOptionsFitWindowMenuItem());
+			optionsMenu.add(getOptionsAdjustTPSMenuItem());
 			optionsMenu.add(new JSeparator());
 			optionsMenu.add(getOptionsShowRankingCheckBoxMenuItem());
 			optionsMenu.add(new JSeparator());
@@ -882,6 +897,24 @@ public class MenuBar extends JMenuBar {
 
 		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
 		WindowUtil.fitWindow(robocodeFrame);
+	}
+
+	private void optionsAdjustTPSActionPerformed() {
+		battleManager.pauseBattle();
+
+		String res = JOptionPane.showInputDialog(this, "Input new TPS: ");
+		if (res != null) {
+			int tps = -1;
+			try {
+				tps = Integer.parseInt(res);
+			} catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(this, "Invalid number entered. ",
+					"Failed to change TPS", JOptionPane.ERROR_MESSAGE);
+			}
+			if (tps >= 0) {
+				robocodeFrame.setTPS(tps, true);
+			}
+		}
 	}
 
 	private void optionsShowRankingActionPerformed() {

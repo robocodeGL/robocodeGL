@@ -10,8 +10,8 @@ package net.sf.robocode.ui.dialog;
 
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.recording.IRecordManager;
-import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.settings.ISettingsListener;
+import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.*;
 import net.sf.robocode.ui.battleview.BattleView;
 import net.sf.robocode.ui.battleview.InteractiveHandler;
@@ -31,6 +31,7 @@ import java.awt.event.*;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.List;
 
@@ -94,6 +95,7 @@ public class RobocodeFrame extends JFrame {
 	private final MenuBar menuBar;
 
 	final List<RobotButton> robotButtons = new ArrayList<RobotButton>();
+	private FileDropHandler fileDropHandler;
 
 	public RobocodeFrame(ISettingsManager properties,
 			IWindowManager windowManager,
@@ -533,6 +535,14 @@ public class RobocodeFrame extends JFrame {
 	 * Initialize the class.
 	 */
 	private void initialize() {
+		try {
+			Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
+			Method method = util.getMethod("setWindowCanFullScreen", Window.class, Boolean.TYPE);
+			method.invoke(util, this, true);
+		} catch (Exception ignore) {
+			// no full screen support
+		}
+
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		setTitle("Robocode");
 		setIconImage(ImageUtil.getImage("/net/sf/robocode/ui/icons/robocode-icon.png"));
@@ -562,6 +572,10 @@ public class RobocodeFrame extends JFrame {
 			getReplayButton().setEnabled(false);
 			exitOnClose = false;
 		}
+
+		fileDropHandler = new FileDropHandler();
+
+		this.setTransferHandler(fileDropHandler);
 	}
 
 	private void pauseResumeButtonActionPerformed() {
@@ -682,7 +696,15 @@ public class RobocodeFrame extends JFrame {
 	private String getTpsFromSliderAsString() {
 		int tps = getTpsFromSlider();
 
-		return "  " + ((tps == MAX_TPS) ? "max" : "" + tps) + "  ";
+		return formatTPS(tps);
+	}
+
+	private String formatTPS(int tps) {
+		return "  " + ((tps >= MAX_TPS) ? "max" : "" + tps) + "  ";
+	}
+
+	public FileDropHandler getFileDropHandler() {
+		return fileDropHandler;
 	}
 
 	private class EventHandler implements ComponentListener, ActionListener, ContainerListener, WindowListener,
@@ -761,19 +783,24 @@ public class RobocodeFrame extends JFrame {
 
 		public void stateChanged(ChangeEvent e) {
 			if (e.getSource() == getTpsSlider()) {
-				int tps = getTpsFromSlider();
-
-				// TODO refactor
-				if (tps == 0) {
-					battleManager.pauseIfResumedBattle();
-				} else {
-					// Only set desired TPS if it is not set to zero
-					properties.setOptionsBattleDesiredTPS(tps);
-					battleManager.resumeIfPausedBattle(); // TODO causing problems when called from PreferencesViewOptionsTab.storePreferences()
-				}
-
-				tpsLabel.setText(getTpsFromSliderAsString());
+				setTPS(getTpsFromSlider(), false);
 			}
+		}
+	}
+
+	public void setTPS(int tps, boolean setSlider) {
+		// TODO refactor
+		if (tps == 0) {
+			battleManager.pauseIfResumedBattle();
+		} else {
+			// Only set desired TPS if it is not set to zero
+			properties.setOptionsBattleDesiredTPS(tps);
+			battleManager.resumeIfPausedBattle(); // TODO causing problems when called from PreferencesViewOptionsTab.storePreferences()
+		}
+
+		tpsLabel.setText(formatTPS(tps));
+		if (setSlider) {
+			setTpsOnSlider(tps);
 		}
 	}
 
@@ -1008,4 +1035,5 @@ public class RobocodeFrame extends JFrame {
 			}
 		}
 	}
+
 }

@@ -14,7 +14,6 @@ import net.sf.robocode.ui.CheckList;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -169,18 +168,52 @@ public class PreferencesDevelopmentOptionsTab extends WizardPanel {
 	}
 
 	private void handleAddAction() {
+		String path = choosePath();
+
+		if (path != null) {
+			if (!getPathList().contains(path)) {
+				getPathList().add(path);
+				getPathList().sort();
+			}
+		}
+
+		updateRemoveButton();
+	}
+
+	private String choosePath() {
+		String osName = System.getProperty("os.name");
+
+		if (osName.toLowerCase().contains("mac")) {
+			System.setProperty("apple.awt.fileDialogForDirectories", "true");
+			try {
+				FileDialog dialog = new FileDialog((Frame)null, "Choose Path", FileDialog.LOAD);
+
+				dialog.setVisible(true);
+
+				if (dialog.getDirectory() != null) {
+					return dialog.getDirectory() + dialog.getFile();
+				} else {
+					return null;
+				}
+			} finally {
+				System.setProperty("apple.awt.fileDialogForDirectories", "false");
+			}
+		} else {
+			return choosePathLegacy();
+		}
+	}
+
+	private String choosePathLegacy() {
 		JFileChooser chooser = new JFileChooser();
 
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		if (chooser.showOpenDialog(optionsPanel) == JFileChooser.APPROVE_OPTION) {
 			String path = chooser.getSelectedFile().getAbsolutePath();
 
-			if (!getPathList().contains(path)) {
-				getPathList().add(path);
-				getPathList().sort();
-			}
+			return path;
+		} else {
+			return null;
 		}
-		updateRemoveButton();
 	}
 
 	private void handleRemoveAction() {
