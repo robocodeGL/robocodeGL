@@ -38,7 +38,7 @@ import javax.swing.UIManager;
 public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 
 	private static final int INITIAL_BUFFER_SIZE = 2 * 1024;
-	private static final int MAX_BUFFER_SIZE = 64 * 1024;
+	private static final int MAX_BUFFER_SIZE = 1024 * 1024; // 64 * 1024;
 
 	private final Method[] methods = Method.class.getEnumConstants();
 
