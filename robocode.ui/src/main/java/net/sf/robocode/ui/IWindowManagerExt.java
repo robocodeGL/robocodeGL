@@ -68,4 +68,12 @@ public interface IWindowManagerExt extends IWindowManager {
 	void showSaveResultsDialog(BattleResultsTableModel tableModel);
 
 	int getFPS();
+
+	void pauseBattle();
+
+	void signalStopBattle();
+
+	void signalPauseBattle(boolean fastPause);
+
+	void signalNextTurn();
 }

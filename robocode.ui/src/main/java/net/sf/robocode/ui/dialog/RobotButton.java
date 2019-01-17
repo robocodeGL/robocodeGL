@@ -77,8 +77,8 @@ public class RobotButton extends JButton implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (robotDialog == null) {
 			attach();
-			if (!robotDialog.isVisible() || robotDialog.getState() != Frame.NORMAL) {
-				WindowUtil.packPlaceShow(robotDialog);
+			if (!robotDialog.isVisible()) { //  || robotDialog.getState() != Frame.NORMAL) {
+				WindowUtil.packPlaceShow(windowManager.getRobocodeFrame(), robotDialog);
 			}
 		} else {
 			robotDialog.setVisible(true);
@@ -189,8 +189,10 @@ public class RobotButton extends JButton implements ActionListener {
 
 			maxScore = 0;
 			for (IScoreSnapshot team : scoreSnapshotList) {
-				if (maxScore < team.getCurrentScore()) {
-					maxScore = (int) team.getCurrentScore();
+				if (team != null) {
+					if (maxScore < team.getCurrentScore()) {
+						maxScore = (int) team.getCurrentScore();
+					}
 				}
 			}
 			if (maxScore == 0) {

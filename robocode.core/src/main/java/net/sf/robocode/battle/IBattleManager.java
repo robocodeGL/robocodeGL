@@ -8,6 +8,7 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
 import robocode.Event;
 
 
@@ -52,7 +53,7 @@ public interface IBattleManager extends IBattleManagerBase {
 	 */
 	void sendInteractiveEvent(Event event);
 
-	void startNewBattle(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording);
+	Promise startNewBattleAsync(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording);
 
 	void nextTurn();
 
@@ -62,13 +63,18 @@ public interface IBattleManager extends IBattleManagerBase {
 
 	void resumeBattle();
 
-	void togglePauseResumeBattle();
+	boolean isPaused();
+
+	/**
+	 * @return true if battle is paused after method call
+	 */
+	boolean togglePauseResumeBattle();
 
 	void resumeIfPausedBattle(); // TODO refactor, remove
 
 	void pauseIfResumedBattle(); // TODO refactor, remove
 
-	void restart();
+	Promise restart();
 
 	void replay();
 
@@ -91,4 +97,8 @@ public interface IBattleManager extends IBattleManagerBase {
 	void setDefaultBattleProperties();
 
 	void cleanup();
+
+	void setSlowMoMode(boolean slowMoMode);
+
+	int getEffectiveTPS();
 }

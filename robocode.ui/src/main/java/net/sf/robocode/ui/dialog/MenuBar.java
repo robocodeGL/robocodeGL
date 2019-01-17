@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.dialog;
 
 
+import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.host.ICpuManager;
 import net.sf.robocode.recording.BattleRecordFormat;
@@ -16,16 +17,28 @@ import net.sf.robocode.serialization.SerializableOptions;
 import net.sf.robocode.settings.ISettingsListener;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.IWindowManagerExt;
+import net.sf.robocode.ui.battleview.PreferredSizeMode;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
-import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
+import net.sf.robocode.ui.mac.MacMenuHandler;
+import net.sf.robocode.ui.mac.MacMenuHelper;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
+
+import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
 
 
 /**
@@ -36,8 +49,8 @@ import java.awt.event.KeyEvent;
  * @author Matthew Reeder (contributor)
  * @author Luis Crespo (contributor)
  */
-@SuppressWarnings("serial")
-public class MenuBar extends JMenuBar {
+@SuppressWarnings({"serial", "InstanceVariableUsedBeforeInitialized"})
+public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	// Battle menu
 	private JMenu battleMenu;
@@ -45,7 +58,17 @@ public class MenuBar extends JMenuBar {
 	private JMenuItem battleOpenMenuItem;
 	private JMenuItem battleSaveMenuItem;
 	private JMenuItem battleSaveAsMenuItem;
+	private JMenuItem battleRestartMenuItem;
+	private JMenuItem battleStopMenuItem;
+	private JMenuItem battleTogglePauseMenuItem;
+	private JMenuItem battleNextTurnMenuItem;
+	private JMenuItem battleSpeedUpMenuItem;
+	private JMenuItem battleNormalSpeedMenuItem;
+	private JMenuItem battleSlowDownMenuItem;
 	private JMenuItem battleExitMenuItem;
+	private JMenu battleRobotListMenu;
+	private JMenuItem battleRobotListEmptyMenuItem;
+	private JMenuItem battleMainBattleMenuItem;
 	private JMenuItem battleOpenRecordMenuItem;
 	private JMenuItem battleSaveRecordAsMenuItem;
 	private JMenuItem battleExportRecordMenuItem;
@@ -62,7 +85,10 @@ public class MenuBar extends JMenuBar {
 	// Options menu
 	private JMenu optionsMenu;
 	private JMenuItem optionsPreferencesMenuItem;
+	private JMenuItem optionsAdjustTPSMenuItem;
+	private JCheckBoxMenuItem optionsHideControlsMenuItem;
 	private JMenuItem optionsFitWindowMenuItem;
+	private JMenuItem optionsFitBattleFieldMenuItem;
 	private JCheckBoxMenuItem optionsShowRankingCheckBoxMenuItem;
 	private JMenuItem optionsRecalculateCpuConstantMenuItem;
 	private JMenuItem optionsCleanRobotCacheMenuItem;
@@ -96,6 +122,20 @@ public class MenuBar extends JMenuBar {
 				battleSaveActionPerformed();
 			} else if (source == mb.getBattleSaveAsMenuItem()) {
 				battleSaveAsActionPerformed();
+			} else if (source == mb.getBattleRestartMenuItem()) {
+				battleRestartActionPerformed();
+			} else if (source == mb.getBattleStopMenuItem()) {
+				battleStopActionPerformed();
+			} else if (source == mb.getBattleTogglePauseMenuItem()) {
+				battleTogglePauseActionPerformed();
+			} else if (source == mb.getBattleNextTurnMenuItem()) {
+				battleNextTurnActionPerformed();
+			} else if (source == mb.getBattleSpeedUpMenuItem()) {
+				battleSpeedUpActionPerformed();
+			} else if (source == mb.getBattleNormalSpeedMenuItem()) {
+				battleNormalSpeedActionPerformed();
+			} else if (source == mb.getBattleSlowDownMenuItem()) {
+				battleSlowDownActionPerformed();
 			} else if (source == mb.getBattleOpenRecordMenuItem()) {
 				battleOpenRecordActionPerformed();
 			} else if (source == mb.getBattleImportRecordMenuItem()) {
@@ -124,8 +164,14 @@ public class MenuBar extends JMenuBar {
 				// Options / Preferences menu
 			} else if (source == mb.getOptionsPreferencesMenuItem()) {
 				optionsPreferencesActionPerformed();
+			} else if (source == mb.getOptionsAdjustTPSMenuItem()) {
+				optionsAdjustTPSActionPerformed();
+			} else if (source == mb.getOptionsHideControlsCheckBoxMenuItem()) {
+				optionsHideControlsActionPerformed();
 			} else if (source == mb.getOptionsFitWindowMenuItem()) {
 				optionsFitWindowActionPerformed();
+			} else if (source == mb.getOptionsFitBattleFieldMenuItem()) {
+				optionsFitBattleFieldActionPerformed();
 			} else if (source == mb.getOptionsShowRankingCheckBoxMenuItem()) {
 				optionsShowRankingActionPerformed();
 			} else if (source == mb.getOptionsRecalculateCpuConstantMenuItem()) {
@@ -162,11 +208,11 @@ public class MenuBar extends JMenuBar {
 		}
 
 		public void menuDeselected(MenuEvent e) {
-			battleManager.resumeBattle();
+			// battleManager.resumeBattle();
 		}
 
 		public void menuSelected(MenuEvent e) {
-			battleManager.pauseBattle();
+			// windowManager.pauseBattle();
 		}
 
 		public void menuCanceled(MenuEvent e) {}
@@ -181,6 +227,8 @@ public class MenuBar extends JMenuBar {
 	private final IRecordManager recordManager;
 	private final ICpuManager cpuManager;
 
+	private final boolean macMenuEnabled;
+
 	public MenuBar(ISettingsManager properties,
 			IWindowManagerExt windowManager,
 			IBattleManager battleManager,
@@ -192,15 +240,33 @@ public class MenuBar extends JMenuBar {
 		this.recordManager = recordManager;
 		this.cpuManager = cpuManager;
 
+		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+			macMenuEnabled = MacMenuHelper.initMacMenu(new MyMacMenuHandler());
+		} else {
+			macMenuEnabled = false;
+		}
+
 		// FNL: Make sure that menus are heavy-weight components so that the menus are not painted
 		// behind the BattleView which is a heavy-weight component. This must be done before
 		// adding any menu to the menubar.
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
+		setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+
 		add(getBattleMenu());
 		add(getRobotMenu());
 		add(getOptionsMenu());
 		add(getHelpMenu());
+
+		properties.addPropertyListener(this);
+		settingChanged(null);
+	}
+
+	@Override
+	public void settingChanged(String ignore) {
+		boolean hideControls = properties.getOptionsUiHideControls();
+
+		getOptionsHideControlsCheckBoxMenuItem().setState(hideControls);
 	}
 
 	public void setup(RobocodeFrame robocodeFrame) {
@@ -208,19 +274,20 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private void battleExitActionPerformed() {
-		robocodeFrame.dispose();
+		robocodeFrame.saveAndDispose();
 	}
 
 	/**
 	 * Handle battleNew menu item action
 	 */
 	private void battleNewActionPerformed() {
+		battleManager.setBattleFilename(null);
 		windowManager.showNewBattleDialog(battleManager.getBattleProperties());
 	}
 
 	private void battleOpenActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
 			String path = windowManager.showBattleOpenDialog(".battle", "Battles");
 			if (path != null) {
@@ -234,7 +301,7 @@ public class MenuBar extends JMenuBar {
 
 	private void battleSaveActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 			String path = battleManager.getBattleFilename();
 
 			if (path == null) {
@@ -251,7 +318,7 @@ public class MenuBar extends JMenuBar {
 
 	private void battleSaveAsActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
 			String path = windowManager.saveBattleDialog(battleManager.getBattlePath(), ".battle", "Battles");
 
@@ -264,28 +331,59 @@ public class MenuBar extends JMenuBar {
 		}
 	}
 
+	private void battleRestartActionPerformed() {
+		robocodeFrame.restartBattleAsync();
+	}
+
+	private void battleStopActionPerformed() {
+		robocodeFrame.stopBattleAsync();
+	}
+
+	private void battleTogglePauseActionPerformed() {
+		robocodeFrame.togglePause();
+	}
+
+	private void battleNextTurnActionPerformed() {
+		robocodeFrame.pauseOrNextTurn();
+	}
+
+	private void battleSpeedUpActionPerformed() {
+		robocodeFrame.speedUp();
+	}
+
+	private void battleNormalSpeedActionPerformed() {
+		robocodeFrame.normalSpeed();
+	}
+
+	private void battleSlowDownActionPerformed() {
+		robocodeFrame.slowDown();
+	}
+
 	private void battleOpenRecordActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
-			String path = windowManager.showBattleOpenDialog(".br", "Records");
+			final String path = windowManager.showBattleOpenDialog(".br", "Records");
 
 			if (path != null) {
-				battleManager.stop(true);
+				battleManager.stopAsync(true).then(new Runnable() {
+					@Override
+					public void run() {
+						robocodeFrame.getReplayButton().setVisible(true);
+						robocodeFrame.getReplayButton().setEnabled(true);
 
-				robocodeFrame.getReplayButton().setVisible(true);
-				robocodeFrame.getReplayButton().setEnabled(true);
+						getBattleSaveRecordAsMenuItem().setEnabled(true);
+						getBattleExportRecordMenuItem().setEnabled(true);
 
-				getBattleSaveRecordAsMenuItem().setEnabled(true);
-				getBattleExportRecordMenuItem().setEnabled(true);
-
-				try {
-					robocodeFrame.setBusyPointer(true);
-					recordManager.loadRecord(path, BattleRecordFormat.BINARY_ZIP);
-				} finally {
-					robocodeFrame.setBusyPointer(false);
-				}
-				battleManager.replay();
+						try {
+							robocodeFrame.setBusyPointer(true);
+							recordManager.loadRecord(path, BattleRecordFormat.BINARY_ZIP);
+						} finally {
+							robocodeFrame.setBusyPointer(false);
+						}
+						battleManager.replay();
+					}
+				});
 			}
 		} finally {
 			battleManager.resumeBattle();
@@ -294,26 +392,29 @@ public class MenuBar extends JMenuBar {
 
 	private void battleImportRecordActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
-			String path = windowManager.showBattleOpenDialog(".br.xml", "XML Records");
+			final String path = windowManager.showBattleOpenDialog(".br.xml", "XML Records");
 
 			if (path != null) {
-				battleManager.stop(true);
+				battleManager.stopAsync(true).then(new Runnable() {
+					@Override
+					public void run() {
+						robocodeFrame.getReplayButton().setVisible(true);
+						robocodeFrame.getReplayButton().setEnabled(true);
 
-				robocodeFrame.getReplayButton().setVisible(true);
-				robocodeFrame.getReplayButton().setEnabled(true);
+						getBattleSaveRecordAsMenuItem().setEnabled(true);
+						getBattleExportRecordMenuItem().setEnabled(true);
 
-				getBattleSaveRecordAsMenuItem().setEnabled(true);
-				getBattleExportRecordMenuItem().setEnabled(true);
-
-				try {
-					robocodeFrame.setBusyPointer(true);
-					recordManager.loadRecord(path, BattleRecordFormat.XML);
-				} finally {
-					robocodeFrame.setBusyPointer(false);
-				}
-				battleManager.replay();
+						try {
+							robocodeFrame.setBusyPointer(true);
+							recordManager.loadRecord(path, BattleRecordFormat.XML);
+						} finally {
+							robocodeFrame.setBusyPointer(false);
+						}
+						battleManager.replay();
+					}
+				});
 			}
 		} finally {
 			battleManager.resumeBattle();
@@ -323,7 +424,7 @@ public class MenuBar extends JMenuBar {
 	private void battleSaveRecordAsActionPerformed() {
 		if (recordManager.hasRecord()) {
 			try {
-				battleManager.pauseBattle();
+				windowManager.pauseBattle();
 
 				String path = windowManager.saveBattleDialog(battleManager.getBattlePath(), ".br", "Records");
 
@@ -344,7 +445,7 @@ public class MenuBar extends JMenuBar {
 	private void battleExportRecordActionPerformed() {
 		if (recordManager.hasRecord()) {
 			try {
-				battleManager.pauseBattle();
+				windowManager.pauseBattle();
 
 				String path = windowManager.saveBattleDialog(battleManager.getBattlePath(), ".br.xml", "XML Records");
 
@@ -385,6 +486,19 @@ public class MenuBar extends JMenuBar {
 			battleMenu.add(getBattleNewMenuItem());
 			battleMenu.add(getBattleOpenMenuItem());
 			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleRestartMenuItem());
+			battleMenu.add(getBattleStopMenuItem());
+			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleTogglePauseMenuItem());
+			battleMenu.add(getBattleNextTurnMenuItem());
+			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleSpeedUpMenuItem());
+			battleMenu.add(getBattleNormalSpeedMenuItem());
+			battleMenu.add(getBattleSlowDownMenuItem());
+			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleRobotListMenu());
+			battleMenu.add(getBattleMainBattleMenuItem());
+			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleSaveMenuItem());
 			battleMenu.add(getBattleSaveAsMenuItem());
 			battleMenu.add(new JSeparator());
@@ -394,14 +508,16 @@ public class MenuBar extends JMenuBar {
 			battleMenu.add(getBattleExportRecordMenuItem());
 			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleTakeScreenshotMenuItem());
-			battleMenu.add(new JSeparator());
-			battleMenu.add(getBattleExitMenuItem());
+			if (!macMenuEnabled) {
+				battleMenu.add(new JSeparator());
+				battleMenu.add(getBattleExitMenuItem());
+			}
 			battleMenu.addMenuListener(eventHandler);
 		}
 		return battleMenu;
 	}
 
-	private JMenuItem getBattleNewMenuItem() {
+	public JMenuItem getBattleNewMenuItem() {
 		if (battleNewMenuItem == null) {
 			battleNewMenuItem = new JMenuItem();
 			battleNewMenuItem.setText("New");
@@ -412,7 +528,7 @@ public class MenuBar extends JMenuBar {
 		return battleNewMenuItem;
 	}
 
-	private JMenuItem getBattleOpenMenuItem() {
+	public JMenuItem getBattleOpenMenuItem() {
 		if (battleOpenMenuItem == null) {
 			battleOpenMenuItem = new JMenuItem();
 			battleOpenMenuItem.setText("Open");
@@ -447,6 +563,114 @@ public class MenuBar extends JMenuBar {
 			battleSaveMenuItem.addActionListener(eventHandler);
 		}
 		return battleSaveMenuItem;
+	}
+
+	public JMenuItem getBattleRestartMenuItem() {
+		if (battleRestartMenuItem == null) {
+			battleRestartMenuItem = new JMenuItem();
+			battleRestartMenuItem.setText("Restart");
+			battleRestartMenuItem.setMnemonic('R');
+			battleRestartMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK, false));
+			battleRestartMenuItem.setEnabled(false);
+			battleRestartMenuItem.addActionListener(eventHandler);
+		}
+		return battleRestartMenuItem;
+	}
+
+	public JMenuItem getBattleStopMenuItem() {
+		if (battleStopMenuItem == null) {
+			battleStopMenuItem = new JMenuItem();
+			battleStopMenuItem.setText("Stop");
+			battleStopMenuItem.setEnabled(false);
+			battleStopMenuItem.addActionListener(eventHandler);
+		}
+		return battleStopMenuItem;
+	}
+
+	public JMenuItem getBattleTogglePauseMenuItem() {
+		if (battleTogglePauseMenuItem == null) {
+			battleTogglePauseMenuItem = new JMenuItem();
+			battleTogglePauseMenuItem.setText("Pause / Resume");
+			battleTogglePauseMenuItem.setMnemonic('P');
+			battleTogglePauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false));
+			battleTogglePauseMenuItem.setEnabled(true);
+			battleTogglePauseMenuItem.addActionListener(eventHandler);
+		}
+		return battleTogglePauseMenuItem;
+	}
+
+	public JMenuItem getBattleNextTurnMenuItem() {
+		if (battleNextTurnMenuItem == null) {
+			battleNextTurnMenuItem = new JMenuItem();
+			battleNextTurnMenuItem.setText("Pause / Next Turn");
+			battleNextTurnMenuItem.setMnemonic('T');
+			battleNextTurnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false));
+			battleNextTurnMenuItem.setEnabled(false);
+			battleNextTurnMenuItem.addActionListener(eventHandler);
+		}
+		return battleNextTurnMenuItem;
+	}
+
+	public JMenuItem getBattleSpeedUpMenuItem() {
+		if (battleSpeedUpMenuItem == null) {
+			battleSpeedUpMenuItem = new JMenuItem();
+			battleSpeedUpMenuItem.setText("Speed Up");
+			battleSpeedUpMenuItem.setMnemonic('F');
+			battleSpeedUpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, false));
+			battleSpeedUpMenuItem.addActionListener(eventHandler);
+		}
+		return battleSpeedUpMenuItem;
+	}
+
+	public JMenuItem getBattleNormalSpeedMenuItem() {
+		if (battleNormalSpeedMenuItem == null) {
+			battleNormalSpeedMenuItem = new JMenuItem();
+			battleNormalSpeedMenuItem.setText("Normal Speed");
+			battleNormalSpeedMenuItem.setMnemonic('d');
+			battleNormalSpeedMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false));
+			battleNormalSpeedMenuItem.addActionListener(eventHandler);
+		}
+		return battleNormalSpeedMenuItem;
+	}
+
+	public JMenuItem getBattleSlowDownMenuItem() {
+		if (battleSlowDownMenuItem == null) {
+			battleSlowDownMenuItem = new JMenuItem();
+			battleSlowDownMenuItem.setText("Slow Down");
+			battleSlowDownMenuItem.setMnemonic('S');
+			battleSlowDownMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false));
+			battleSlowDownMenuItem.addActionListener(eventHandler);
+		}
+		return battleSlowDownMenuItem;
+	}
+
+	public JMenu getBattleRobotListMenu() {
+		if (battleRobotListMenu == null) {
+			battleRobotListMenu = new JMenu();
+			battleRobotListMenu.setText("Robots");
+			battleRobotListMenu.setMnemonic('R');
+			battleRobotListMenu.addActionListener(eventHandler);
+			battleRobotListMenu.add(getBattleRobotListEmptyMenuItem());
+		}
+		return battleRobotListMenu;
+	}
+
+	public JMenuItem getBattleRobotListEmptyMenuItem() {
+		if (battleRobotListEmptyMenuItem == null) {
+			battleRobotListEmptyMenuItem = new JMenuItem();
+			battleRobotListEmptyMenuItem.setText("(empty)");
+			battleRobotListEmptyMenuItem.setEnabled(false);
+		}
+		return battleRobotListEmptyMenuItem;
+	}
+
+	public JMenuItem getBattleMainBattleMenuItem() {
+		if (battleMainBattleMenuItem == null) {
+			battleMainBattleMenuItem = new JMenuItem();
+			battleMainBattleMenuItem.setText("Main Battle");
+			battleMainBattleMenuItem.setMnemonic('M');
+		}
+		return battleMainBattleMenuItem;
 	}
 
 	private JMenuItem getBattleOpenRecordMenuItem() {
@@ -582,8 +806,10 @@ public class MenuBar extends JMenuBar {
 			helpMenu.add(new JSeparator());
 			helpMenu.add(getHelpCheckForNewVersionMenuItem());
 			helpMenu.add(getHelpVersionsTxtMenuItem());
-			helpMenu.add(new JSeparator());
-			helpMenu.add(getHelpAboutMenuItem());
+			if (!macMenuEnabled) {
+				helpMenu.add(new JSeparator());
+				helpMenu.add(getHelpAboutMenuItem());
+			}
 			helpMenu.addMenuListener(eventHandler);
 		}
 		return helpMenu;
@@ -695,6 +921,26 @@ public class MenuBar extends JMenuBar {
 		return helpRoboRumbleMenuItem;
 	}
 
+	public JMenuItem getOptionsAdjustTPSMenuItem() {
+		if (optionsAdjustTPSMenuItem == null) {
+			optionsAdjustTPSMenuItem = new JMenuItem();
+			optionsAdjustTPSMenuItem.setText("Set TPS");
+			optionsAdjustTPSMenuItem.setMnemonic('T');
+			optionsAdjustTPSMenuItem.addActionListener(eventHandler);
+		}
+		return optionsAdjustTPSMenuItem;
+	}
+
+	private JCheckBoxMenuItem getOptionsHideControlsCheckBoxMenuItem() {
+		if (optionsHideControlsMenuItem == null) {
+			optionsHideControlsMenuItem = new JCheckBoxMenuItem();
+			optionsHideControlsMenuItem.setText("Hide controls");
+			optionsHideControlsMenuItem.setMnemonic('H');
+			optionsHideControlsMenuItem.addActionListener(eventHandler);
+		}
+		return optionsHideControlsMenuItem;
+	}
+
 	private JMenuItem getOptionsFitWindowMenuItem() {
 		if (optionsFitWindowMenuItem == null) {
 			optionsFitWindowMenuItem = new JMenuItem();
@@ -703,6 +949,16 @@ public class MenuBar extends JMenuBar {
 			optionsFitWindowMenuItem.addActionListener(eventHandler);
 		}
 		return optionsFitWindowMenuItem;
+	}
+
+	private JMenuItem getOptionsFitBattleFieldMenuItem() {
+		if (optionsFitBattleFieldMenuItem == null) {
+			optionsFitBattleFieldMenuItem = new JMenuItem();
+			optionsFitBattleFieldMenuItem.setText("Fit battle view");
+			optionsFitBattleFieldMenuItem.setMnemonic('F');
+			optionsFitBattleFieldMenuItem.addActionListener(eventHandler);
+		}
+		return optionsFitBattleFieldMenuItem;
 	}
 
 	public JCheckBoxMenuItem getOptionsShowRankingCheckBoxMenuItem() {
@@ -743,8 +999,14 @@ public class MenuBar extends JMenuBar {
 			optionsMenu = new JMenu();
 			optionsMenu.setText("Options");
 			optionsMenu.setMnemonic('O');
-			optionsMenu.add(getOptionsPreferencesMenuItem());
+			if (!macMenuEnabled) {
+				optionsMenu.add(getOptionsPreferencesMenuItem());
+			}
+			optionsMenu.add(getOptionsAdjustTPSMenuItem());
+			optionsMenu.add(new JSeparator());
+			optionsMenu.add(getOptionsHideControlsCheckBoxMenuItem());
 			optionsMenu.add(getOptionsFitWindowMenuItem());
+			optionsMenu.add(getOptionsFitBattleFieldMenuItem());
 			optionsMenu.add(new JSeparator());
 			optionsMenu.add(getOptionsShowRankingCheckBoxMenuItem());
 			optionsMenu.add(new JSeparator());
@@ -760,6 +1022,7 @@ public class MenuBar extends JMenuBar {
 			optionsPreferencesMenuItem = new JMenuItem();
 			optionsPreferencesMenuItem.setText("Preferences");
 			optionsPreferencesMenuItem.setMnemonic('P');
+			optionsPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, MENU_SHORTCUT_KEY_MASK, false));
 			optionsPreferencesMenuItem.addActionListener(eventHandler);
 		}
 		return optionsPreferencesMenuItem;
@@ -770,7 +1033,7 @@ public class MenuBar extends JMenuBar {
 			robotEditorMenuItem = new JMenuItem();
 			robotEditorMenuItem.setText("Source Editor");
 			robotEditorMenuItem.setMnemonic('E');
-			robotEditorMenuItem.setVisible(net.sf.robocode.core.Container.getComponent(IRobocodeEditor.class) != null);
+			robotEditorMenuItem.setEnabled(net.sf.robocode.core.Container.getComponent(IRobocodeEditor.class) != null);
 			robotEditorMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK, false));
 			robotEditorMenuItem.addActionListener(eventHandler);
 		}
@@ -878,10 +1141,51 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private void optionsFitWindowActionPerformed() {
-		JFrame robocodeFrame = windowManager.getRobocodeFrame();
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.SCALED);
+			}
+		});
+	}
 
-		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
-		WindowUtil.fitWindow(robocodeFrame);
+	private void optionsFitBattleFieldActionPerformed() {
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.SHRINK_TO_FIT);
+			}
+		});
+	}
+
+	private void optionsHideControlsActionPerformed() {
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				properties.setOptionsUiHideControls(!properties.getOptionsUiHideControls());
+			}
+		});
+	}
+
+	private void optionsAdjustTPSActionPerformed() {
+		windowManager.pauseBattle();
+
+		int tps = properties.getOptionsBattleDesiredTPS();
+		String res = JOptionPane.showInputDialog(this, "Input new TPS: ", tps);
+		if (res != null) {
+			try {
+				tps = Integer.parseInt(res);
+			} catch (NumberFormatException ex) {
+				JOptionPane.showMessageDialog(this, "Invalid number entered. ",
+					"Failed to change TPS", JOptionPane.ERROR_MESSAGE);
+			}
+		}
+
+		battleManager.resumeBattle();
+
+		if (tps >= 0) {
+			robocodeFrame.setTPS(tps, false);
+		}
 	}
 
 	private void optionsShowRankingActionPerformed() {
@@ -935,5 +1239,22 @@ public class MenuBar extends JMenuBar {
 
 	private void robotPackagerActionPerformed() {
 		windowManager.showRobotPackager();
+	}
+
+	public class MyMacMenuHandler implements MacMenuHandler {
+		@Override
+		public void handleAbout(Object e) {
+			helpAboutActionPerformed();
+		}
+
+		@Override
+		public void handlePreferences(Object e) {
+			optionsPreferencesActionPerformed();
+		}
+
+		@Override
+		public void handleQuitRequestWith(Object e, Object r) {
+			battleExitActionPerformed();
+		}
 	}
 }

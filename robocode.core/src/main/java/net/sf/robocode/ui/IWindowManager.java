@@ -47,6 +47,10 @@ public interface IWindowManager extends IWindowManagerBase {
 
 	ITurnSnapshot getLastSnapshot();
 
+	ITurnSnapshot getLastLastSnapshot();
+
+	boolean pollSnapshot();
+
 	void addBattleListener(IBattleListener listener);
 
 	void removeBattleListener(IBattleListener listener);

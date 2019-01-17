@@ -35,6 +35,8 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JComboBox optionsRenderingNoBuffersComboBox;
 	private JCheckBox optionsRenderingBufferImagesCheckBox;
 	private JCheckBox optionsRenderingForceBulletColorCheckBox;
+	private JCheckBox optionsRenderingAllowScaleUpCheckBox;
+	private JCheckBox displayFpsMeterCheckBox;
 
 	private JButton predefinedPlaformDefaultButton;
 	private JButton predefinedSpeedButton;
@@ -51,6 +53,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		eventHandler = new EventHandler();
 
 		setLayout(new GridLayout(1, 3));
@@ -65,6 +68,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JPanel getSpecificSettingsPanel() {
 		if (specificSettingsPanel == null) {
 			specificSettingsPanel = new JPanel();
+			specificSettingsPanel.setOpaque(false);
 			specificSettingsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Specific settings"));
 			specificSettingsPanel.setLayout(new GridBagLayout());
@@ -118,6 +122,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JPanel getPredefinedSettingsPanel() {
 		if (predefinedSettingsPanel == null) {
 			predefinedSettingsPanel = new JPanel();
+			predefinedSettingsPanel.setOpaque(false);
 			predefinedSettingsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Predefined settings"));
 			predefinedSettingsPanel.setLayout(new GridBagLayout());
@@ -148,11 +153,14 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JPanel getOtherSettingsPanel() {
 		if (otherSettingsPanel == null) {
 			otherSettingsPanel = new JPanel();
+			otherSettingsPanel.setOpaque(false);
 			otherSettingsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Other settings"));
 			otherSettingsPanel.setLayout(new BoxLayout(otherSettingsPanel, BoxLayout.Y_AXIS));
 			otherSettingsPanel.add(getOptionsRenderingBufferImagesCheckBox());
 			otherSettingsPanel.add(getOptionsRenderingForceBulletColorCheckBox());
+			otherSettingsPanel.add(getOptionsRenderingAllowScaleUpCheckBox());
+			otherSettingsPanel.add(getOptionsMiscFpsMeterCheckBox());
 		}
 		return otherSettingsPanel;
 	}
@@ -193,6 +201,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JButton getPredefinedPlatformDefaultButton() {
 		if (predefinedPlaformDefaultButton == null) {
 			predefinedPlaformDefaultButton = new JButton("Default");
+			predefinedPlaformDefaultButton.setOpaque(false);
 			predefinedPlaformDefaultButton.setMnemonic('u');
 			predefinedPlaformDefaultButton.setDisplayedMnemonicIndex(4);
 			predefinedPlaformDefaultButton.addActionListener(eventHandler);
@@ -203,6 +212,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JButton getPredefinedSpeedButton() {
 		if (predefinedSpeedButton == null) {
 			predefinedSpeedButton = new JButton("Speed");
+			predefinedSpeedButton.setOpaque(false);
 			predefinedSpeedButton.setMnemonic('p');
 			predefinedSpeedButton.setDisplayedMnemonicIndex(1);
 			predefinedSpeedButton.addActionListener(eventHandler);
@@ -213,6 +223,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JButton getPredefinedQualityButton() {
 		if (predefinedQualityButton == null) {
 			predefinedQualityButton = new JButton("Quality");
+			predefinedQualityButton.setOpaque(false);
 			predefinedQualityButton.setMnemonic('Q');
 			predefinedQualityButton.addActionListener(eventHandler);
 		}
@@ -222,6 +233,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox getOptionsRenderingBufferImagesCheckBox() {
 		if (optionsRenderingBufferImagesCheckBox == null) {
 			optionsRenderingBufferImagesCheckBox = new JCheckBox("Buffer images (uses memory)");
+			optionsRenderingBufferImagesCheckBox.setOpaque(false);
 			optionsRenderingBufferImagesCheckBox.setMnemonic('i');
 			optionsRenderingBufferImagesCheckBox.setDisplayedMnemonicIndex(7);
 			optionsRenderingBufferImagesCheckBox.addActionListener(eventHandler);
@@ -232,10 +244,31 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox getOptionsRenderingForceBulletColorCheckBox() {
 		if (optionsRenderingForceBulletColorCheckBox == null) {
 			optionsRenderingForceBulletColorCheckBox = new JCheckBox("Make all bullets white");
+			optionsRenderingForceBulletColorCheckBox.setOpaque(false);
 			optionsRenderingForceBulletColorCheckBox.setMnemonic('M');
 			optionsRenderingForceBulletColorCheckBox.addActionListener(eventHandler);
 		}
 		return optionsRenderingForceBulletColorCheckBox;
+	}
+
+	private JCheckBox getOptionsRenderingAllowScaleUpCheckBox() {
+		if (optionsRenderingAllowScaleUpCheckBox == null) {
+			optionsRenderingAllowScaleUpCheckBox = new JCheckBox("Allow scaling battle view up");
+			optionsRenderingAllowScaleUpCheckBox.setOpaque(false);
+			optionsRenderingAllowScaleUpCheckBox.setMnemonic('S');
+			optionsRenderingAllowScaleUpCheckBox.addActionListener(eventHandler);
+		}
+		return optionsRenderingAllowScaleUpCheckBox;
+	}
+
+	private JCheckBox getOptionsMiscFpsMeterCheckBox() {
+		if (displayFpsMeterCheckBox == null) {
+			displayFpsMeterCheckBox = new JCheckBox("Display FPS Meter");
+			displayFpsMeterCheckBox.setOpaque(false);
+			displayFpsMeterCheckBox.setMnemonic('P');
+			displayFpsMeterCheckBox.setDisplayedMnemonicIndex(9);
+		}
+		return displayFpsMeterCheckBox;
 	}
 
 	private void loadPreferences(ISettingsManager props) {
@@ -245,6 +278,8 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		getOptionsRenderingNoBuffersComboBox().setSelectedIndex(props.getOptionsRenderingNoBuffers() - 1);
 		getOptionsRenderingBufferImagesCheckBox().setSelected(props.getOptionsRenderingBufferImages());
 		getOptionsRenderingForceBulletColorCheckBox().setSelected(props.getOptionsRenderingForceBulletColor());
+		getOptionsRenderingAllowScaleUpCheckBox().setSelected(props.getOptionsRenderingAllowScaleUp());
+		getOptionsMiscFpsMeterCheckBox().setSelected(props.getOptionsMiscFPSMeter());
 	}
 
 	public void storePreferences() {
@@ -256,6 +291,8 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		props.setOptionsRenderingNoBuffers(optionsRenderingNoBuffersComboBox.getSelectedIndex() + 1);
 		props.setOptionsRenderingBufferImages(optionsRenderingBufferImagesCheckBox.isSelected());
 		props.setOptionsRenderingForceBulletColor(optionsRenderingForceBulletColorCheckBox.isSelected());
+		props.setOptionsRenderingAllowScaleUp(optionsRenderingAllowScaleUpCheckBox.isSelected());
+		props.setOptionsMiscFPSMeter(getOptionsMiscFpsMeterCheckBox().isSelected());
 		properties.saveProperties();
 	}
 

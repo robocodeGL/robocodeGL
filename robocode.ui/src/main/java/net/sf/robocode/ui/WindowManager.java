@@ -14,26 +14,49 @@ import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.core.Container;
 import net.sf.robocode.host.ICpuManager;
 import net.sf.robocode.io.FileUtil;
-import net.sf.robocode.io.Logger;
 import net.sf.robocode.repository.IRepositoryManager;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.battle.AwtBattleAdaptor;
-import net.sf.robocode.ui.battleview.ScreenshotUtil;
-import net.sf.robocode.ui.dialog.*;
-import net.sf.robocode.ui.packager.RobotPackager;
+import net.sf.robocode.ui.dialog.AboutBox;
+import net.sf.robocode.ui.dialog.FileDropHandler;
+import net.sf.robocode.ui.dialog.NewBattleDialog;
+import net.sf.robocode.ui.dialog.PreferencesDialog;
+import net.sf.robocode.ui.dialog.RankingDialog;
+import net.sf.robocode.ui.dialog.RcSplashScreen;
+import net.sf.robocode.ui.dialog.ResultsDialog;
+import net.sf.robocode.ui.dialog.RobocodeFrame;
+import net.sf.robocode.ui.dialog.RobotExtractor;
+import net.sf.robocode.ui.dialog.TeamCreator;
+import net.sf.robocode.ui.dialog.WindowUtil;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
+import net.sf.robocode.ui.packager.RobotPackager;
 import net.sf.robocode.version.IVersionManager;
 import robocode.control.events.BattleCompletedEvent;
 import robocode.control.events.IBattleListener;
 import robocode.control.snapshot.ITurnSnapshot;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
+import java.awt.EventQueue;
+import java.awt.FileDialog;
+import java.awt.Font;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map.Entry;
 
 
 /**
@@ -69,7 +92,7 @@ public class WindowManager implements IWindowManagerExt {
 		this.cpuManager = cpuManager;
 		this.versionManager = versionManager;
 		this.imageManager = imageManager;
-		awtAdaptor = new AwtBattleAdaptor(battleManager, TIMER_TICKS_PER_SECOND, true);
+		awtAdaptor = new AwtBattleAdaptor(battleManager, settingsManager, TIMER_TICKS_PER_SECOND, true);
 
 		// we will set UI better priority than robots and battle have
 		EventQueue.invokeLater(new Runnable() {
@@ -131,6 +154,15 @@ public class WindowManager implements IWindowManagerExt {
 		return awtAdaptor.getLastSnapshot();
 	}
 
+	public ITurnSnapshot getLastLastSnapshot() {
+		return awtAdaptor.getLastLastSnapshot();
+	}
+
+	@Override
+	public boolean pollSnapshot() {
+		return awtAdaptor.pollFrame(false, true);
+	}
+
 	public int getFPS() {
 		return isIconified() ? 0 : awtAdaptor.getFPS();
 	}
@@ -157,32 +189,146 @@ public class WindowManager implements IWindowManagerExt {
 
 			frame.checkUpdateOnStart();
 
+			FileDropHandler handler = frame.getFileDropHandler();
+			if (handler.getConsumer() == null) {
+				handler.setConsumer(new FileDropHandler.FileListConsumer() {
+					@Override
+					public void accept(List<File> files) throws IOException {
+						RobotJarFilter filter = new RobotJarFilter();
+
+						List<File> accepted = new ArrayList<File>();
+
+						for (File file : files) {
+							if (filter.accept(file.getParentFile(), file.getName())) {
+								accepted.add(file);
+							}
+						}
+
+						if (accepted.isEmpty()) throw new IOException("Nothing to import");
+
+						importRobots(accepted);
+					}
+				});
+			}
+
 		} else {
 			frame.setVisible(false);
 		}
 	}
 
 	public void showAboutBox() {
-		packCenterShow(Container.getComponent(AboutBox.class), true);
+		packCenterShow(Container.getComponent(AboutBox.class));
 	}
 
 	public String showBattleOpenDialog(final String defExt, final String name) {
+		return showNativeDialog(defExt, name, FileDialog.LOAD, battleManager.getBattlePath(), null);
+	}
+
+	private String showNativeDialog(final String defExt, String name, int mode, String directory, String file) {
+		return showNativeDialog(name, mode, directory, file, new FilenameFilter() {
+			@Override
+			public boolean accept(File dir, String name) {
+				return name.toLowerCase().lastIndexOf(defExt.toLowerCase())
+						== name.length() - defExt.length();
+			}
+		});
+	}
+
+	private String showNativeDialog(String name, int mode, String directory, String file, FilenameFilter filter) {
+		FileDialog dialog = new FileDialog(getRobocodeFrame(), name, mode);
+
+		dialog.setFilenameFilter(filter);
+
+		dialog.setDirectory(directory);
+		dialog.setFile(file);
+
+		dialog.setVisible(true);
+
+		if (dialog.getFile() == null) {
+			return null;
+		} else {
+			return dialog.getDirectory() + dialog.getFile();
+		}
+	}
+
+	private File[] showNativeDialogMultipleFile(String name, int mode, String directory, String file, FilenameFilter filter) {
+		FileDialog dialog = new FileDialog(getRobocodeFrame(), name, mode);
+
+		dialog.setFilenameFilter(filter);
+
+		dialog.setDirectory(directory);
+		dialog.setFile(file);
+
+		Class<FileDialog> fileDialogClass = FileDialog.class;
+
+		try {
+			Method setMultipleMode = fileDialogClass.getMethod("setMultipleMode", Boolean.TYPE);
+			Method getFiles = fileDialogClass.getMethod("getFiles");
+
+			setMultipleMode.invoke(dialog, true);
+
+			dialog.setVisible(true);
+
+			File[] files = (File[]) getFiles.invoke(dialog);
+			if (files.length == 0) {
+				return null;
+			} else {
+				return files;
+			}
+		} catch (NoSuchMethodException e) {
+			dialog.setVisible(true);
+
+			if (dialog.getFile() == null) {
+				return null;
+			}
+
+			return new File[]{new File(dialog.getDirectory() + dialog.getFile())};
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+
+			return null;
+		} catch (InvocationTargetException e) {
+			e.printStackTrace();
+
+			return null;
+		}
+	}
+
+	public String saveBattleDialog(String path, final String defExt, final String name) {
+		String result = showNativeDialog(defExt, name, FileDialog.SAVE, path, null);
+
+		if (result != null) {
+			int idx = result.lastIndexOf('.');
+			String extension = "";
+
+			if (idx > 0) {
+				extension = result.substring(idx);
+			}
+			if (!(extension.equalsIgnoreCase(defExt))) {
+				result += defExt;
+			}
+		}
+
+		return result;
+	}
+
+	public String showBattleOpenDialogLegacy(final String defExt, final String name) {
 		JFileChooser chooser = new JFileChooser(battleManager.getBattlePath());
 
 		chooser.setFileFilter(
 				new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				return pathname.isDirectory()
-						|| pathname.getName().toLowerCase().lastIndexOf(defExt.toLowerCase())
+					@Override
+					public boolean accept(File pathname) {
+						return pathname.isDirectory()
+								|| pathname.getName().toLowerCase().lastIndexOf(defExt.toLowerCase())
 								== pathname.getName().length() - defExt.length();
-			}
+					}
 
-			@Override
-			public String getDescription() {
-				return name;
-			}
-		});
+					@Override
+					public String getDescription() {
+						return name;
+					}
+				});
 
 		if (chooser.showOpenDialog(getRobocodeFrame()) == JFileChooser.APPROVE_OPTION) {
 			return chooser.getSelectedFile().getPath();
@@ -190,19 +336,19 @@ public class WindowManager implements IWindowManagerExt {
 		return null;
 	}
 
-	public String saveBattleDialog(String path, final String defExt, final String name) {
+	public String saveBattleDialogLegacy(String path, final String defExt, final String name) {
 		File f = new File(path);
 
 		JFileChooser chooser;
 
 		chooser = new JFileChooser(f);
 
-		javax.swing.filechooser.FileFilter filter = new javax.swing.filechooser.FileFilter() {
+		FileFilter filter = new FileFilter() {
 			@Override
 			public boolean accept(File pathname) {
 				return pathname.isDirectory()
 						|| pathname.getName().toLowerCase().lastIndexOf(defExt.toLowerCase())
-								== pathname.getName().length() - defExt.length();
+						== pathname.getName().length() - defExt.length();
 			}
 
 			@Override
@@ -237,7 +383,7 @@ public class WindowManager implements IWindowManagerExt {
 	public void showHelpApi() {
 		showInBrowser(
 				"file://" + new File(FileUtil.getCwd(), "").getAbsoluteFile() + File.separator + "javadoc" + File.separator
-				+ "index.html");
+						+ "index.html");
 	}
 
 	public void showReadMe() {
@@ -274,7 +420,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	public void showOptionsPreferences() {
 		try {
-			battleManager.pauseBattle();
+			pauseBattle();
 
 			WindowUtil.packCenterShow(getRobocodeFrame(), Container.getComponent(PreferencesDialog.class));
 		} finally {
@@ -286,7 +432,7 @@ public class WindowManager implements IWindowManagerExt {
 		final ResultsDialog dialog = Container.getComponent(ResultsDialog.class);
 
 		dialog.setup(event.getSortedResults(), event.getBattleRules().getNumRounds());
-		packCenterShow(dialog, true);
+		packCenterShow(dialog);
 	}
 
 	public void showRankingDialog(boolean visible) {
@@ -308,7 +454,7 @@ public class WindowManager implements IWindowManagerExt {
 		RankingDialog rankingDialog = Container.getComponent(RankingDialog.class);
 
 		if (visible) {
-			packCenterShow(rankingDialog, centerRankings);
+			packCenterShow(rankingDialog);
 			centerRankings = false; // only center the first time Rankings are shown
 		} else {
 			rankingDialog.dispose();
@@ -351,7 +497,7 @@ public class WindowManager implements IWindowManagerExt {
 	public void showSplashScreen() {
 		RcSplashScreen splashScreen = Container.getComponent(RcSplashScreen.class);
 
-		packCenterShow(splashScreen, true);
+		packCenterShow(splashScreen);
 
 		WindowUtil.setStatusLabel(splashScreen.getSplashLabel());
 
@@ -368,13 +514,15 @@ public class WindowManager implements IWindowManagerExt {
 
 	public void showNewBattleDialog(BattleProperties battleProperties) {
 		try {
-			battleManager.pauseBattle();
+			pauseBattle();
 			final NewBattleDialog battleDialog = Container.createComponent(NewBattleDialog.class);
 
 			battleDialog.setup(settingsManager, battleProperties);
 			WindowUtil.packCenterShow(getRobocodeFrame(), battleDialog);
 		} finally {
 			battleManager.resumeBattle();
+
+			robocodeFrame.updateRestartButtonStatus();
 		}
 	}
 
@@ -391,80 +539,117 @@ public class WindowManager implements IWindowManagerExt {
 	}
 
 	public void showImportRobotDialog() {
-		JFileChooser chooser = new JFileChooser();
+		File[] files = showNativeDialogMultipleFile("Select the robot .jar file to copy to " + repositoryManager.getRobotsDirectory(),
+				FileDialog.LOAD, null, null,
+			new RobotJarFilter());
+		if (files != null) {
+			importRobots(Arrays.asList(files));
+		}
+	}
 
-		chooser.setFileFilter(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				if (pathname.isHidden()) {
-					return false;
-				}
-				if (pathname.isDirectory()) {
-					return true;
-				}
-				String filename = pathname.getName();
+	@Override
+	public void signalStopBattle() {
+		awtAdaptor.signalStopBattle();
+	}
 
-				if (filename.equals("robocode.jar")) {
-					return false;
-				}
-				int idx = filename.lastIndexOf('.');
+	@Override
+	public void signalPauseBattle(boolean fastPause) {
+		awtAdaptor.signalPauseBattle(fastPause);
+	}
 
-				String extension = "";
+	@Override
+	public void signalNextTurn() {
+		awtAdaptor.signalNextTurn();
+	}
 
-				if (idx >= 0) {
-					extension = filename.substring(idx);
-				}
-				return extension.equalsIgnoreCase(".jar") || extension.equalsIgnoreCase(".zip");
-			}
+	@Override
+	public void pauseBattle() {
+		boolean fastPause = battleManager.getEffectiveTPS() < 60.1;
+		battleManager.pauseBattle();
+		signalPauseBattle(fastPause);
+	}
 
-			@Override
-			public String getDescription() {
-				return "Jar Files";
-			}
-		});
+	private void importRobots(List<File> files) {
+		// for (File file : files) {
+		// 	tryImportRobot(file);
+		// }
 
-		chooser.setDialogTitle("Select the robot .jar file to copy to " + repositoryManager.getRobotsDirectory());
+		int skipped = 0;
 
-		if (chooser.showDialog(getRobocodeFrame(), "Import") == JFileChooser.APPROVE_OPTION) {
-			File inputFile = chooser.getSelectedFile();
-			String fileName = inputFile.getName();
-			String extension = "";
+		List<Entry<File, File>> todo = new ArrayList<Entry<File, File>>();
+		List<File> to_overwrite = new ArrayList<File>();
+		List<Entry<File, File>> overwrite = new ArrayList<Entry<File, File>>();
 
-			int idx = fileName.lastIndexOf('.');
-
-			if (idx >= 0) {
-				extension = fileName.substring(idx);
-			}
-			if (!extension.equalsIgnoreCase(".jar")) {
-				fileName += ".jar";
-			}
-			File outputFile = new File(repositoryManager.getRobotsDirectory(), fileName);
-
+		for (File inputFile : files) {
+			File outputFile = prepareImportRobot(inputFile);
 			if (inputFile.equals(outputFile)) {
-				JOptionPane.showMessageDialog(getRobocodeFrame(),
-						outputFile.getName() + " is already in the robots directory!");
-				return;
+				skipped += 1;
+				continue;
 			}
 			if (outputFile.exists()) {
-				if (JOptionPane.showConfirmDialog(getRobocodeFrame(), outputFile + " already exists.  Overwrite?",
-						"Warning", JOptionPane.YES_NO_OPTION)
-						== JOptionPane.NO_OPTION) {
-					return;
-				}
+				to_overwrite.add(outputFile);
+				overwrite.add(new SimpleImmutableEntry<File, File>(inputFile, outputFile));
+				continue;
 			}
-			if (JOptionPane.showConfirmDialog(getRobocodeFrame(),
-					"Robocode will now copy " + inputFile.getName() + " to " + outputFile.getParent(), "Import robot",
-					JOptionPane.OK_CANCEL_OPTION)
-					== JOptionPane.OK_OPTION) {
-				try {
-					FileUtil.copy(inputFile, outputFile);
-					repositoryManager.refresh();
-					JOptionPane.showMessageDialog(getRobocodeFrame(), "Robot imported successfully.");
-				} catch (IOException e) {
-					JOptionPane.showMessageDialog(getRobocodeFrame(), "Import failed: " + e);
-				}
+			todo.add(new SimpleImmutableEntry<File, File>(inputFile, outputFile));
+		}
+
+		int suc = 0;
+		List<Exception> exceptions = new ArrayList<Exception>();
+
+		if (!todo.isEmpty()) {
+			exceptions.addAll(importRobotsImpl(todo));
+			suc += todo.size();
+		}
+
+		if (!overwrite.isEmpty()) {
+			if (JOptionPane.showConfirmDialog(getRobocodeFrame(), to_overwrite + " already exists.  Overwrite?",
+				"Warning", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+				skipped += overwrite.size();
+			} else {
+				exceptions.addAll(importRobotsImpl(overwrite));
+				suc += overwrite.size();
 			}
 		}
+
+		suc -= exceptions.size();
+
+		String exceptionMsg = exceptions.size() == 0 ? "" : String.format("Exceptions: %s", exceptions);
+		String msg = String.format(
+			"%d Robots imported successfully, %d skipped, %d failed. %s", suc, skipped, exceptions.size(), exceptionMsg);
+
+		JOptionPane.showMessageDialog(getRobocodeFrame(), msg);
+	}
+
+	private List<Exception> importRobotsImpl(List<Entry<File, File>> todo) {
+		List<Exception> exceptions = new ArrayList<Exception>();
+
+		for (Entry<File, File> pair : todo) {
+			try {
+				FileUtil.copy(pair.getKey(), pair.getValue());
+			} catch (IOException e) {
+				exceptions.add(e);
+			}
+		}
+
+		repositoryManager.refresh();
+
+		return exceptions;
+	}
+
+	private File prepareImportRobot(File inputFile) {
+		String fileName = inputFile.getName();
+		String extension = "";
+
+		int idx = fileName.lastIndexOf('.');
+
+		if (idx >= 0) {
+			extension = fileName.substring(idx);
+		}
+		if (!extension.equalsIgnoreCase(".jar")) {
+			fileName += ".jar";
+		}
+		return new File(repositoryManager.getRobotsDirectory(), fileName);
 	}
 
 	/**
@@ -529,18 +714,11 @@ public class WindowManager implements IWindowManagerExt {
 
 	/**
 	 * Packs, centers, and shows the specified window on the screen.
-     *
+	 *
 	 * @param window the window to pack, center, and show
-	 * @param center {@code true} if the window must be centered; {@code false} otherwise
 	 */
-	private void packCenterShow(Window window, boolean center) {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
-		window.pack();
-		if (center) {
-			window.setLocation((screenSize.width - window.getWidth()) / 2, (screenSize.height - window.getHeight()) / 2);
-		}
-		window.setVisible(true);
+	private void packCenterShow(Window window) {
+		WindowUtil.packCenterScreenShowNoRemember(null, window);
 	}
 
 	public void cleanup() {
@@ -559,7 +737,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	public IRobotDialogManager getRobotDialogManager() {
 		if (robotDialogManager == null) {
-			robotDialogManager = new RobotDialogManager();
+			robotDialogManager = Container.getComponent(IRobotDialogManager.class);
 		}
 		return robotDialogManager;
 	}
@@ -576,6 +754,12 @@ public class WindowManager implements IWindowManagerExt {
 	 * If this also fails, the LAF will not be changed.
 	 */
 	private void setLookAndFeel() {
+		ensureDefaultGUIFontSize();
+
+		if (System.getProperty("apple.laf.useScreenMenuBar") == null) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable t) {
@@ -606,16 +790,28 @@ public class WindowManager implements IWindowManagerExt {
 			battleManager.setBattleFilename(intro.getPath());
 			battleManager.loadBattleProperties();
 
+
 			final boolean origShowResults = showResults; // save flag for showing the results
 
+			final int oldTPS = settingsManager.getOptionsBattleDesiredTPS();
+			settingsManager.setOptionsBattleDesiredTPS(30);
+			robocodeFrame.disableControlForIntro();
+
 			showResults = false;
-			try {
-				battleManager.startNewBattle(battleManager.loadBattleProperties(), true, false);
-				battleManager.setDefaultBattleProperties();
-				robocodeFrame.afterIntroBattle();
-			} finally {
-				showResults = origShowResults; // always restore the original flag for showing the results
-			}
+			battleManager.startNewBattleAsync(battleManager.loadBattleProperties(), true, false)
+					.then(new Runnable() {
+						@Override
+						public void run() {
+							robocodeFrame.restoreControlForIntro();
+
+							battleManager.setDefaultBattleProperties();
+							robocodeFrame.afterIntroBattle();
+
+							showResults = origShowResults; // always restore the original flag for showing the results
+
+							settingsManager.setOptionsBattleDesiredTPS(oldTPS);
+						}
+					});
 		}
 	}
 
@@ -647,6 +843,49 @@ public class WindowManager implements IWindowManagerExt {
 		if (isGUIEnabled()) {
 			showRobocodeFrame(visible, false);
 			showResults = visible;
+		}
+	}
+
+	private static class RobotJarFilter implements FilenameFilter {
+		@Override
+		public boolean accept(File dir, String name) {
+			if (name.equals("robocode.jar")) {
+				return false;
+			}
+			int idx = name.lastIndexOf('.');
+
+			String extension = "";
+
+			if (idx >= 0) {
+				extension = name.substring(idx);
+			}
+			return extension.equalsIgnoreCase(".jar") || extension.equalsIgnoreCase(".zip");
+		}
+	}
+
+	private static void ensureDefaultGUIFontSize() {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Font guiFont = (Font) toolkit.getDesktopProperty("win.defaultGUI.font");
+		if (guiFont == null) return;
+		Font iconFont = (Font) toolkit.getDesktopProperty("win.icon.font");
+		if (guiFont.getSize() < iconFont.getSize()) {
+			invokeDeclaredMethod("setDesktopProperty", Toolkit.class,
+				toolkit, "win.defaultGUI.font", iconFont);
+		}
+	}
+
+	private static void invokeDeclaredMethod(String methodName,
+	                                         Class<?> clazz, Object instance, String propertyName,
+	                                         Object propertyValue) {
+		try {
+			Method method = clazz.getDeclaredMethod(methodName, String.class, Object.class);
+			method.setAccessible(true);
+			method.invoke(instance, propertyName, propertyValue);
+		} catch (NoSuchMethodException ignore) {
+		} catch (SecurityException ignore) {
+		} catch (IllegalAccessException ignore) {
+		} catch (IllegalArgumentException ignore) {
+		} catch (InvocationTargetException ignore) {
 		}
 	}
 }

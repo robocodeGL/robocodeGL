@@ -8,6 +8,8 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
+import net.sf.robocode.async.PromiseSupplier;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.core.Container;
 import net.sf.robocode.host.ICpuManager;
@@ -15,8 +17,6 @@ import net.sf.robocode.host.IHostManager;
 import net.sf.robocode.io.FileUtil;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.RobocodeProperties;
-import static net.sf.robocode.io.Logger.logError;
-import static net.sf.robocode.io.Logger.logMessage;
 import net.sf.robocode.recording.BattlePlayer;
 import net.sf.robocode.recording.IRecordManager;
 import net.sf.robocode.repository.IRepositoryManager;
@@ -31,8 +31,15 @@ import robocode.control.events.BattlePausedEvent;
 import robocode.control.events.BattleResumedEvent;
 import robocode.control.events.IBattleListener;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static net.sf.robocode.io.Logger.logError;
+import static net.sf.robocode.io.Logger.logMessage;
 
 
 /**
@@ -62,6 +69,10 @@ public class BattleManager implements IBattleManager {
 	private int pauseCount = 0;
 	private final AtomicBoolean isManagedTPS = new AtomicBoolean(false);
 
+	private boolean slowMoMode = false;
+
+	private Promise busyPromise = Promise.resolved();
+
 	public BattleManager(ISettingsManager properties, IRepositoryManager repositoryManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher battleEventDispatcher, IRecordManager recordManager) { // NO_UCD (unused code)
 		this.properties = properties;
 		this.recordManager = recordManager;
@@ -74,19 +85,32 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized void cleanup() {
-		if (battle != null) {
-			battle.waitTillOver();
-			battle.cleanup();
-		}
-		battle = null;
+		busyPromise = busyPromise.then(new PromiseSupplier() {
+			@Override
+			public Promise get() {
+				return Promise.fromSync(new Runnable() {
+					@Override
+					public void run() {
+						if (battle != null) {
+							boolean old = isManagedTPS();
+							setManagedTPS(false);
+							battle.waitTillOver();
+							battle.cleanup();
+							setManagedTPS(old);
+						}
+						battle = null;
+					}
+				});
+			}
+		});
 	}
 
 	// Called when starting a new battle from GUI
-	public void startNewBattle(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording) {
+	public Promise startNewBattleAsync(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording) {
 		this.battleProperties = battleProperties;
 		final RobotSpecification[] robots = repositoryManager.loadSelectedRobots(battleProperties.getSelectedRobots());
 
-		startNewBattleImpl(robots, waitTillOver, enableCLIRecording);
+		return busyPromise = startNewBattleAsync(robots, waitTillOver, enableCLIRecording);
 	}
 
 	// Called from the RobocodeEngine
@@ -110,7 +134,30 @@ public class BattleManager implements IBattleManager {
 
 		final RobotSpecification[] robots = repositoryManager.loadSelectedRobots(spec.getRobots());
 
-		startNewBattleImpl(robots, waitTillOver, enableRecording);
+		startNewBattleSync(robots, waitTillOver, enableRecording);
+	}
+
+	private Promise startNewBattleAsync(final RobotSpecification[] battlingRobotsList, final boolean waitTillOver, final boolean enableCLIRecording) {
+		return stopAsyncInternal(busyPromise, true).then(new PromiseSupplier() {
+			@Override
+			public Promise get() {
+				final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
+
+				// Start the realBattle thread
+				battleThread.start();
+
+				// Wait until the realBattle is running and ended.
+				// This must be done as a new realBattle could be started immediately after this one causing
+				// multiple realBattle threads to run at the same time, which must be prevented!
+				return realBattle.asyncWaitTillStarted()
+						.then(new PromiseSupplier() {
+							@Override
+							public Promise get() {
+								return waitTillOver ? realBattle.asyncWaitTillOver() : Promise.resolved();
+							}
+						});
+			}
+		});
 	}
 
 	@Override
@@ -122,9 +169,24 @@ public class BattleManager implements IBattleManager {
 		}
 	}
 
-	private void startNewBattleImpl(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableRecording) {
-		stop(true);
+	private void startNewBattleSync(final RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableRecording) {
+		stopSync(true);
 
+		Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
+
+		// Start the realBattle thread
+		battleThread.start();
+
+		// Wait until the realBattle is running and ended.
+		// This must be done as a new realBattle could be started immediately after this one causing
+		// multiple realBattle threads to run at the same time, which must be prevented!
+		realBattle.waitTillStarted();
+		if (waitTillOver) {
+			realBattle.waitTillOver();
+		}
+	}
+
+	private Battle prepareRealBattle(RobotSpecification[] battlingRobotsList, boolean enableCLIRecording) {
 		logMessage("Preparing battle...");
 
 		final boolean recording = (properties.getOptionsCommonEnableReplayRecording()
@@ -160,22 +222,15 @@ public class BattleManager implements IBattleManager {
 		if (RobocodeProperties.isSecurityOn()) {
 			hostManager.addSafeThread(battleThread);
 		}
-
-		// Start the realBattle thread
-		battleThread.start();
-
-		// Wait until the realBattle is running and ended.
-		// This must be done as a new realBattle could be started immediately after this one causing
-		// multiple realBattle threads to run at the same time, which must be prevented!
-		realBattle.waitTillStarted();
-		if (waitTillOver) {
-			realBattle.waitTillOver();
-		}
+		return realBattle;
 	}
 
 	public void waitTillOver() {
 		if (battle != null) {
+			boolean old = isManagedTPS();
+			setManagedTPS(false);
 			battle.waitTillOver();
+			setManagedTPS(old);
 		}
 	}
 
@@ -186,7 +241,10 @@ public class BattleManager implements IBattleManager {
 		logMessage("Preparing replay...");
 
 		if (battle != null && battle.isRunning()) {
+			boolean old = isManagedTPS();
+			setManagedTPS(false);
 			battle.stop(true);
+			setManagedTPS(old);
 		}
 
 		Logger.setLogListener(battleEventDispatcher);
@@ -219,6 +277,8 @@ public class BattleManager implements IBattleManager {
 			if (!battleFilename.endsWith(".battle")) {
 				battleFilename += ".battle";
 			}
+		} else {
+			battleFilename = newBattleFilename;
 		}
 	}
 
@@ -298,9 +358,46 @@ public class BattleManager implements IBattleManager {
 		battleEventDispatcher.removeListener(listener);
 	}
 
-	public synchronized void stop(boolean waitTillEnd) {
+	public synchronized Promise stopAsync(final boolean waitTillEnd) {
+		return busyPromise = stopAsyncInternal(busyPromise, waitTillEnd);
+	}
+
+	private Promise stopAsyncInternal(final Promise condition, final boolean waitTillEnd) {
+		return condition.then(new PromiseSupplier() {
+			@Override
+			public Promise get() {
+				if (battle != null && battle.isRunning()) {
+					final boolean old = isManagedTPS();
+					setManagedTPS(false);
+					battle.stop(false);
+					return (waitTillEnd ? battle.asyncWaitTillOver() : Promise.resolved()).then(new Runnable() {
+						@Override
+						public void run() {
+							setManagedTPS(old);
+						}
+					});
+				} else {
+					return Promise.resolved();
+				}
+			}
+		}).then(new Runnable() {
+			@Override
+			public void run() {
+				if (hostManager != null && battleThread != null) {
+					hostManager.removeSafeThread(battleThread);
+				}
+				battleThread = null;
+			}
+		});
+	}
+
+	@Override
+	public synchronized void stopSync(boolean waitTillEnd) {
 		if (battle != null && battle.isRunning()) {
+			boolean old = isManagedTPS();
+			setManagedTPS(false);
 			battle.stop(waitTillEnd);
+			setManagedTPS(old);
 		}
 		if (hostManager != null && battleThread != null) {
 			hostManager.removeSafeThread(battleThread);
@@ -308,24 +405,28 @@ public class BattleManager implements IBattleManager {
 		battleThread = null;
 	}
 
-	public synchronized void restart() {
+
+	public synchronized Promise restart() {
 		// Start new battle. The old battle is automatically stopped
-		startNewBattle(battleProperties, false, false);
+		return startNewBattleAsync(battleProperties, false, false);
 	}
 
 	public synchronized void replay() {
 		replayBattle();
 	}
 
-	private boolean isPaused() {
+	@Override
+	public boolean isPaused() {
 		return (pauseCount != 0);
 	}
 
-	public synchronized void togglePauseResumeBattle() {
+	public synchronized boolean togglePauseResumeBattle() {
 		if (isPaused()) {
 			resumeBattle();
+			return false;
 		} else {
 			pauseBattle();
+			return true;
 		}
 	}
 
@@ -411,5 +512,15 @@ public class BattleManager implements IBattleManager {
 		if (battle != null && battle.isRunning() && !isPaused() && battle instanceof Battle) {
 			((Battle) battle).sendInteractiveEvent(event);
 		}
+	}
+
+	@Override
+	public void setSlowMoMode(boolean slowMoMode) {
+		this.slowMoMode = slowMoMode;
+	}
+
+	@Override
+	public int getEffectiveTPS() {
+		return isPaused() || slowMoMode ? 10 : properties.getOptionsBattleDesiredTPS();
 	}
 }

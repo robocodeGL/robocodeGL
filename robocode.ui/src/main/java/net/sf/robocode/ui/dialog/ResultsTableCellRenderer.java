@@ -23,10 +23,12 @@ public class ResultsTableCellRenderer extends DefaultTableCellRenderer {
 
 	private final boolean isBordered;
 
-	public ResultsTableCellRenderer(boolean isBordered) {
+	public ResultsTableCellRenderer(boolean isBordered, boolean alignCenter) {
 		super();
 		this.isBordered = isBordered;
-		setHorizontalAlignment(SwingConstants.CENTER);
+		if (alignCenter) {
+			setHorizontalAlignment(SwingConstants.CENTER);
+		}
 		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 	}
 
@@ -35,14 +37,18 @@ public class ResultsTableCellRenderer extends DefaultTableCellRenderer {
 			boolean hasFocus, int row, int column) {
 		if (isBordered) {
 			setBorder(new EtchedBorder(EtchedBorder.RAISED));
-			setBackground(SystemColor.menu);
-			setForeground(SystemColor.menuText);
+			if (isSelected) {
+				setBackground(Color.lightGray);
+			} else {
+				setBackground(Color.white);
+			}
+			setForeground(Color.black);
 		} else if (isSelected) {
-			setBackground(SystemColor.textHighlight);
-			setForeground(SystemColor.textHighlightText);
+			setBackground(Color.lightGray);
+			setForeground(Color.black);
 		} else {
-			setBackground(SystemColor.text);
-			setForeground(SystemColor.textText);
+			setBackground(Color.white);
+			setForeground(Color.black);
 		}
 		setText(value.toString());
 

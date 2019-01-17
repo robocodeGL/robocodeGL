@@ -69,6 +69,10 @@ public class NewBattleRulesTab extends JPanel {
 	}
 
 	public void setup(ISettingsManager settingsManager, BattleProperties battleProperties) {
+		setOpaque(false);
+		hideEnemyNamesCheckBox.setOpaque(false);
+		restoreDefaultsButton.setOpaque(false);
+
 		this.settingsManager = settingsManager;
 		this.battleProperties = battleProperties;
 
@@ -103,6 +107,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JPanel createBattlefieldSizePanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 		panel.addAncestorListener(eventHandler);
 		
 		Border border = BorderFactory.createCompoundBorder(
@@ -123,6 +128,7 @@ public class NewBattleRulesTab extends JPanel {
 	
 	private JPanel createBattlefieldSlidersPanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -157,6 +163,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JPanel createPredefinedSizesPanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 
 		Border border = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0),
 				BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Predefined Sizes"));
@@ -172,9 +179,11 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JPanel createRulesPanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 
 		panel.addAncestorListener(new EventHandler());
-		panel.setBorder(BorderFactory.createEtchedBorder());
+		// panel.setBorder(BorderFactory.createEtchedBorder());
+		panel.setBorder(BorderFactory.createEmptyBorder());
 
 		GroupLayout layout = new GroupLayout(panel);
 		layout.setAutoCreateContainerGaps(true);
@@ -343,6 +352,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JSlider createBattlefieldSizeSlider() {
 		JSlider slider = new JSlider();
+		slider.setOpaque(false);
 		slider.setMinimum(MIN_BATTLEFIELD_SIZE);
 		slider.setMaximum(MAX_BATTLEFIELD_SIZE);
 		slider.setMajorTickSpacing(BATTLEFIELD_STEP_SIZE);
@@ -366,6 +376,7 @@ public class NewBattleRulesTab extends JPanel {
 			this.width = width;
 			this.height = height;
 			addActionListener(eventHandler);
+			this.setOpaque(false);
 		}
 	}
 
@@ -446,7 +457,7 @@ public class NewBattleRulesTab extends JPanel {
 			} else if (event.getSource() == restoreDefaultsButton) {
 				battleProperties.setBattlefieldWidth(800);
 				battleProperties.setBattlefieldHeight(600);
-				battleProperties.setNumRounds(10);
+				battleProperties.setNumRounds(35);
 				battleProperties.setGunCoolingRate(0.1);
 				battleProperties.setInactivityTime(450);
 				battleProperties.setHideEnemyNames(false);

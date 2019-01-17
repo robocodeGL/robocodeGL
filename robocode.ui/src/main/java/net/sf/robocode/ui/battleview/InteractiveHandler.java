@@ -33,6 +33,8 @@ public final class InteractiveHandler implements KeyEventDispatcher, MouseListen
 	private final IBattleManager battleManager;
 	private final BattleView battleView;
 
+	private ScaleProvider scaleProvider;
+
 	public InteractiveHandler(IBattleManager battleManager, BattleView battleView) {
 		this.battleManager = battleManager;
 		this.battleView = battleView;
@@ -96,10 +98,13 @@ public final class InteractiveHandler implements KeyEventDispatcher, MouseListen
 	}
 
 	private void handleInteractiveEvent(robocode.Event event) {
+		if (event == null) return;
+
 		battleManager.sendInteractiveEvent(event);
 	}
 
 	private MouseEvent mirroredMouseEvent(final MouseEvent e) {
+		if (e.isConsumed()) return null;
 
 		double scale;
 		BattleProperties battleProps = battleManager.getBattleProperties();
@@ -109,11 +114,7 @@ public final class InteractiveHandler implements KeyEventDispatcher, MouseListen
 		int fWidth = battleProps.getBattlefieldWidth();
 		int fHeight = battleProps.getBattlefieldHeight();
 
-		if (vWidth < fWidth || vHeight < fHeight) {
-			scale = min((double) vWidth / fWidth, (double) vHeight / fHeight);
-		} else {
-			scale = 1;
-		}
+		scale = scaleProvider != null ? scaleProvider.getScale() : 1;
 
 		double dx = (vWidth - scale * fWidth) / 2;
 		double dy = (vHeight - scale * fHeight) / 2;
@@ -149,5 +150,9 @@ public final class InteractiveHandler implements KeyEventDispatcher, MouseListen
 
 		return new MouseWheelEvent(SafeComponent.getSafeEventComponent(), e.getID(), e.getWhen(), e.getModifiersEx(), x,
 				y, e.getClickCount(), e.isPopupTrigger(), e.getScrollType(), e.getScrollAmount(), e.getWheelRotation());
+	}
+
+	public void setScaleProvider(ScaleProvider scaleProvider) {
+		this.scaleProvider = scaleProvider;
 	}
 }

@@ -44,8 +44,9 @@ public class SettingsManager implements ISettingsManager {
 			optionsViewRobotNames = true,
 			optionsViewScanArcs = false,
 			optionsViewExplosions = true,
-			optionsViewGround = true,
+			optionsViewGround = false,
 			optionsViewExplosionDebris = true,
+			optionsRenderingAllowScaleUp = true,
 			optionsViewSentryBorder = false;
 
 	// View Options (Turns Per Second)
@@ -68,6 +69,10 @@ public class SettingsManager implements ISettingsManager {
 	private boolean
 			optionsRenderingBufferImages = true,
 			optionsRenderingForceBulletColor = false;
+
+	private boolean
+			optionsMiscFPSMeter = false,
+			optionsUiHideControls = true;
 
 	// Sound Options (Sound Effects)
 	private boolean
@@ -232,6 +237,24 @@ public class SettingsManager implements ISettingsManager {
 		props.setProperty(OPTIONS_VIEW_FPS, "" + optionsViewFPS);
 	}
 
+	public boolean getOptionsMiscFPSMeter() {
+		return optionsMiscFPSMeter;
+	}
+
+	public void setOptionsMiscFPSMeter(boolean optionsMiscFPSMeter) {
+		this.optionsMiscFPSMeter = optionsMiscFPSMeter;
+		props.setProperty(OPTIONS_MISC_FPS_METER, "" + optionsMiscFPSMeter);
+	}
+
+	public boolean getOptionsUiHideControls() {
+		return optionsUiHideControls;
+	}
+
+	public void setOptionsUiHideControls(boolean optionsUiHideControls) {
+		this.optionsUiHideControls = optionsUiHideControls;
+		props.setProperty(OPTIONS_UI_HIDE_CONTROLS, "" + optionsUiHideControls);
+	}
+
 	public boolean getOptionsViewExplosions() {
 		return optionsViewExplosions;
 	}
@@ -375,6 +398,15 @@ public class SettingsManager implements ISettingsManager {
 	public void setOptionsRenderingForceBulletColor(boolean optionsRenderingForceBulletColor) {
 		this.optionsRenderingForceBulletColor = optionsRenderingForceBulletColor;
 		props.setProperty(OPTIONS_RENDERING_FORCE_BULLET_COLOR, "" + optionsRenderingForceBulletColor);
+	}
+
+	public boolean getOptionsRenderingAllowScaleUp() {
+		return optionsRenderingAllowScaleUp;
+	}
+
+	public void setOptionsRenderingAllowScaleUp(boolean optionsRenderingAllowScaleUp) {
+		this.optionsRenderingAllowScaleUp = optionsRenderingAllowScaleUp;
+		props.setProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "" + optionsRenderingAllowScaleUp);
 	}
 
 	public int getOptionsBattleDesiredTPS() {
@@ -711,11 +743,14 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewRobotNames = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_ROBOTNAMES, "true"));
 		optionsViewScanArcs = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_SCANARCS, "false"));
 		optionsViewRobotEnergy = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_ROBOTENERGY, "true"));
-		optionsViewGround = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_GROUND, "true"));
+		optionsViewGround = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_GROUND, "false"));
 		optionsViewTPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_TPS, "true"));
 		optionsViewFPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_FPS, "true"));
 		optionsViewExplosions = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSIONS, "true"));
 		optionsViewExplosionDebris = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "true"));
+		optionsRenderingAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "true"));
+		optionsMiscFPSMeter = Boolean.valueOf(props.getProperty(OPTIONS_MISC_FPS_METER, "false"));
+		optionsUiHideControls = Boolean.valueOf(props.getProperty(OPTIONS_UI_HIDE_CONTROLS, "true"));
 		optionsViewSentryBorder = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_SENTRY_BORDER, "false"));
 		optionsViewPreventSpeedupWhenMinimized = Boolean.valueOf(
 				props.getProperty(OPTIONS_VIEW_PREVENT_SPEEDUP_WHEN_MINIMIZED, "false"));
@@ -789,7 +824,7 @@ public class SettingsManager implements ISettingsManager {
 		battleDefaultGunCoolingRate = Double.parseDouble(props.getProperty(BATTLE_DEFAULT_GUN_COOLING_RATE, "0.1"));
 		battleDefaultInactivityTime = Long.parseLong(props.getProperty(BATTLE_DEFAULT_INACTIVITY_TIME, "450"));
 		battleDefaultHideEnemyNames = Boolean.parseBoolean(props.getProperty(BATTLE_DEFAULT_HIDE_ENEMY_NAMES, "false"));
-		battleDefaultNumberOfRounds = Integer.parseInt(props.getProperty(BATTLE_DEFAULT_NUMBER_OF_ROUNDS, "10"));
+		battleDefaultNumberOfRounds = Integer.parseInt(props.getProperty(BATTLE_DEFAULT_NUMBER_OF_ROUNDS, "35"));
 
 		robotFilesystemQuota = Long.parseLong(props.getProperty(ROBOT_FILESYSTEM_QUOTA, "" + 200000));
 		consoleQuota = Long.parseLong(props.getProperty(CONSOLE_QUOTA, "8192"));

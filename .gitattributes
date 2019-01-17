@@ -1,0 +1,11 @@
+* text=auto
+.gitignore eol=lf
+.gitattributes eol=lf
+*.sh eol=lf
+*.command eol=lf
+*.cmd eol=crlf
+*.bat eol=crlf
+
+*.png binary
+*.jar binary
+*.zip binary

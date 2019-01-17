@@ -29,7 +29,7 @@ import java.io.StringWriter;
 /**
  * @author Pavel Savara (original)
  */
-public class BattleDialog extends JFrame {
+public class BattleDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private final BattleObserver battleObserver = new BattleObserver();
@@ -53,6 +53,7 @@ public class BattleDialog extends JFrame {
 	}
 
 	private void initialize() {
+		// setAlwaysOnTop(true);
 		this.setTitle("Main battle log");
 		this.add(getBattleDialogContentPane());
 		pack();

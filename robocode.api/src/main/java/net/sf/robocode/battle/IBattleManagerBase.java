@@ -8,6 +8,7 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
 import robocode.control.BattleSpecification;
 import robocode.control.events.IBattleListener;
 
@@ -22,7 +23,9 @@ public interface IBattleManagerBase {
 
 	void waitTillOver();
 
-	void stop(boolean waitTillEnd);
+	Promise stopAsync(boolean waitTillEnd);
+
+	void stopSync(boolean waitTillEnd);
 
 	void startNewBattle(BattleSpecification spec, String initialPositions, boolean waitTillOver, boolean enableRecording);
 

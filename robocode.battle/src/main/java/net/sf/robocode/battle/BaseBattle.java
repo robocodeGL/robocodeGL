@@ -8,11 +8,10 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.URLJarCollector;
-import static net.sf.robocode.io.Logger.logError;
-import static net.sf.robocode.io.Logger.logMessage;
 import net.sf.robocode.settings.ISettingsManager;
 import robocode.BattleRules;
 import robocode.control.events.BattlePausedEvent;
@@ -21,6 +20,9 @@ import robocode.control.events.BattleResumedEvent;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static net.sf.robocode.io.Logger.logError;
+import static net.sf.robocode.io.Logger.logMessage;
 
 
 /**
@@ -65,6 +67,8 @@ public abstract class BaseBattle implements IBattle, Runnable {
 	private boolean runBackward;
 	private boolean roundOver;
 	private final Queue<Command> pendingCommands = new ConcurrentLinkedQueue<Command>();
+
+	private final Object stepNotifier = new Object();
 
 	protected BaseBattle(ISettingsManager properties, IBattleManager battleManager, BattleEventDispatcher eventDispatcher) {
 		stepCount = 0;
@@ -312,21 +316,17 @@ public abstract class BaseBattle implements IBattle, Runnable {
 			long delay = 0;
 
 			if (!isAborted() && endTimer < TURNS_DISPLAYED_AFTER_ENDING) {
-				int desiredTPS = properties.getOptionsBattleDesiredTPS();
+				int desiredTPS = battleManager.getEffectiveTPS();
 
-				if (desiredTPS < MAX_TPS) {
+				if (!(desiredTPS < 60.1)) {
+				// if (desiredTPS < MAX_TPS) {
 					long deltaTime = System.nanoTime() - turnStartTime;
 
 					delay = Math.max(1000000000 / desiredTPS - deltaTime, 0);
 				}
 			}
 			if (delay > 500000) { // sleep granularity is worse than 500000
-				try {
-					Thread.sleep(delay / 1000000, (int) (delay % 1000000));
-				} catch (InterruptedException e) {
-					// Immediately reasserts the exception by interrupting the caller thread itself
-					Thread.currentThread().interrupt();
-				}
+				notifiableSleep(delay / 1000000, (int) (delay % 1000000));
 			}
 		}
 	}
@@ -381,22 +381,58 @@ public abstract class BaseBattle implements IBattle, Runnable {
 
 	public void stop(boolean waitTillEnd) {
 		sendCommand(new AbortCommand());
+		notifyBattleThread();
 
 		if (waitTillEnd) {
 			waitTillOver();
 		}
 	}
 
+	@Override
+	public Promise asyncStopAndWait() {
+		stop(false);
+		return asyncWaitTillOver();
+	}
+
+	@Override
+	public Promise asyncWaitTillOver() {
+		return Promise.fromSync(new Runnable() {
+			@Override
+			public void run() {
+				waitTillOver();
+			}
+		});
+	}
+
+	@Override
+	public Promise asyncWaitTillStarted() {
+		return Promise.fromSync(new Runnable() {
+			@Override
+			public void run() {
+				waitTillStarted();
+			}
+		});
+	}
+
 	public void pause() {
 		sendCommand(new PauseCommand());
+		notifyBattleThread();
 	}
 
 	public void resume() {
 		sendCommand(new ResumeCommand());
+		notifyBattleThread();
 	}
 
 	public void step() {
 		sendCommand(new StepCommand());
+		notifyBattleThread();
+	}
+
+	private void notifyBattleThread() {
+		synchronized (stepNotifier) {
+			stepNotifier.notifyAll();
+		}
 	}
 
 	protected void stepBack() {
@@ -465,11 +501,28 @@ public abstract class BaseBattle implements IBattle, Runnable {
 	//
 
 	private void shortSleep() {
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// Immediately reasserts the exception by interrupting the caller thread itself
-			Thread.currentThread().interrupt();
+		notifiableSleep(100);
+	}
+
+	private void notifiableSleep(int timeout) {
+		synchronized (stepNotifier) {
+			try {
+				stepNotifier.wait(timeout);
+			} catch (InterruptedException e) {
+				// Immediately reasserts the exception by interrupting the caller thread itself
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
+
+	private void notifiableSleep(long millis, int nanos) {
+		synchronized (stepNotifier) {
+			try {
+				stepNotifier.wait(millis, nanos);
+			} catch (InterruptedException e) {
+				// Immediately reasserts the exception by interrupting the caller thread itself
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 }

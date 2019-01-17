@@ -46,6 +46,14 @@ public interface ISettingsManager {
 
 	void setOptionsViewFPS(boolean optionsViewFPS);
 
+	boolean getOptionsMiscFPSMeter();
+
+	void setOptionsMiscFPSMeter(boolean optionsMiscFPSMeter);
+
+	boolean getOptionsUiHideControls();
+
+	void setOptionsUiHideControls(boolean optionsUiHideControls);
+
 	boolean getOptionsViewExplosions();
 
 	void setOptionsViewExplosions(boolean optionsViewExplosions);
@@ -53,6 +61,10 @@ public interface ISettingsManager {
 	boolean getOptionsViewExplosionDebris();
 
 	void setOptionsViewExplosionDebris(boolean optionsViewExplosionDebris);
+
+	boolean getOptionsRenderingAllowScaleUp();
+
+	void setOptionsRenderingAllowScaleUp(boolean optionsAllowScaleUp);
 
 	boolean getOptionsViewSentryBorder();
 
@@ -265,6 +277,9 @@ public interface ISettingsManager {
 			OPTIONS_RENDERING_NO_BUFFERS = "robocode.options.rendering.noBuffers",
 			OPTIONS_RENDERING_BUFFER_IMAGES = "robocode.options.rendering.bufferImages",
 			OPTIONS_RENDERING_FORCE_BULLET_COLOR = "robocode.options.rendering.forceBulletColor",
+			OPTIONS_RENDERING_ALLOW_SCALE_UP = "robocode.options.rendering.allowScaleUp",
+			OPTIONS_MISC_FPS_METER = "robocode.options.misc.FPSMeter",
+			OPTIONS_UI_HIDE_CONTROLS = "robocode.options.ui.hideControls",
 
 			OPTIONS_SOUND_ENABLESOUND = "robocode.options.sound.enableSound",
 			OPTIONS_SOUND_ENABLEGUNSHOT = "robocode.options.sound.enableGunshot",

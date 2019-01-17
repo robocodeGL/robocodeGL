@@ -9,7 +9,6 @@ package net.sf.robocode.core;
 
 
 import net.sf.robocode.io.Logger;
-
 import org.picocontainer.Characteristics;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.behaviors.Caching;
@@ -20,9 +19,10 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,14 +52,25 @@ public final class Container extends ContainerBase {
 	public static final MutablePicoContainer cache;
 	public static final MutablePicoContainer factory;
 	public static final ClassLoader systemLoader;
-	private static final ClassLoader engineLoader;
+	private static ClassLoader appLoader;
+	public static final ClassLoader engineLoader; // NO_UCD (use private - used by the .NET plug-in)
 	private static Set<String> known = new HashSet<String>();
 	private static final List<IModule> modules = new ArrayList<IModule>();
 
 	static {
 		instance = new Container();
 		systemLoader = Container.class.getClassLoader();
+		appLoader = systemLoader;
 		engineLoader = new EngineClassLoader(systemLoader);
+
+		ClassLoader[] loaders = {
+				Object.class.getClassLoader(),
+				systemLoader,
+				engineLoader,
+		};
+
+		System.out.println("loaders=" + Arrays.toString(loaders));
+
 		final Thread currentThread = Thread.currentThread();
 
 		currentThread.setContextClassLoader(engineLoader);
@@ -91,6 +102,10 @@ public final class Container extends ContainerBase {
 				loadFromPath(path);
 			}
 		}
+		// todo check module load!!!!!!
+		// for (String path : cp) {
+		// 	loadFromPath(path);
+		// }
 
 		if (known.size() < 2) {
 			Logger.logError("Main modules not loaded, something went wrong. We have only " + known.size() + " modules");
@@ -235,6 +250,14 @@ public final class Container extends ContainerBase {
 			}
 		}
 		return urls;
+	}
+
+	public static ClassLoader getAppLoader() {
+		return appLoader;
+	}
+
+	static void setAppLoader(ClassLoader appLoader) {
+		Container.appLoader = appLoader;
 	}
 
 	protected <T> T getBaseComponent(final Class<T> tClass) {

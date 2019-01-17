@@ -9,12 +9,22 @@ package net.sf.robocode.ui;
 
 
 import net.sf.robocode.settings.ISettingsManager;
+import net.sf.robocode.ui.gfx.ImageAtlas;
 import net.sf.robocode.ui.gfx.ImageUtil;
 import net.sf.robocode.ui.gfx.RenderImage;
+import net.sf.robocode.ui.gfx.RenderImageRegion;
+import net.sf.robocode.ui.gfx.RenderObject;
 
-import java.awt.*;
-import java.util.*;
+import javax.imageio.ImageIO;
+import java.awt.Color;
+import java.awt.Image;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -23,23 +33,28 @@ import java.util.List;
  * @author Titus Chen (contributor)
  */
 public class ImageManager implements IImageManager {
+	private static final boolean USE_GL2_IMAGE = true;
+	private static final double GL2_ROBOT_SCALE = .18;
 
 	private final ISettingsManager properties;
 
 	private Image[] groundImages;
 
-	private RenderImage[][] explosionRenderImages;
+	private RenderObject[][] explosionRenderImages;
 	private RenderImage debriseRenderImage;
 
+	private Image gl2RobotImage;
 	private Image bodyImage;
 	private Image gunImage;
 	private Image radarImage;
 
 	private static final int MAX_NUM_COLORS = 256;
 
-	private HashMap<Integer, RenderImage> robotBodyImageCache;
-	private HashMap<Integer, RenderImage> robotGunImageCache;
-	private HashMap<Integer, RenderImage> robotRadarImageCache;
+	private HashMap<Integer, Image> gl2RobotImageCache;
+
+	private HashMap<Integer, RenderObject> robotBodyImageCache;
+	private HashMap<Integer, RenderObject> robotGunImageCache;
+	private HashMap<Integer, RenderObject> robotRadarImageCache;
 
 	public ImageManager(ISettingsManager properties) {
 		this.properties = properties;
@@ -55,9 +70,10 @@ public class ImageManager implements IImageManager {
 		bodyImage = null;
 		gunImage = null;
 		radarImage = null;
-		robotBodyImageCache = new RenderCache<Integer, RenderImage>();
-		robotGunImageCache = new RenderCache<Integer, RenderImage>();
-		robotRadarImageCache = new RenderCache<Integer, RenderImage>();
+		gl2RobotImageCache = new RenderCache<Integer, Image>();
+		robotBodyImageCache = new RenderCache<Integer, RenderObject>();
+		robotGunImageCache = new RenderCache<Integer, RenderObject>();
+		robotRadarImageCache = new RenderCache<Integer, RenderObject>();
 
 		// Read images into the cache
 		getBodyImage();
@@ -73,39 +89,73 @@ public class ImageManager implements IImageManager {
 		return groundImages[index];
 	}
 
-	public RenderImage getExplosionRenderImage(int which, int frame) {
+	public RenderObject getExplosionRenderImage(int which, int frame) {
 		if (explosionRenderImages == null) {
 			int numExplosion, numFrame;
 			String filename;
 
-			List<List<RenderImage>> explosions = new ArrayList<List<RenderImage>>();
+			List<List<RenderObject>> explosions = new ArrayList<List<RenderObject>>();
 
 			boolean done = false;
 
+			ImageAtlas atlas;
+			Image img;
+			if (USE_GL2_IMAGE) {
+				try {
+					String name = "/net/sf/robocode/ui/images/gl2/explosions.png";
+					URL url = ImageManager.class.getResource(name);
+					if (url == null) {
+						throw new IOException("Invalid: " + name);
+					} else {
+						img = ImageIO.read(url);
+						// System.out.println("before Parse");
+						atlas = ImageAtlas.parse("/net/sf/robocode/ui/images/gl2/explosions.atlas");
+						// System.out.println("after Parse");
+					}
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
+
 			for (numExplosion = 1; !done; numExplosion++) {
-				List<RenderImage> frames = new ArrayList<RenderImage>();
+				List<RenderObject> frames = new ArrayList<RenderObject>();
 
 				for (numFrame = 1;; numFrame++) {
-					filename = "/net/sf/robocode/ui/images/explosion/explosion" + numExplosion + '-' + numFrame + ".png";
+					if (USE_GL2_IMAGE) {
+						ImageAtlas.Region region = atlas.findRegion("explosion" + numExplosion + '-' + numFrame);
 
-					if (ImageManager.class.getResource(filename) == null) {
-						if (numFrame == 1) {
-							done = true;
-						} else {
-							explosions.add(frames);
+						if (region == null) {
+							if (numFrame == 1) {
+								done = true;
+							} else {
+								explosions.add(frames);
+							}
+							break;
 						}
-						break;
-					}
 
-					frames.add(new RenderImage(getImage(filename)));
+						frames.add(region.toImageRegion(img, 1));
+					} else {
+						filename = "/net/sf/robocode/ui/images/explosion/explosion" + numExplosion + '-' + numFrame + ".png";
+
+						if (ImageManager.class.getResource(filename) == null) {
+							if (numFrame == 1) {
+								done = true;
+							} else {
+								explosions.add(frames);
+							}
+							break;
+						}
+
+						frames.add(new RenderImage(getImage(filename)));
+					}
 				}
 			}
 
 			numExplosion = explosions.size();
-			explosionRenderImages = new RenderImage[numExplosion][];
+			explosionRenderImages = new RenderObject[numExplosion][];
 
 			for (int i = numExplosion - 1; i >= 0; i--) {
-				explosionRenderImages[i] = explosions.get(i).toArray(new RenderImage[explosions.size()]);
+				explosionRenderImages[i] = explosions.get(i).toArray(new RenderObject[explosions.size()]);
 			}
 		}
 		return explosionRenderImages[which][frame];
@@ -126,6 +176,15 @@ public class ImageManager implements IImageManager {
 		}
 		return image;
 	}
+
+
+	private Image getGl2RobotImage() {
+		if (gl2RobotImage == null) {
+			gl2RobotImage = getImage("/net/sf/robocode/ui/images/gl2/robot.png");
+		}
+		return gl2RobotImage;
+	}
+
 
 	/**
 	 * Gets the body image
@@ -166,31 +225,54 @@ public class ImageManager implements IImageManager {
 		return radarImage;
 	}
 
-	public RenderImage getColoredBodyRenderImage(Integer color) {
-		RenderImage img = robotBodyImageCache.get(color);
-
+	private Image getColoredGl2RobotImage(Integer color) {
+		Image img = gl2RobotImageCache.get(color);
 		if (img == null) {
-			img = new RenderImage(ImageUtil.createColouredRobotImage(getBodyImage(), new Color(color, true)));
+			img = ImageUtil.createColouredRobotImage(getGl2RobotImage(), new Color(color, true));
+			gl2RobotImageCache.put(color, img);
+		}
+		return img;
+	}
+
+	public RenderObject getColoredBodyRenderImage(Integer color) {
+		RenderObject img = robotBodyImageCache.get(color);
+		if (img == null) {
+			if (USE_GL2_IMAGE) {
+				img = new RenderImageRegion(getColoredGl2RobotImage(color),
+					2, 100, 205, 230, GL2_ROBOT_SCALE);
+			} else {
+				img = new RenderImage(ImageUtil.createColouredRobotImage(getBodyImage(), new Color(color, true)));
+			}
 			robotBodyImageCache.put(color, img);
 		}
 		return img;
 	}
 
-	public RenderImage getColoredGunRenderImage(Integer color) {
-		RenderImage img = robotGunImageCache.get(color);
+	public RenderObject getColoredGunRenderImage(Integer color) {
+		RenderObject img = robotGunImageCache.get(color);
 
 		if (img == null) {
-			img = new RenderImage(ImageUtil.createColouredRobotImage(getGunImage(), new Color(color, true)));
+			if (USE_GL2_IMAGE) {
+				img = new RenderImageRegion(getColoredGl2RobotImage(color),
+					209, 30, 121, 300, GL2_ROBOT_SCALE);
+			} else {
+				img = new RenderImage(ImageUtil.createColouredRobotImage(getGunImage(), new Color(color, true)));
+			}
 			robotGunImageCache.put(color, img);
 		}
 		return img;
 	}
 
-	public RenderImage getColoredRadarRenderImage(Integer color) {
-		RenderImage img = robotRadarImageCache.get(color);
+	public RenderObject getColoredRadarRenderImage(Integer color) {
+		RenderObject img = robotRadarImageCache.get(color);
 
 		if (img == null) {
-			img = new RenderImage(ImageUtil.createColouredRobotImage(getRadarImage(), new Color(color, true)));
+			if (USE_GL2_IMAGE) {
+				img = new RenderImageRegion(getColoredGl2RobotImage(color),
+					2, 2, 151, 96, GL2_ROBOT_SCALE);
+			} else {
+				img = new RenderImage(ImageUtil.createColouredRobotImage(getRadarImage(), new Color(color, true)));
+			}
 			robotRadarImageCache.put(color, img);
 		}
 		return img;

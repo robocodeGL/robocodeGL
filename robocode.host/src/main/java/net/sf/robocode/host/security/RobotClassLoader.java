@@ -65,7 +65,7 @@ public class RobotClassLoader extends URLClassLoader implements IRobotClassLoade
 	private String[] staticRobotInstanceWarning;  
 
 	public RobotClassLoader(URL robotClassPath, String robotFullClassName) {
-		super(new URL[] { robotClassPath}, Container.systemLoader);
+		super(new URL[] { robotClassPath}, Container.getAppLoader());
 		fullClassName = robotFullClassName;
 		parent = getParent();
 		try {

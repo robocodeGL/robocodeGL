@@ -8,6 +8,8 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
+
 /**
  * @author Pavel Savara (original)
  */
@@ -29,4 +31,10 @@ interface IBattle extends Runnable {
 	void waitTillOver();
 
 	void setPaintEnabled(int robotIndex, boolean enable);
+
+	Promise asyncStopAndWait();
+
+	Promise asyncWaitTillStarted();
+
+	Promise asyncWaitTillOver();
 }

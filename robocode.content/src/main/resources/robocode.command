@@ -8,6 +8,6 @@
 ################################################################################
 
 pwd=`pwd`
-cd "${0%/*}"
-java -Xdock:icon=robocode.ico -Xdock:name=Robocode -Xmx512M -cp "libs/*" -XX:+IgnoreUnrecognizedVMOptions "--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED" "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" "--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED" "--add-opens=java.desktop/sun.awt=ALL-UNNAMED" robocode.Robocode $*
-cd "${pwd}"
+cd "${0%/*}" || exit
+java -Dcom.apple.mrj.application.apple.menu.about.name="RobocodeGL" -Dapple.awt.application.name="RobocodeGL" -Xdock:icon=robocode.icns -Xdock:name=RobocodeGL -Xmx512M -cp "libs/*" -XX:+IgnoreUnrecognizedVMOptions "--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED" "--add-opens=java.base/java.lang.reflect=ALL-UNNAMED" "--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED" "--add-opens=java.desktop/sun.awt=ALL-UNNAMED" "--add-opens=java.desktop/java.awt=ALL-UNNAMED" "--add-opens=java.base/java.lang=ALL-UNNAMED" "--add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED" "--add-opens=java.desktop/sun.java2d.opengl=ALL-UNNAMED" robocode.Robocode -NSRequiresAquaSystemAppearance False "$@"
+cd "${pwd}" || exit

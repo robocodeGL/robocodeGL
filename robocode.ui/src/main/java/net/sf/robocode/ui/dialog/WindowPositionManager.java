@@ -89,7 +89,11 @@ public class WindowPositionManager implements ComponentListener {
 	public Rectangle getWindowRect(Window window) {
 		window.addComponentListener(this);
 
-		String rString = (String) getWindowPositions().get(window.getClass().getName());
+		return getWindowRect(window.getClass().getName());
+	}
+
+	public Rectangle getWindowRect(String name) {
+		String rString = (String) getWindowPositions().get(name);
 
 		if (rString == null) {
 			return null;
@@ -128,18 +132,8 @@ public class WindowPositionManager implements ComponentListener {
 		}
 
 		// Return the input window bounds, if we can find a screen device that contains these bounds
-
-		final GraphicsEnvironment gfxEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
-		final GraphicsDevice[] screenDevices = gfxEnv.getScreenDevices();
-
-		for (int i = screenDevices.length - 1; i >= 0; i--) {
-			GraphicsConfiguration[] gfxCfg = screenDevices[i].getConfigurations();
-
-			for (int j = gfxCfg.length - 1; j >= 0; j--) {
-				if (gfxCfg[j].getBounds().contains(windowBounds.getLocation())) {
-					return windowBounds; // Found the bounds
-				}
-			}
+		if (findDeviceContainingLocation(windowBounds.getLocation()) != null) {
+			return windowBounds; // Found the bounds
 		}
 
 		// Otherwise, return window bounds at a location within the current screen
@@ -150,5 +144,28 @@ public class WindowPositionManager implements ComponentListener {
 		int y = (screenSize.height - windowBounds.height) / 2;
 
 		return new Rectangle(x, y, windowBounds.width, windowBounds.height);
+	}
+
+	public static GraphicsConfiguration findDeviceContainingLocation(Point location) {
+		final GraphicsEnvironment gfxEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
+		final GraphicsDevice[] screenDevices = gfxEnv.getScreenDevices();
+
+		for (int i = screenDevices.length - 1; i >= 0; i--) {
+			GraphicsDevice screenDevice = screenDevices[i];
+			GraphicsConfiguration gc = screenDevice.getDefaultConfiguration();
+			if (gc.getBounds().contains(location)) {
+				return gc;
+			}
+
+			// GraphicsConfiguration[] gfxCfg = screenDevice.getConfigurations();
+			//
+			// for (int j = gfxCfg.length - 1; j >= 0; j--) {
+			// 	GraphicsConfiguration gc = gfxCfg[j];
+			// 	if (gc.getBounds().contains(windowBounds.getLocation())) {
+			// 		return screenDevice;
+			// 	}
+			// }
+		}
+		return null;
 	}
 }

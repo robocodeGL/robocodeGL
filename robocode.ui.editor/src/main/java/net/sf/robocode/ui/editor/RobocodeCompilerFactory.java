@@ -127,7 +127,7 @@ public class RobocodeCompilerFactory {
 					JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE);
 
-			if (rc == JOptionPane.NO_OPTION) {
+			if (rc != JOptionPane.YES_OPTION) {
 				javacOK = false;
 			}
 		}

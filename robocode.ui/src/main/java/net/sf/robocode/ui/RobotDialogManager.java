@@ -29,6 +29,7 @@ public class RobotDialogManager implements IRobotDialogManager {
 
 	private final Map<String, RobotDialog> robotDialogMap = new ConcurrentHashMap<String, RobotDialog>();
 	private BattleDialog battleDialog = null;
+	private RobocodeFrame robocodeFrame;
 
 	public RobotDialogManager() {
 		super();
@@ -78,7 +79,7 @@ public class RobotDialogManager implements IRobotDialogManager {
 			robotDialog = Container.createComponent(RobotDialog.class);
 			robotDialog.setup(robotButton);
 			robotDialog.pack();
-			WindowUtil.place(robotDialog);
+			WindowUtil.place(robocodeFrame, robotDialog);
 			robotDialogMap.put(name, robotDialog);
 		}
 		return robotDialog;
@@ -89,9 +90,13 @@ public class RobotDialogManager implements IRobotDialogManager {
 		if (create && battleDialog == null) {
 			battleDialog = Container.getComponent(BattleDialog.class);
 			battleDialog.pack();
-			WindowUtil.place(battleDialog);
+			WindowUtil.place(robocodeFrame, battleDialog);
 		}
 		return battleDialog;
 	}
 
+	@Override
+	public void setRobocodeFrame(RobocodeFrame robocodeFrame) {
+		this.robocodeFrame = robocodeFrame;
+	}
 }

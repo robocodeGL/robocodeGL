@@ -146,7 +146,7 @@ public final class RobocodeMain extends RobocodeMainBase {
 
 				battleManager.setBattleFilename(setup.battleFilename);
 				if (new File(battleManager.getBattleFilename()).exists()) {
-					battleManager.startNewBattle(battleManager.loadBattleProperties(), false, enableCLIRecording);
+					battleManager.startNewBattleAsync(battleManager.loadBattleProperties(), false, enableCLIRecording);
 				} else {
 					System.err.println("The specified battle file '" + setup.battleFilename + "' was not found");
 					System.exit(8);
@@ -211,11 +211,11 @@ public final class RobocodeMain extends RobocodeMainBase {
 		// http://java.sun.com/developer/technicalArticles/J2SE/Desktop/headless/
 		System.setProperty("java.awt.headless", "false");
 
-		// Set UI scale to 1 for HiDPI if no UI scale has been set from the command line
-		// This way HiDPI will not affect Robocode, as 1x1 pixel is not affected by HiDPI scaling
-		if (System.getProperty("sun.java2d.uiScale") == null) {
-			System.setProperty("sun.java2d.uiScale", "1");
-		}
+		// // Set UI scale to 1 for HiDPI if no UI scale has been set from the command line
+		// // This way HiDPI will not affect Robocode, as 1x1 pixel is not affected by HiDPI scaling
+		// if (System.getProperty("sun.java2d.uiScale") == null) {
+		// 	System.setProperty("sun.java2d.uiScale", "1");
+		// }
 
 		for (int i = 0; i < args.length; i++) {
 			String currentArg = args[i];
@@ -261,6 +261,8 @@ public final class RobocodeMain extends RobocodeMainBase {
 			} else if (currentArg.equals("-?") || currentArg.equalsIgnoreCase("-help")) {
 				printUsage();
 				System.exit(0);
+			} else if (currentArg.startsWith("-NS")) {
+				i++;
 			} else {
 				Logger.logError("Not understood: " + currentArg);
 				printUsage();

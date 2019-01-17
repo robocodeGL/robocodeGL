@@ -1,9 +1,17 @@
-# Robocode
+# robocodeGL
+<img src="https://github.com/robocodeGL/robocodeGL/workflows/Java%20CI/badge.svg">
+
 #### *Build the best - destroy the rest!*
 
-Robocode is a programming game, where the goal is to develop a robot battle tank to battle against other tanks in Java. The robot battles are running in real-time and on-screen.
+**robocodeGL** is a recreation of the programming game [robocode](https://github.com/robo-code/robocode), where the goal is to develop a robot battle tank to battle against other tanks in Java. 
+The robot battles are either running in real-time and on-screen, or in full speed and off-screen.
 
-Read the [Introduction](https://robocode.sourceforge.io/docs/ReadMe.html) for Robocode.
+<img src="https://robocodeGL.github.io/imgs/robocodeGL-002@2x.png" width="912">
+  
+Read [Introduction](https://robocode.sourceforge.io/docs/ReadMe.html)  
+Continue reading on [Robocode home page](https://robocode.sourceforge.io/)  
+Learn from community at [RoboWiki](https://robowiki.net/)  
+Talk to developers at [robocode-developers](http://groups.google.com/group/robocode-developers)
 
 Continue reading on [Robocode home page](https://robocode.sourceforge.io/).
 

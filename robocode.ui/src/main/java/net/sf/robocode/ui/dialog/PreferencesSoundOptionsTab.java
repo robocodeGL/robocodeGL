@@ -54,6 +54,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		setLayout(new GridLayout(1, 2));
 
 		add(getSoundOptionsPanel());
@@ -65,6 +66,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JPanel getSoundOptionsPanel() {
 		if (soundOptionsPanel == null) {
 			soundOptionsPanel = new JPanel();
+			soundOptionsPanel.setOpaque(false);
 			soundOptionsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Sound Effects"));
 
@@ -105,6 +107,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableSoundCheckBox() {
 		if (enableSoundCheckBox == null) {
 			enableSoundCheckBox = new JCheckBox("Enable Sound");
+			enableSoundCheckBox.setOpaque(false);
 			enableSoundCheckBox.setMnemonic('E');
 		}
 		return enableSoundCheckBox;
@@ -113,6 +116,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableGunshotCheckBox() {
 		if (enableGunshotCheckBox == null) {
 			enableGunshotCheckBox = new JCheckBox("Gun Shots");
+			enableGunshotCheckBox.setOpaque(false);
 			enableGunshotCheckBox.setMnemonic('G');
 		}
 		return enableGunshotCheckBox;
@@ -121,6 +125,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableBulletHitCheckBox() {
 		if (enableBulletHitCheckBox == null) {
 			enableBulletHitCheckBox = new JCheckBox("Bullet Hit");
+			enableBulletHitCheckBox.setOpaque(false);
 			enableBulletHitCheckBox.setMnemonic('H');
 			enableBulletHitCheckBox.setDisplayedMnemonicIndex(7);
 		}
@@ -130,6 +135,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableRobotDeathCheckBox() {
 		if (enableRobotDeathCheckBox == null) {
 			enableRobotDeathCheckBox = new JCheckBox("Robot Death Explosions");
+			enableRobotDeathCheckBox.setOpaque(false);
 			enableRobotDeathCheckBox.setMnemonic('x');
 			enableRobotDeathCheckBox.setDisplayedMnemonicIndex(13);
 		}
@@ -139,6 +145,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableRobotCollisionCheckBox() {
 		if (enableRobotCollisionCheckBox == null) {
 			enableRobotCollisionCheckBox = new JCheckBox("Robot Collisions");
+			enableRobotCollisionCheckBox.setOpaque(false);
 			enableRobotCollisionCheckBox.setMnemonic('t');
 			enableRobotCollisionCheckBox.setDisplayedMnemonicIndex(4);
 		}
@@ -148,6 +155,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableWallCollisionCheckBox() {
 		if (enableWallCollisionCheckBox == null) {
 			enableWallCollisionCheckBox = new JCheckBox("Wall Collisions");
+			enableWallCollisionCheckBox.setOpaque(false);
 			enableWallCollisionCheckBox.setMnemonic('l');
 			enableWallCollisionCheckBox.setDisplayedMnemonicIndex(2);
 		}
@@ -157,6 +165,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JButton getEnableAllSoundsButton() {
 		if (enableAllSoundsButton == null) {
 			enableAllSoundsButton = new JButton("Enable all");
+			enableAllSoundsButton.setOpaque(false);
 			enableAllSoundsButton.setMnemonic('a');
 			enableAllSoundsButton.setDisplayedMnemonicIndex(7);
 			enableAllSoundsButton.addActionListener(eventHandler);
@@ -167,6 +176,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JButton getDisableAllSoundsButton() {
 		if (disableAllSoundsButton == null) {
 			disableAllSoundsButton = new JButton("Disable all");
+			disableAllSoundsButton.setOpaque(false);
 			disableAllSoundsButton.setMnemonic('i');
 			disableAllSoundsButton.setDisplayedMnemonicIndex(1);
 			disableAllSoundsButton.addActionListener(eventHandler);
@@ -177,6 +187,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JPanel getMixerOptionsPanel() {
 		if (mixerOptionsPanel == null) {
 			mixerOptionsPanel = new JPanel();
+			mixerOptionsPanel.setOpaque(false);
 			mixerOptionsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mixer"));
 
 			mixerOptionsPanel.setLayout(new GridBagLayout());
@@ -240,6 +251,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JButton getMixerDefaultButton() {
 		if (mixerDefaultButton == null) {
 			mixerDefaultButton = new JButton("Default");
+			mixerDefaultButton.setOpaque(false);
 			mixerDefaultButton.setMnemonic('u');
 			mixerDefaultButton.setDisplayedMnemonicIndex(4);
 			mixerDefaultButton.addActionListener(eventHandler);
@@ -250,6 +262,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableMixerVolumeCheckBox() {
 		if (enableMixerVolumeCheckBox == null) {
 			enableMixerVolumeCheckBox = new JCheckBox("Volume");
+			enableMixerVolumeCheckBox.setOpaque(false);
 			enableMixerVolumeCheckBox.setMnemonic('V');
 			enableMixerVolumeCheckBox.addActionListener(eventHandler);
 		}
@@ -259,6 +272,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JCheckBox getEnableMixerPanCheckBox() {
 		if (enableMixerPanCheckBox == null) {
 			enableMixerPanCheckBox = new JCheckBox("Pan");
+			enableMixerPanCheckBox.setOpaque(false);
 			enableMixerPanCheckBox.setMnemonic('P');
 			enableMixerPanCheckBox.addActionListener(eventHandler);
 		}
