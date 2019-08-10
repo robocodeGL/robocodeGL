@@ -9,6 +9,7 @@ package net.sf.robocode.ui.dialog;
 
 
 import net.sf.robocode.battle.IBattleManager;
+import net.sf.robocode.io.Logger;
 import net.sf.robocode.recording.IRecordManager;
 import net.sf.robocode.settings.ISettingsListener;
 import net.sf.robocode.settings.ISettingsManager;
@@ -175,7 +176,7 @@ public class RobocodeFrame extends JFrame {
 				newVersionAvailable = true;
 				if (Version.isFinal(newVersion)
 						|| (Version.isBeta(newVersion) && properties.getOptionsCommonNotifyAboutNewBetaVersions())) {
-					showNewVersion(newVersion);
+					showNewVersion(newVersion, false);
 				}
 			}
 		}
@@ -199,7 +200,11 @@ public class RobocodeFrame extends JFrame {
 				"No update available", JOptionPane.INFORMATION_MESSAGE);
 	}
 
-	private void showNewVersion(String newVersion) {
+	private void showNewVersion(String newVersion, boolean dialog) {
+		Logger.logMessage("Version " + newVersion + " of Robocode is now available. ");
+
+		if (!dialog) return;
+
 		if (JOptionPane.showConfirmDialog(this,
 				"Version " + newVersion + " of Robocode is now available.  Would you like to download it?",
 				"Version " + newVersion + " available", JOptionPane.YES_NO_OPTION)
