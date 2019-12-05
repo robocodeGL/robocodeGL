@@ -11,7 +11,7 @@
 	<id>setup</id>
 	<formats>
 		<format>dir</format>
-		<format>jar</format>
+<!--		<format>jar</format>-->
 	</formats>
 	<includeBaseDirectory>false</includeBaseDirectory>
 	<dependencySets>

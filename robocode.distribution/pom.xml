@@ -50,7 +50,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 					<ignoreDirFormatExtensions>true</ignoreDirFormatExtensions>
 					<descriptors>
 						<descriptor>setup.asm.xml</descriptor>
-						<descriptor>src.asm.xml</descriptor>
+<!--						<descriptor>src.asm.xml</descriptor>-->
 					</descriptors>
 					<archive>
 						<manifest>
