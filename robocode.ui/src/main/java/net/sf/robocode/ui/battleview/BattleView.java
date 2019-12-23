@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.battleview;
 
 
+import com.jogamp.opengl.util.FPSAnimator;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
 import net.sf.robocode.robotpaint.IGraphicsProxy;
@@ -144,6 +145,11 @@ public class BattleView extends GLG2DCanvas {
 
 		setDrawableComponent(new MyPanel());
 		setGLDrawing(true);
+
+		FPSAnimator animator = new FPSAnimator(60);
+		animator.add(this.getGLDrawable());
+
+		animator.start();
 	}
 
 	public BufferedImage getScreenshot() {
@@ -670,20 +676,15 @@ public class BattleView extends GLG2DCanvas {
 			super.onBattleStarted(event);
 
 			robotGraphics = new IGraphicsProxy[event.getRobotsCount()];
-
-			repaint();
 		}
 
 		@Override
 		public void onBattleFinished(BattleFinishedEvent event) {
 			super.onBattleFinished(event);
 			robotGraphics = null;
-
-			repaint();
 		}
 
 		public void onTurnEnded(final TurnEndedEvent event) {
-			repaint();
 		}
 	}
 }
