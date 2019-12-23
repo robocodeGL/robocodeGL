@@ -799,7 +799,7 @@ public class RobocodeFrame extends JFrame {
 			battleManager.pauseIfResumedBattle();
 		} else {
 			// Only set desired TPS if it is not set to zero
-			// properties.setOptionsBattleDesiredTPS(tps);
+			properties.setOptionsBattleDesiredTPS(tps);
 			battleManager.resumeIfPausedBattle(); // TODO causing problems when called from PreferencesViewOptionsTab.storePreferences()
 		}
 
