@@ -307,28 +307,29 @@ public abstract class BaseBattle implements IBattle, Runnable {
 	private void synchronizeTPS() {
 		// Let the battle sleep is the GUI is enabled and is not minimized
 		// in order to keep the desired TPS
-		//
-		// if (battleManager.isManagedTPS()) {
-		// 	long delay = 0;
-		//
-		// 	if (!isAborted() && endTimer < TURNS_DISPLAYED_AFTER_ENDING) {
-		// 		int desiredTPS = properties.getOptionsBattleDesiredTPS();
-		//
-		// 		if (desiredTPS < MAX_TPS) {
-		// 			long deltaTime = System.nanoTime() - turnStartTime;
-		//
-		// 			delay = Math.max(1000000000 / desiredTPS - deltaTime, 0);
-		// 		}
-		// 	}
-		// 	if (delay > 500000) { // sleep granularity is worse than 500000
-		// 		try {
-		// 			Thread.sleep(delay / 1000000, (int) (delay % 1000000));
-		// 		} catch (InterruptedException e) {
-		// 			// Immediately reasserts the exception by interrupting the caller thread itself
-		// 			Thread.currentThread().interrupt();
-		// 		}
-		// 	}
-		// }
+
+		if (battleManager.isManagedTPS()) {
+			long delay = 0;
+
+			if (!isAborted() && endTimer < TURNS_DISPLAYED_AFTER_ENDING) {
+				int desiredTPS = properties.getOptionsBattleDesiredTPS();
+
+				if (!(desiredTPS < 60.1)) {
+				// if (desiredTPS < MAX_TPS) {
+					long deltaTime = System.nanoTime() - turnStartTime;
+
+					delay = Math.max(1000000000 / desiredTPS - deltaTime, 0);
+				}
+			}
+			if (delay > 500000) { // sleep granularity is worse than 500000
+				try {
+					Thread.sleep(delay / 1000000, (int) (delay % 1000000));
+				} catch (InterruptedException e) {
+					// Immediately reasserts the exception by interrupting the caller thread itself
+					Thread.currentThread().interrupt();
+				}
+			}
+		}
 	}
 
 	private void calculateTPS() {
