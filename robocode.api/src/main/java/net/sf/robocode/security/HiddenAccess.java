@@ -19,7 +19,7 @@ import robocode.control.RobotSpecification;
 import robocode.control.events.IBattleListener;
 import robocode.robotinterfaces.IBasicRobot;
 
-import java.awt.*;
+import java.awt.Graphics2D;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.UnsupportedEncodingException;
@@ -173,6 +173,11 @@ public class HiddenAccess {
 					urls.add(url);
 				}
 				if (name.contains("kotlin-stdlib")) { // Kotlin standard library
+					urls.add(url);
+				}
+				if (name.contains("jogl") ||
+					name.contains("jogamp") ||
+					name.contains("gluegen")) { // JOGL
 					urls.add(url);
 				}
 				classPath.append(File.pathSeparator);
