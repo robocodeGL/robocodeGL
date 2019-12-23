@@ -635,7 +635,6 @@ public class BattleView extends GLG2DCanvas {
 		g.drawString(ROBOCODE_SLOGAN, (float) ((getWidth() - width) / 2.0), (float) (getHeight() / 2.0 + 50));
 	}
 
-	private double aimTPS = 30;
 	private long frameCount = 0L;
 
 	private static boolean eq(double a, double b) {
@@ -646,28 +645,21 @@ public class BattleView extends GLG2DCanvas {
 		return -1e-9 < a && a < 1e-9;
 	}
 
-	public void setAimTPS(double aimTPS) {
-		this.aimTPS = aimTPS;
-	}
-
 	private class MyPanel extends JPanel {
 		@Override
 		public void paint(Graphics g) {
-			if (eq(aimTPS, 30)) {
+			double desiredTPS = properties.getOptionsBattleDesiredTPS();
+
+			if (eq(desiredTPS, 30)) {
 				if ((frameCount & 1) == 0) {
 					windowManager.pollSnapshot();
 				}
-			} else if (eq(aimTPS, 60)) {
+			} else if (desiredTPS >= 59.9) {
 				windowManager.pollSnapshot();
 			} else {
-				int mod = (int) Math.floor(60 / aimTPS + 0.001);
+				int mod = (int) Math.floor(60 / desiredTPS + 0.001);
 				if (mod == 0) {
-					// todo this won't work
-					int num = (int) Math.round(aimTPS / 60);
-					if (num < 1) num = 1;
-					for (int i = 0; i < num; ++i) {
-						windowManager.pollSnapshot();
-					}
+					throw new IllegalStateException();
 				} else {
 					if ((frameCount % mod) == 0) {
 						windowManager.pollSnapshot();

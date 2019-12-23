@@ -12,6 +12,7 @@ import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.io.Logger;
+import net.sf.robocode.settings.ISettingsManager;
 import robocode.control.events.BattleAdaptor;
 import robocode.control.events.BattleCompletedEvent;
 import robocode.control.events.BattleErrorEvent;
@@ -40,6 +41,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class AwtBattleAdaptor {
 	private boolean isEnabled;
 	private final IBattleManager battleManager;
+	private final ISettingsManager properties;
 	private final BattleEventDispatcher battleEventDispatcher = new BattleEventDispatcher();
 	private final BattleObserver observer;
 
@@ -51,8 +53,9 @@ public final class AwtBattleAdaptor {
 	private ITurnSnapshot lastSnapshot;
 	private StringBuilder[] outCache;
 
-	public AwtBattleAdaptor(IBattleManager battleManager, int maxFps, boolean skipSameFrames) {
+	public AwtBattleAdaptor(IBattleManager battleManager, ISettingsManager properties, int maxFps, boolean skipSameFrames) {
 		this.battleManager = battleManager;
+		this.properties = properties;
 		snapshot = new ArrayBlockingQueue<Turn>(1);
 
 		this.skipSameFrames = skipSameFrames;
@@ -190,11 +193,8 @@ public final class AwtBattleAdaptor {
 		public void onTurnEnded(final TurnEndedEvent event) {
 			if (lastMajorEvent.get() == majorEvent.get()) {
 				// snapshot is updated out of order, but always within the same major event
-				try {
-					snapshot.put(new Turn(event.getTurnSnapshot()));
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
+
+				putSnapshot(event.getTurnSnapshot());
 			}
 
 			final IRobotSnapshot[] robots = event.getTurnSnapshot().getRobots();
@@ -225,11 +225,7 @@ public final class AwtBattleAdaptor {
 		@Override
 		public void onRoundStarted(final RoundStartedEvent event) {
 			if (lastMajorEvent.get() == majorEvent.get()) {
-				try {
-					snapshot.put(new Turn(event.getStartSnapshot()));
-				} catch (InterruptedException e) {
-					Thread.currentThread().interrupt();
-				}
+				putSnapshot(event.getStartSnapshot());
 			}
 			majorEvent.incrementAndGet();
 			EventQueue.invokeLater(new Runnable() {
@@ -254,11 +250,7 @@ public final class AwtBattleAdaptor {
 							outCache[i] = new StringBuilder(1024);
 						}
 					}
-					try {
-						snapshot.put(new Turn(null));
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
+					putSnapshot(null);
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
 					awtOnTurnEnded(true, false);
@@ -278,11 +270,7 @@ public final class AwtBattleAdaptor {
 
 					battleEventDispatcher.onBattleFinished(event);
 					lastMajorEvent.incrementAndGet();
-					try {
-						snapshot.put(new Turn(null));
-					} catch (InterruptedException e) {
-						Thread.currentThread().interrupt();
-					}
+					putSnapshot(null);
 
 					// paint logo
 					awtOnTurnEnded(true, true);
@@ -353,6 +341,18 @@ public final class AwtBattleAdaptor {
 					battleEventDispatcher.onBattleError(event);
 				}
 			});
+		}
+	}
+
+	private void putSnapshot(ITurnSnapshot turnSnapshot) {
+		if (properties.getOptionsBattleDesiredTPS() < 10000) {
+			try {
+				snapshot.put(new Turn(turnSnapshot));
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
+			}
+		} else {
+			snapshot.offer(new Turn(turnSnapshot));
 		}
 	}
 }
