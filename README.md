@@ -1,5 +1,6 @@
 # Robocode
 #### *Build the best - destroy the rest!*
+<img src="https://github.com/robocoding/RobocodeGL/workflows/Java%20CI/badge.svg">
 
 Robocode is a programming game, where the goal is to develop a robot battle tank to battle against other tanks in Java or .NET. The robot battles are running in real-time and on-screen.
   
