@@ -31,6 +31,7 @@ import robocode.control.snapshot.ITurnSnapshot;
 import java.awt.EventQueue;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -348,9 +349,9 @@ public final class AwtBattleAdaptor {
 	}
 
 	private void putSnapshot(ITurnSnapshot turnSnapshot) {
-		if (properties.getOptionsBattleDesiredTPS() < 60.1) {
+		if (battleManager.isManagedTPS() && properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
-				snapshot.put(new Turn(turnSnapshot));
+				snapshot.offer(new Turn(turnSnapshot), 1500, TimeUnit.MILLISECONDS); // prevent deadlock
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}

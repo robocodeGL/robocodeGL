@@ -112,6 +112,7 @@ public class BattleManager implements IBattleManager {
 		startNewBattleImpl(robots, waitTillOver, enableCLIRecording);
 	}
 
+	// TODO Never block GUI thread. Use a separate managing thread for async logic.
 	private void startNewBattleImpl(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableCLIRecording) {
 		stop(true);
 
