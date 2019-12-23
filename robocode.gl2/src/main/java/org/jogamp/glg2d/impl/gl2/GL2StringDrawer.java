@@ -25,6 +25,7 @@ import java.util.HashMap;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.fixedfunc.GLMatrixFunc;
 
+import net.sf.robocode.io.Logger;
 import org.jogamp.glg2d.impl.AbstractTextDrawer;
 
 import com.jogamp.opengl.util.awt.TextRenderer;
@@ -63,6 +64,8 @@ public class GL2StringDrawer extends AbstractTextDrawer {
   @Override
   public void drawString(String string, int x, int y) {
     TextRenderer renderer = getRenderer(getFont());
+
+    if (renderer == null) return;
 
     begin(renderer);
     renderer.draw3D(string, x, g2d.getCanvasHeight() - y, 0, 1);
@@ -121,7 +124,11 @@ public class GL2StringDrawer extends AbstractTextDrawer {
       TextRenderer renderer = renderers[antiAlias ? 1 : 0];
 
       if (renderer == null) {
-        renderer = new TextRenderer(font, antiAlias, false);
+        try {
+          renderer = new TextRenderer(font, antiAlias, false);
+        } catch (NullPointerException ignore) {
+          return null;
+        }
         renderers[antiAlias ? 1 : 0] = renderer;
       }
 
