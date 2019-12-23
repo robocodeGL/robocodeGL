@@ -642,7 +642,7 @@ public class BattleView extends GLG2DCanvas {
 	}
 
 	private static boolean eqZero(double a) {
-		return -1e-9 < a && a < 1e-9;
+		return -0.1 < a && a < 0.1;
 	}
 
 	private class MyPanel extends JPanel {

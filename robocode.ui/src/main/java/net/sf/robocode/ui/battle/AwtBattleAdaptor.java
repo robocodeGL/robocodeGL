@@ -191,11 +191,11 @@ public final class AwtBattleAdaptor {
 
 		@Override
 		public void onTurnEnded(final TurnEndedEvent event) {
-			if (lastMajorEvent.get() == majorEvent.get()) {
-				// snapshot is updated out of order, but always within the same major event
-
-				putSnapshot(event.getTurnSnapshot());
-			}
+			// if (lastMajorEvent.get() == majorEvent.get()) {
+			// 	// snapshot is updated out of order, but always within the same major event
+			//
+			putSnapshot(event.getTurnSnapshot());
+			// }
 
 			final IRobotSnapshot[] robots = event.getTurnSnapshot().getRobots();
 
@@ -222,7 +222,7 @@ public final class AwtBattleAdaptor {
 			// 	}
 			// });
 
-			putSnapshot(event.getTurnSnapshot());
+			// putSnapshot(event.getTurnSnapshot());
 		}
 
 		@Override
