@@ -27,6 +27,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
 		<module>robocode.repository</module>
 		<module>robocode.content</module>
 		<module>robocode.distribution</module>
+		<module>robocode.gl2</module>
 	</modules>
 	<build>
 		<plugins>
