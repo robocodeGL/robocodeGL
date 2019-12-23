@@ -134,7 +134,7 @@ public abstract class AbstractTextDrawer implements GLG2DTextHelper {
   public static Font getDefaultFont() {
     Font arial = DEFAULT_FONT.get();
     if (arial == null) {
-      DEFAULT_FONT.set(arial = new Font("Arial", Font.PLAIN, 12));
+      DEFAULT_FONT.set(arial = new Font("Arial", Font.PLAIN, 10));
     }
     return arial;
   }
