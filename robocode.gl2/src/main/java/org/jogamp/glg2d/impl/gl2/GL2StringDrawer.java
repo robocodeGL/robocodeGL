@@ -126,7 +126,8 @@ public class GL2StringDrawer extends AbstractTextDrawer {
       if (renderer == null) {
         try {
           renderer = new TextRenderer(font, antiAlias, false);
-        } catch (NullPointerException ignore) {
+        } catch (NullPointerException ex) {
+          ex.printStackTrace();
           return null;
         }
         renderers[antiAlias ? 1 : 0] = renderer;
