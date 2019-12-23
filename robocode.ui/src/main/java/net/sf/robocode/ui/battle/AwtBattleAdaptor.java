@@ -215,11 +215,14 @@ public final class AwtBattleAdaptor {
 					});
 				}
 			}
-			EventQueue.invokeLater(new Runnable() {
-				public void run() {
-					awtOnTurnEnded(false, true);
-				}
-			});
+
+			// EventQueue.invokeLater(new Runnable() {
+			// 	public void run() {
+			// 		awtOnTurnEnded(false, true);
+			// 	}
+			// });
+
+			putSnapshot(event.getTurnSnapshot());
 		}
 
 		@Override
