@@ -134,6 +134,11 @@ public class WindowManager implements IWindowManagerExt {
 		return awtAdaptor.getLastSnapshot();
 	}
 
+	@Override
+	public void pollSnapshot() {
+		awtAdaptor.pollFrame(false, true);
+	}
+
 	public int getFPS() {
 		return isIconified() ? 0 : awtAdaptor.getFPS();
 	}

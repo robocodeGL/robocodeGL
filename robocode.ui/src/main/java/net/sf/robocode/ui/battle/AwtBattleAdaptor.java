@@ -12,16 +12,25 @@ import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.io.Logger;
-import robocode.control.events.*;
+import robocode.control.events.BattleAdaptor;
+import robocode.control.events.BattleCompletedEvent;
+import robocode.control.events.BattleErrorEvent;
+import robocode.control.events.BattleFinishedEvent;
+import robocode.control.events.BattleMessageEvent;
+import robocode.control.events.BattlePausedEvent;
+import robocode.control.events.BattleResumedEvent;
+import robocode.control.events.BattleStartedEvent;
+import robocode.control.events.IBattleListener;
+import robocode.control.events.RoundEndedEvent;
+import robocode.control.events.RoundStartedEvent;
+import robocode.control.events.TurnEndedEvent;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.EventQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -33,9 +42,8 @@ public final class AwtBattleAdaptor {
 	private final IBattleManager battleManager;
 	private final BattleEventDispatcher battleEventDispatcher = new BattleEventDispatcher();
 	private final BattleObserver observer;
-	private final Timer timerTask;
 
-	private final AtomicReference<ITurnSnapshot> snapshot;
+	private final BlockingQueue<Turn> snapshot;
 	private final AtomicBoolean isRunning;
 	private final AtomicBoolean isPaused;
 	private final AtomicInteger majorEvent;
@@ -45,10 +53,9 @@ public final class AwtBattleAdaptor {
 
 	public AwtBattleAdaptor(IBattleManager battleManager, int maxFps, boolean skipSameFrames) {
 		this.battleManager = battleManager;
-		snapshot = new AtomicReference<ITurnSnapshot>(null);
+		snapshot = new ArrayBlockingQueue<Turn>(1);
 
 		this.skipSameFrames = skipSameFrames;
-		timerTask = new Timer(1000 / maxFps, new TimerTask());
 		isRunning = new AtomicBoolean(false);
 		isPaused = new AtomicBoolean(false);
 		majorEvent = new AtomicInteger(0);
@@ -59,7 +66,6 @@ public final class AwtBattleAdaptor {
 
 	protected void finalize() throws Throwable {
 		try {
-			timerTask.stop();
 			battleManager.removeListener(observer);
 		} finally {
 			super.finalize();
@@ -69,7 +75,6 @@ public final class AwtBattleAdaptor {
 	public void subscribe(boolean isEnabled) {
 		if (this.isEnabled && !isEnabled) {
 			battleManager.removeListener(observer);
-			timerTask.stop();
 			isEnabled = false;
 		} else if (!this.isEnabled && isEnabled) {
 			battleManager.addListener(observer);
@@ -91,8 +96,23 @@ public final class AwtBattleAdaptor {
 
 	// this is always dispatched on AWT thread
 	private void awtOnTurnEnded(boolean forceRepaint, boolean readoutText) {
+	}
+
+	private static final class Turn {
+		final ITurnSnapshot current;
+
+		private Turn(ITurnSnapshot current) {
+			this.current = current;
+		}
+	}
+
+	public void pollFrame(boolean forceRepaint, boolean readoutText) {
 		try {
-			ITurnSnapshot current = snapshot.get();
+			Turn turn = snapshot.poll();
+
+			if (turn == null) return;
+
+			ITurnSnapshot current = turn.current;
 
 			if (current == null) { // !isRunning.get() ||
 				// paint logo
@@ -162,13 +182,6 @@ public final class AwtBattleAdaptor {
 		}
 	}
 
-	private class TimerTask implements ActionListener {
-		public void actionPerformed(ActionEvent e) {
-			awtOnTurnEnded(false, true);
-		}
-	}
-
-
 	// BattleObserver methods are always called by battle thread
 	// but everything inside invokeLater {} block in on AWT thread 
 	private class BattleObserver extends BattleAdaptor {
@@ -177,7 +190,11 @@ public final class AwtBattleAdaptor {
 		public void onTurnEnded(final TurnEndedEvent event) {
 			if (lastMajorEvent.get() == majorEvent.get()) {
 				// snapshot is updated out of order, but always within the same major event
-				snapshot.set(event.getTurnSnapshot());
+				try {
+					snapshot.put(new Turn(event.getTurnSnapshot()));
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 
 			final IRobotSnapshot[] robots = event.getTurnSnapshot().getRobots();
@@ -198,19 +215,21 @@ public final class AwtBattleAdaptor {
 					});
 				}
 			}
-			if (isPaused.get()) {
-				EventQueue.invokeLater(new Runnable() {
-					public void run() {
-						awtOnTurnEnded(false, true);
-					}
-				});
-			}
+			EventQueue.invokeLater(new Runnable() {
+				public void run() {
+					awtOnTurnEnded(false, true);
+				}
+			});
 		}
 
 		@Override
 		public void onRoundStarted(final RoundStartedEvent event) {
 			if (lastMajorEvent.get() == majorEvent.get()) {
-				snapshot.set(event.getStartSnapshot());
+				try {
+					snapshot.put(new Turn(event.getStartSnapshot()));
+				} catch (InterruptedException e) {
+					Thread.currentThread().interrupt();
+				}
 			}
 			majorEvent.incrementAndGet();
 			EventQueue.invokeLater(new Runnable() {
@@ -235,11 +254,14 @@ public final class AwtBattleAdaptor {
 							outCache[i] = new StringBuilder(1024);
 						}
 					}
-					snapshot.set(null);
+					try {
+						snapshot.put(new Turn(null));
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
 					awtOnTurnEnded(true, false);
-					timerTask.start();
 				}
 			});
 		}
@@ -251,13 +273,16 @@ public final class AwtBattleAdaptor {
 				public void run() {
 					isRunning.set(false);
 					isPaused.set(false);
-					timerTask.stop();
 					// flush text cache
 					awtOnTurnEnded(true, true);
 
 					battleEventDispatcher.onBattleFinished(event);
 					lastMajorEvent.incrementAndGet();
-					snapshot.set(null);
+					try {
+						snapshot.put(new Turn(null));
+					} catch (InterruptedException e) {
+						Thread.currentThread().interrupt();
+					}
 
 					// paint logo
 					awtOnTurnEnded(true, true);
@@ -293,7 +318,6 @@ public final class AwtBattleAdaptor {
 		public void onBattlePaused(final BattlePausedEvent event) {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					timerTask.stop();
 					battleEventDispatcher.onBattlePaused(event);
 					awtOnTurnEnded(true, true);
 					isPaused.set(true);
@@ -307,7 +331,6 @@ public final class AwtBattleAdaptor {
 				public void run() {
 					battleEventDispatcher.onBattleResumed(event);
 					if (isRunning.get()) {
-						timerTask.start();
 						isPaused.set(false);
 					}
 				}

@@ -638,6 +638,7 @@ public class BattleView extends GLG2DCanvas {
 	private class MyPanel extends JPanel {
 		@Override
 		public void paint(Graphics g) {
+			windowManager.pollSnapshot();
 			final ITurnSnapshot lastSnapshot = windowManager.getLastSnapshot();
 			if (lastSnapshot != null) {
 				update(lastSnapshot, g);
