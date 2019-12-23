@@ -348,7 +348,7 @@ public final class AwtBattleAdaptor {
 	}
 
 	private void putSnapshot(ITurnSnapshot turnSnapshot) {
-		if (properties.getOptionsBattleDesiredTPS() < 10000) {
+		if (properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
 				snapshot.put(new Turn(turnSnapshot));
 			} catch (InterruptedException e) {
