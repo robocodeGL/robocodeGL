@@ -721,7 +721,7 @@ public class RobocodeFrame extends JFrame {
 			if (source == getPauseButton()) {
 				pauseResumeButtonActionPerformed();
 			} else if (source == getStopButton()) {
-				battleManager.stop(false);
+				battleManager.stopAsync(false);
 			} else if (source == getRestartButton()) {
 				battleManager.restart();
 			} else if (source == getNextTurnButton()) {

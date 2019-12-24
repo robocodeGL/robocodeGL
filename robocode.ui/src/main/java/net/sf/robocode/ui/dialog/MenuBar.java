@@ -275,7 +275,7 @@ public class MenuBar extends JMenuBar {
 			String path = windowManager.showBattleOpenDialog(".br", "Records");
 
 			if (path != null) {
-				battleManager.stop(true);
+				battleManager.stopAsync(true);
 
 				robocodeFrame.getReplayButton().setVisible(true);
 				robocodeFrame.getReplayButton().setEnabled(true);
@@ -303,7 +303,7 @@ public class MenuBar extends JMenuBar {
 			String path = windowManager.showBattleOpenDialog(".br.xml", "XML Records");
 
 			if (path != null) {
-				battleManager.stop(true);
+				battleManager.stopAsync(true);
 
 				robocodeFrame.getReplayButton().setVisible(true);
 				robocodeFrame.getReplayButton().setEnabled(true);

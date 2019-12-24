@@ -266,7 +266,7 @@ public class RobocodeEngine implements IRobocodeEngine {
 	 * {@inheritDoc}
 	 */
 	public void abortCurrentBattle() {
-		ContainerBase.getComponent(IBattleManagerBase.class).stop(true);
+		ContainerBase.getComponent(IBattleManagerBase.class).stopSync(true);
 	}
 
 	/**
