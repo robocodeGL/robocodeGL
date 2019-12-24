@@ -497,6 +497,8 @@ public class WindowManager implements IWindowManagerExt {
 			WindowUtil.packCenterShow(getRobocodeFrame(), battleDialog);
 		} finally {
 			battleManager.resumeBattle();
+
+			robocodeFrame.updateRestartButtonStatus();
 		}
 	}
 
