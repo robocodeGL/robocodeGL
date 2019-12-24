@@ -54,6 +54,8 @@ public final class AwtBattleAdaptor {
 	private ITurnSnapshot lastSnapshot;
 	private StringBuilder[] outCache;
 
+	private volatile boolean frameSync = false;
+
 	public AwtBattleAdaptor(IBattleManager battleManager, ISettingsManager properties, int maxFps, boolean skipSameFrames) {
 		this.battleManager = battleManager;
 		this.properties = properties;
@@ -70,6 +72,7 @@ public final class AwtBattleAdaptor {
 
 	protected void finalize() throws Throwable {
 		try {
+			frameSync = false;
 			battleManager.removeListener(observer);
 		} finally {
 			super.finalize();
@@ -79,6 +82,7 @@ public final class AwtBattleAdaptor {
 	public void subscribe(boolean isEnabled) {
 		if (this.isEnabled && !isEnabled) {
 			battleManager.removeListener(observer);
+			frameSync = false;
 			isEnabled = false;
 		} else if (!this.isEnabled && isEnabled) {
 			battleManager.addListener(observer);
@@ -195,7 +199,7 @@ public final class AwtBattleAdaptor {
 			// if (lastMajorEvent.get() == majorEvent.get()) {
 			// 	// snapshot is updated out of order, but always within the same major event
 			//
-			putSnapshot(event.getTurnSnapshot());
+			// putSnapshot(event.getTurnSnapshot());
 			// }
 
 			final IRobotSnapshot[] robots = event.getTurnSnapshot().getRobots();
@@ -223,7 +227,7 @@ public final class AwtBattleAdaptor {
 			// 	}
 			// });
 
-			// putSnapshot(event.getTurnSnapshot());
+			putSnapshot(event.getTurnSnapshot());
 		}
 
 		@Override
@@ -260,6 +264,7 @@ public final class AwtBattleAdaptor {
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
 					awtOnTurnEnded(true, false);
+					frameSync = true;
 				}
 			});
 		}
@@ -271,6 +276,7 @@ public final class AwtBattleAdaptor {
 				public void run() {
 					isRunning.set(false);
 					isPaused.set(false);
+					frameSync = false;
 					// flush text cache
 					awtOnTurnEnded(true, true);
 
@@ -313,6 +319,7 @@ public final class AwtBattleAdaptor {
 		public void onBattlePaused(final BattlePausedEvent event) {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
+					frameSync = false;
 					battleEventDispatcher.onBattlePaused(event);
 					awtOnTurnEnded(true, true);
 					isPaused.set(true);
@@ -326,6 +333,7 @@ public final class AwtBattleAdaptor {
 				public void run() {
 					battleEventDispatcher.onBattleResumed(event);
 					if (isRunning.get()) {
+						frameSync = true;
 						isPaused.set(false);
 					}
 				}
@@ -352,7 +360,7 @@ public final class AwtBattleAdaptor {
 	}
 
 	private void putSnapshot(ITurnSnapshot turnSnapshot) {
-		if (battleManager.isManagedTPS() && properties.getOptionsBattleDesiredTPS() < 60.1) {
+		if (frameSync && properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
 				snapshot.offer(new Turn(turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
