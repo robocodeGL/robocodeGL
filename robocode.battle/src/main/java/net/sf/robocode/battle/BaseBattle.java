@@ -8,11 +8,11 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
+import net.sf.robocode.async.ResolveConsumer;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.URLJarCollector;
-import static net.sf.robocode.io.Logger.logError;
-import static net.sf.robocode.io.Logger.logMessage;
 import net.sf.robocode.settings.ISettingsManager;
 import robocode.BattleRules;
 import robocode.control.events.BattlePausedEvent;
@@ -21,6 +21,9 @@ import robocode.control.events.BattleResumedEvent;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static net.sf.robocode.io.Logger.logError;
+import static net.sf.robocode.io.Logger.logMessage;
 
 
 /**
@@ -386,6 +389,32 @@ public abstract class BaseBattle implements IBattle, Runnable {
 		if (waitTillEnd) {
 			waitTillOver();
 		}
+	}
+
+	@Override
+	public Promise asyncStopAndWait() {
+		stop(false);
+		return asyncWaitTillOver();
+	}
+
+	@Override
+	public Promise asyncWaitTillOver() {
+		return Promise.fromSync(new Runnable() {
+			@Override
+			public void run() {
+				waitTillOver();
+			}
+		});
+	}
+
+	@Override
+	public Promise asyncWaitTillStarted() {
+		return Promise.fromSync(new Runnable() {
+			@Override
+			public void run() {
+				waitTillStarted();
+			}
+		});
 	}
 
 	public void pause() {
