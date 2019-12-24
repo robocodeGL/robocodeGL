@@ -82,7 +82,7 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized void cleanup() {
-		busyPromise.then(new PromiseSupplier() {
+		busyPromise = busyPromise.then(new PromiseSupplier() {
 			@Override
 			public Promise get() {
 				return Promise.fromSync(new Runnable() {
@@ -107,7 +107,7 @@ public class BattleManager implements IBattleManager {
 		this.battleProperties = battleProperties;
 		final RobotSpecification[] robots = repositoryManager.loadSelectedRobots(battleProperties.getSelectedRobots());
 
-		return startNewBattleAsync(robots, waitTillOver, enableCLIRecording);
+		return busyPromise = startNewBattleAsync(robots, waitTillOver, enableCLIRecording);
 	}
 
 	// Called from the RobocodeEngine
@@ -345,7 +345,7 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized Promise stopAsync(final boolean waitTillEnd) {
-		return stopAsyncInternal(busyPromise, waitTillEnd);
+		return busyPromise = stopAsyncInternal(busyPromise, waitTillEnd);
 	}
 
 	private Promise stopAsyncInternal(final Promise condition, final boolean waitTillEnd) {
