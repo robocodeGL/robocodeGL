@@ -254,7 +254,9 @@ public final class AwtBattleAdaptor {
 							outCache[i] = new StringBuilder(1024);
 						}
 					}
+					lastSnapshot = null;
 					putSnapshot(null);
+
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
 					awtOnTurnEnded(true, false);
@@ -274,6 +276,7 @@ public final class AwtBattleAdaptor {
 
 					battleEventDispatcher.onBattleFinished(event);
 					lastMajorEvent.incrementAndGet();
+					lastSnapshot = null;
 					putSnapshot(null);
 
 					// paint logo
