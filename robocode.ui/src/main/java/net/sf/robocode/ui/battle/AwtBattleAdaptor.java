@@ -319,7 +319,7 @@ public final class AwtBattleAdaptor {
 		public void onBattlePaused(final BattlePausedEvent event) {
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					frameSync = false;
+					// frameSync = false;
 					battleEventDispatcher.onBattlePaused(event);
 					awtOnTurnEnded(true, true);
 					isPaused.set(true);
@@ -333,7 +333,7 @@ public final class AwtBattleAdaptor {
 				public void run() {
 					battleEventDispatcher.onBattleResumed(event);
 					if (isRunning.get()) {
-						frameSync = true;
+						// frameSync = true;
 						isPaused.set(false);
 					}
 				}
