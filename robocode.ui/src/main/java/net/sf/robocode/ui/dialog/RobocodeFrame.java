@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.dialog;
 
 
+import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.recording.IRecordManager;
@@ -718,17 +719,42 @@ public class RobocodeFrame extends JFrame {
 		public void actionPerformed(ActionEvent e) {
 			final Object source = e.getSource();
 
+			Promise then = Promise.resolved();
+
 			if (source == getPauseButton()) {
 				pauseResumeButtonActionPerformed();
 			} else if (source == getStopButton()) {
-				battleManager.stopAsync(false);
+				then = battleManager.stopAsync(true);
 			} else if (source == getRestartButton()) {
-				battleManager.restart();
+				then = battleManager.restart();
 			} else if (source == getNextTurnButton()) {
 				battleManager.nextTurn();
 			} else if (source == getReplayButton()) {
 				battleManager.replay();
 			}
+
+			final boolean enableStopButton = getStopButton().isEnabled();
+			final boolean enablePauseButton = getPauseButton().isEnabled();
+			final boolean enableNextTurnButton = getNextTurnButton().isEnabled();
+			final boolean enableRestartButton = getRestartButton().isEnabled();
+			final boolean enableReplayButton = getReplayButton().isEnabled();
+
+			getStopButton().setEnabled(false);
+			getPauseButton().setEnabled(false);
+			getNextTurnButton().setEnabled(false);
+			getRestartButton().setEnabled(false);
+			getReplayButton().setEnabled(false);
+
+			then.then(new Runnable() {
+				@Override
+				public void run() {
+					getStopButton().setEnabled(enableStopButton);
+					getPauseButton().setEnabled(enablePauseButton);
+					getNextTurnButton().setEnabled(enableNextTurnButton);
+					getRestartButton().setEnabled(enableRestartButton);
+					getReplayButton().setEnabled(enableReplayButton);
+				}
+			});
 		}
 
 		public void componentResized(ComponentEvent e) {

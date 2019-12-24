@@ -69,7 +69,7 @@ public interface IBattleManager extends IBattleManagerBase {
 
 	void pauseIfResumedBattle(); // TODO refactor, remove
 
-	void restart();
+	Promise restart();
 
 	void replay();
 
