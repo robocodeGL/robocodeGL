@@ -747,7 +747,7 @@ public class WindowManager implements IWindowManagerExt {
 
 			showResults = false;
 			try {
-				battleManager.startNewBattle(battleManager.loadBattleProperties(), true, false);
+				battleManager.startNewBattleAsync(battleManager.loadBattleProperties(), true, false);
 				battleManager.setDefaultBattleProperties();
 				robocodeFrame.afterIntroBattle();
 			} finally {

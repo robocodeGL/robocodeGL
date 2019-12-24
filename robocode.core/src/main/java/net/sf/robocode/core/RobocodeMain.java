@@ -151,7 +151,7 @@ public final class RobocodeMain extends RobocodeMainBase {
 
 				battleManager.setBattleFilename(setup.battleFilename);
 				if (new File(battleManager.getBattleFilename()).exists()) {
-					battleManager.startNewBattle(battleManager.loadBattleProperties(), false, enableCLIRecording);
+					battleManager.startNewBattleAsync(battleManager.loadBattleProperties(), false, enableCLIRecording);
 				} else {
 					System.err.println("The specified battle file '" + setup.battleFilename + "' was not found");
 					System.exit(8);

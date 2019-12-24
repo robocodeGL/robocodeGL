@@ -8,6 +8,8 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
+import net.sf.robocode.async.PromiseSupplier;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.core.Container;
 import net.sf.robocode.host.ICpuManager;
@@ -15,8 +17,6 @@ import net.sf.robocode.host.IHostManager;
 import net.sf.robocode.io.FileUtil;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.RobocodeProperties;
-import static net.sf.robocode.io.Logger.logError;
-import static net.sf.robocode.io.Logger.logMessage;
 import net.sf.robocode.recording.BattlePlayer;
 import net.sf.robocode.recording.IRecordManager;
 import net.sf.robocode.repository.IRepositoryManager;
@@ -30,8 +30,15 @@ import robocode.control.events.BattlePausedEvent;
 import robocode.control.events.BattleResumedEvent;
 import robocode.control.events.IBattleListener;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import static net.sf.robocode.io.Logger.logError;
+import static net.sf.robocode.io.Logger.logMessage;
 
 
 /**
@@ -61,6 +68,8 @@ public class BattleManager implements IBattleManager {
 	private int pauseCount = 0;
 	private final AtomicBoolean isManagedTPS = new AtomicBoolean(false);
 
+	private volatile boolean isBusy = false;
+
 	public BattleManager(ISettingsManager properties, IRepositoryManager repositoryManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher battleEventDispatcher, IRecordManager recordManager) { // NO_UCD (unused code)
 		this.properties = properties;
 		this.recordManager = recordManager;
@@ -81,11 +90,11 @@ public class BattleManager implements IBattleManager {
 	}
 
 	// Called when starting a new battle from GUI
-	public void startNewBattle(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording) {
+	public Promise startNewBattleAsync(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording) {
 		this.battleProperties = battleProperties;
 		final RobotSpecification[] robots = repositoryManager.loadSelectedRobots(battleProperties.getSelectedRobots());
 
-		startNewBattleImpl(robots, waitTillOver, enableCLIRecording);
+		return startNewBattleAsync(robots, waitTillOver, enableCLIRecording);
 	}
 
 	// Called from the RobocodeEngine
@@ -109,13 +118,65 @@ public class BattleManager implements IBattleManager {
 
 		final RobotSpecification[] robots = repositoryManager.loadSelectedRobots(spec.getRobots());
 
-		startNewBattleImpl(robots, waitTillOver, enableCLIRecording);
+		startNewBattleSync(robots, waitTillOver, enableCLIRecording);
 	}
 
-	// TODO Never block GUI thread. Use a separate managing thread for async logic.
-	private void startNewBattleImpl(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableCLIRecording) {
+	private Promise startNewBattleAsync(final RobotSpecification[] battlingRobotsList, final boolean waitTillOver, final boolean enableCLIRecording) {
+		if (isBusy) {
+			throw new IllegalStateException("BattleManager is busy");
+		}
+
+		isBusy = true;
+
+		stop(false);
+		return battle.asyncWaitTillOver()
+			.then(new PromiseSupplier() {
+				@Override
+				public Promise get() {
+					final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
+
+					// Start the realBattle thread
+					battleThread.start();
+
+					// Wait until the realBattle is running and ended.
+					// This must be done as a new realBattle could be started immediately after this one causing
+					// multiple realBattle threads to run at the same time, which must be prevented!
+					return realBattle.asyncWaitTillStarted()
+						.then(new PromiseSupplier() {
+							@Override
+							public Promise get() {
+								return waitTillOver ? realBattle.asyncWaitTillOver() : Promise.resolved();
+							}
+						});
+				}
+			})
+			.then(new Runnable() {
+				@Override
+				public void run() {
+					// todo finally block equivalent
+					isBusy = false;
+				}
+			});
+	}
+
+	private void startNewBattleSync(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableCLIRecording) {
 		stop(true);
 
+		Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
+
+		// Start the realBattle thread
+		battleThread.start();
+
+		// Wait until the realBattle is running and ended.
+		// This must be done as a new realBattle could be started immediately after this one causing
+		// multiple realBattle threads to run at the same time, which must be prevented!
+		realBattle.waitTillStarted();
+		if (waitTillOver) {
+			realBattle.waitTillOver();
+		}
+	}
+
+	private Battle prepareRealBattle(RobotSpecification[] battlingRobotsList, boolean enableCLIRecording) {
 		logMessage("Preparing battle...");
 
 		final boolean recording = (properties.getOptionsCommonEnableReplayRecording()
@@ -151,17 +212,7 @@ public class BattleManager implements IBattleManager {
 		if (RobocodeProperties.isSecurityOn()) {
 			hostManager.addSafeThread(battleThread);
 		}
-
-		// Start the realBattle thread
-		battleThread.start();
-
-		// Wait until the realBattle is running and ended.
-		// This must be done as a new realBattle could be started immediately after this one causing
-		// multiple realBattle threads to run at the same time, which must be prevented!
-		realBattle.waitTillStarted();
-		if (waitTillOver) {
-			realBattle.waitTillOver();
-		}
+		return realBattle;
 	}
 
 	public void waitTillOver() {
@@ -301,7 +352,7 @@ public class BattleManager implements IBattleManager {
 
 	public synchronized void restart() {
 		// Start new battle. The old battle is automatically stopped
-		startNewBattle(battleProperties, false, false);
+		startNewBattleAsync(battleProperties, false, false);
 	}
 
 	public synchronized void replay() {
