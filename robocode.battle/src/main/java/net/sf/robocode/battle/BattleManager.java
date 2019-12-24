@@ -74,11 +74,8 @@ public class BattleManager implements IBattleManager {
 
 	public synchronized void cleanup() {
 		if (battle != null) {
-			boolean old = isManagedTPS();
-			setManagedTPS(false);
 			battle.waitTillOver();
 			battle.cleanup();
-			setManagedTPS(old);
 		}
 		battle = null;
 	}
@@ -117,9 +114,6 @@ public class BattleManager implements IBattleManager {
 
 	// TODO Never block GUI thread. Use a separate managing thread for async logic.
 	private void startNewBattleImpl(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableCLIRecording) {
-		boolean old = isManagedTPS();
-		setManagedTPS(false);
-
 		stop(true);
 
 		logMessage("Preparing battle...");
@@ -168,16 +162,11 @@ public class BattleManager implements IBattleManager {
 		if (waitTillOver) {
 			realBattle.waitTillOver();
 		}
-
-		setManagedTPS(old);
 	}
 
 	public void waitTillOver() {
 		if (battle != null) {
-			boolean old = isManagedTPS();
-			setManagedTPS(false);
 			battle.waitTillOver();
-			setManagedTPS(old);
 		}
 	}
 
@@ -188,10 +177,7 @@ public class BattleManager implements IBattleManager {
 		logMessage("Preparing replay...");
 
 		if (battle != null && battle.isRunning()) {
-			boolean old = isManagedTPS();
-			setManagedTPS(false);
 			battle.stop(true);
-			setManagedTPS(old);
 		}
 
 		Logger.setLogListener(battleEventDispatcher);
@@ -305,10 +291,7 @@ public class BattleManager implements IBattleManager {
 
 	public synchronized void stop(boolean waitTillEnd) {
 		if (battle != null && battle.isRunning()) {
-			boolean old = isManagedTPS();
-			setManagedTPS(false);
 			battle.stop(waitTillEnd);
-			setManagedTPS(old);
 		}
 		if (hostManager != null && battleThread != null) {
 			hostManager.removeSafeThread(battleThread);
