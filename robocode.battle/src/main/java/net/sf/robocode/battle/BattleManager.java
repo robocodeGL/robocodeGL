@@ -68,7 +68,7 @@ public class BattleManager implements IBattleManager {
 	private int pauseCount = 0;
 	private final AtomicBoolean isManagedTPS = new AtomicBoolean(false);
 
-	private volatile boolean isBusy = false;
+	private Promise busyPromise = Promise.resolved();
 
 	public BattleManager(ISettingsManager properties, IRepositoryManager repositoryManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher battleEventDispatcher, IRecordManager recordManager) { // NO_UCD (unused code)
 		this.properties = properties;
@@ -82,11 +82,21 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized void cleanup() {
-		if (battle != null) {
-			battle.waitTillOver();
-			battle.cleanup();
-		}
-		battle = null;
+		busyPromise = busyPromise.then(new PromiseSupplier() {
+			@Override
+			public Promise get() {
+				return Promise.fromSync(new Runnable() {
+					@Override
+					public void run() {
+						if (battle != null) {
+							battle.waitTillOver();
+							battle.cleanup();
+						}
+						battle = null;
+					}
+				});
+			}
+		});
 	}
 
 	// Called when starting a new battle from GUI
@@ -122,41 +132,33 @@ public class BattleManager implements IBattleManager {
 	}
 
 	private Promise startNewBattleAsync(final RobotSpecification[] battlingRobotsList, final boolean waitTillOver, final boolean enableCLIRecording) {
-		if (isBusy) {
-			throw new IllegalStateException("BattleManager is busy");
-		}
+		return busyPromise = busyPromise.then(new PromiseSupplier() {
+			@Override
+			public Promise get() {
+				stop(false);
+				return (battle != null ? battle.asyncWaitTillOver() : Promise.resolved())
+					.then(new PromiseSupplier() {
+						@Override
+						public Promise get() {
+							final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
 
-		isBusy = true;
+							// Start the realBattle thread
+							battleThread.start();
 
-		stop(false);
-		return (battle != null ? battle.asyncWaitTillOver() : Promise.resolved())
-			.then(new PromiseSupplier() {
-				@Override
-				public Promise get() {
-					final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
-
-					// Start the realBattle thread
-					battleThread.start();
-
-					// Wait until the realBattle is running and ended.
-					// This must be done as a new realBattle could be started immediately after this one causing
-					// multiple realBattle threads to run at the same time, which must be prevented!
-					return realBattle.asyncWaitTillStarted()
-						.then(new PromiseSupplier() {
-							@Override
-							public Promise get() {
-								return waitTillOver ? realBattle.asyncWaitTillOver() : Promise.resolved();
-							}
-						});
-				}
-			})
-			.then(new Runnable() {
-				@Override
-				public void run() {
-					// todo finally block equivalent
-					isBusy = false;
-				}
-			});
+							// Wait until the realBattle is running and ended.
+							// This must be done as a new realBattle could be started immediately after this one causing
+							// multiple realBattle threads to run at the same time, which must be prevented!
+							return realBattle.asyncWaitTillStarted()
+								.then(new PromiseSupplier() {
+									@Override
+									public Promise get() {
+										return waitTillOver ? realBattle.asyncWaitTillOver() : Promise.resolved();
+									}
+								});
+						}
+					});
+			}
+		});
 	}
 
 	private void startNewBattleSync(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableCLIRecording) {
