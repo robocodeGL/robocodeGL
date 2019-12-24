@@ -102,19 +102,27 @@ public final class Promise {
 	}
 
 	public static Promise delayed(final int millis) {
+		return Promise.fromSync(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Thread.sleep(millis);
+				} catch (InterruptedException ex) {
+					Thread.currentThread().interrupt();
+				}
+			}
+		});
+	}
+
+	public static Promise fromSync(final Runnable runnable) {
 		return new Promise(new ResolveConsumer() {
 			@Override
 			public void accept(final Runnable resolve) {
 				new Thread(new Runnable() {
 					@Override
 					public void run() {
-						try {
-							Thread.sleep(millis);
-
-							resolve.run();
-						} catch (InterruptedException ex) {
-							Thread.currentThread().interrupt();
-						}
+						runnable.run();
+						resolve.run();
 					}
 				}).start();
 			}
