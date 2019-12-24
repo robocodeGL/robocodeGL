@@ -227,13 +227,13 @@ public final class AwtBattleAdaptor {
 			// 	}
 			// });
 
-			putSnapshot(event.getTurnSnapshot());
+			putSnapshot(event.getTurnSnapshot(), true);
 		}
 
 		@Override
 		public void onRoundStarted(final RoundStartedEvent event) {
 			if (lastMajorEvent.get() == majorEvent.get()) {
-				putSnapshot(event.getStartSnapshot());
+				putSnapshot(event.getStartSnapshot(), true);
 			}
 			majorEvent.incrementAndGet();
 			EventQueue.invokeLater(new Runnable() {
@@ -259,7 +259,7 @@ public final class AwtBattleAdaptor {
 						}
 					}
 					lastSnapshot = null;
-					putSnapshot(null);
+					putSnapshot(null, false);
 
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
@@ -283,7 +283,7 @@ public final class AwtBattleAdaptor {
 					battleEventDispatcher.onBattleFinished(event);
 					lastMajorEvent.incrementAndGet();
 					lastSnapshot = null;
-					putSnapshot(null);
+					putSnapshot(null, false);
 
 					// paint logo
 					awtOnTurnEnded(true, true);
@@ -359,8 +359,12 @@ public final class AwtBattleAdaptor {
 		}
 	}
 
-	private void putSnapshot(ITurnSnapshot turnSnapshot) {
-		if (frameSync && properties.getOptionsBattleDesiredTPS() < 60.1) {
+	private void putSnapshot(ITurnSnapshot turnSnapshot, boolean blocking) {
+		if (!isRunning.get()) {
+			turnSnapshot = null;
+		}
+
+		if (blocking && frameSync && properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
 				snapshot.offer(new Turn(turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
