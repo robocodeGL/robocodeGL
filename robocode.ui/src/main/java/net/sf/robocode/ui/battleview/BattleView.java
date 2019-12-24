@@ -8,7 +8,7 @@
 package net.sf.robocode.ui.battleview;
 
 
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.Animator;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
 import net.sf.robocode.robotpaint.IGraphicsProxy;
@@ -146,7 +146,7 @@ public class BattleView extends GLG2DCanvas {
 		setDrawableComponent(new MyPanel());
 		setGLDrawing(true);
 
-		FPSAnimator animator = new FPSAnimator(60);
+		Animator animator = new Animator();
 		animator.add(this.getGLDrawable());
 
 		animator.start();
@@ -646,44 +646,44 @@ public class BattleView extends GLG2DCanvas {
 	}
 
 	private class MyPanel extends JPanel {
-		// private double lastDesiredTPS = 0.;
+		private double lastDesiredTPS = 0.;
 
 		@Override
 		public void paint(Graphics g) {
-			// double desiredTPS = properties.getOptionsBattleDesiredTPS();
-			//
-			// if (lastDesiredTPS != desiredTPS) {
-			// 	if (lastDesiredTPS != 0) {
-			// 		int mod0 = (int) Math.floor(60 / lastDesiredTPS + 0.001);
-			// 		int mod1 = (int) Math.floor(60 / desiredTPS + 0.001);
-			//
-			// 		frameCount = Math.round((double) frameCount / mod0 * mod1);
-			// 	}
-			// 	lastDesiredTPS = desiredTPS;
-			// }
-			//
-			// if (eq(desiredTPS, 30)) {
-			// 	if ((frameCount & 1) == 0) {
-			// 		frameCount = 0L;
-			// 		windowManager.pollSnapshot();
-			// 	}
-			// } else if (desiredTPS >= 59.9) {
-			// 	frameCount = 0L;
-			// 	windowManager.pollSnapshot();
-			// } else {
-			// 	int mod = (int) Math.floor(60 / desiredTPS + 0.001);
-			// 	if (mod == 0) {
-			// 		throw new IllegalStateException();
-			// 	} else {
-			// 		if ((frameCount % mod) == 0) {
-			// 			frameCount = 0L;
-			// 			windowManager.pollSnapshot();
-			// 		}
-			// 	}
-			// }
-			// frameCount += 1L;
+			double desiredTPS = properties.getOptionsBattleDesiredTPS();
 
-			windowManager.pollSnapshot();
+			if (lastDesiredTPS != desiredTPS) {
+				if (lastDesiredTPS != 0) {
+					int mod0 = (int) Math.floor(60 / lastDesiredTPS + 0.001);
+					int mod1 = (int) Math.floor(60 / desiredTPS + 0.001);
+
+					frameCount = Math.round((double) frameCount / mod0 * mod1);
+				}
+				lastDesiredTPS = desiredTPS;
+			}
+
+			if (eq(desiredTPS, 30)) {
+				if ((frameCount & 1) == 0) {
+					frameCount = 0L;
+					windowManager.pollSnapshot();
+				}
+			} else if (desiredTPS >= 59.9) {
+				frameCount = 0L;
+				windowManager.pollSnapshot();
+			} else {
+				int mod = (int) Math.floor(60 / desiredTPS + 0.001);
+				if (mod == 0) {
+					throw new IllegalStateException();
+				} else {
+					if ((frameCount % mod) == 0) {
+						frameCount = 0L;
+						windowManager.pollSnapshot();
+					}
+				}
+			}
+			frameCount += 1L;
+
+			// windowManager.pollSnapshot();
 
 			final ITurnSnapshot lastSnapshot = windowManager.getLastSnapshot();
 			if (lastSnapshot != null) {
