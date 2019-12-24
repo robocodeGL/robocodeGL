@@ -8,6 +8,7 @@
 package net.sf.robocode.battle;
 
 
+import net.sf.robocode.async.Promise;
 import robocode.Event;
 
 
@@ -52,7 +53,7 @@ public interface IBattleManager extends IBattleManagerBase {
 	 */
 	void sendInteractiveEvent(Event event);
 
-	void startNewBattle(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording);
+	Promise startNewBattleAsync(BattleProperties battleProperties, boolean waitTillOver, boolean enableCLIRecording);
 
 	void nextTurn();
 
