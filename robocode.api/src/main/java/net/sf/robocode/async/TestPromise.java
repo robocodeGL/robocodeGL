@@ -24,18 +24,35 @@ public final class TestPromise extends JFrame {
 						}
 					})
 					.delay(1000)
-					.then(new Runnable() {
+					.then(new PromiseSupplier() {
 						@Override
-						public void run() {
+						public Promise get() {
 							System.out.println("1s elapsed");
+
+							return Promise
+								.delayed(1000)
+								.then(new PromiseSupplier() {
+									@Override
+									public Promise get() {
+										System.out.println("2s elapsed");
+
+										return Promise.delayed(1000);
+									}
+								});
 						}
 					})
-					.delay(1000)
 					.then((Runnable) null)
 					.then(new Runnable() {
 						@Override
 						public void run() {
-							System.out.println("2s elapsed");
+							System.out.println("3s elapsed");
+						}
+					})
+					.delay(1000)
+					.then(new Runnable() {
+						@Override
+						public void run() {
+							System.out.println("4s elapsed");
 						}
 					})
 				;
