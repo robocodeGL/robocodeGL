@@ -147,7 +147,7 @@ public class BattleView extends GLG2DCanvas {
 		setDrawableComponent(new MyPanel());
 		setGLDrawing(true);
 
-		FPSAnimator animator = new FPSAnimator(60, true);
+		Animator animator = new Animator();
 		animator.add(this.getGLDrawable());
 
 		animator.start();
