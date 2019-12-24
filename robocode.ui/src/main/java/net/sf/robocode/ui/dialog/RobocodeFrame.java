@@ -724,7 +724,12 @@ public class RobocodeFrame extends JFrame {
 			} else if (source == getStopButton()) {
 				getRestartButton().setEnabled(false);
 				getStopButton().setEnabled(false);
-				battleManager.stopAsync(true);
+				battleManager.stopAsync(true).then(new Runnable() {
+					@Override
+					public void run() {
+						getRestartButton().setEnabled(battleManager.getBattleProperties().getSelectedRobots() != null);
+					}
+				});
 			} else if (source == getRestartButton()) {
 				getRestartButton().setEnabled(false);
 				getStopButton().setEnabled(false);
