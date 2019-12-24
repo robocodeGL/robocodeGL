@@ -272,24 +272,27 @@ public class MenuBar extends JMenuBar {
 		try {
 			battleManager.pauseBattle();
 
-			String path = windowManager.showBattleOpenDialog(".br", "Records");
+			final String path = windowManager.showBattleOpenDialog(".br", "Records");
 
 			if (path != null) {
-				battleManager.stopAsync(true);
+				battleManager.stopAsync(true).then(new Runnable() {
+					@Override
+					public void run() {
+						robocodeFrame.getReplayButton().setVisible(true);
+						robocodeFrame.getReplayButton().setEnabled(true);
 
-				robocodeFrame.getReplayButton().setVisible(true);
-				robocodeFrame.getReplayButton().setEnabled(true);
+						getBattleSaveRecordAsMenuItem().setEnabled(true);
+						getBattleExportRecordMenuItem().setEnabled(true);
 
-				getBattleSaveRecordAsMenuItem().setEnabled(true);
-				getBattleExportRecordMenuItem().setEnabled(true);
-
-				try {
-					robocodeFrame.setBusyPointer(true);
-					recordManager.loadRecord(path, BattleRecordFormat.BINARY_ZIP);
-				} finally {
-					robocodeFrame.setBusyPointer(false);
-				}
-				battleManager.replay();
+						try {
+							robocodeFrame.setBusyPointer(true);
+							recordManager.loadRecord(path, BattleRecordFormat.BINARY_ZIP);
+						} finally {
+							robocodeFrame.setBusyPointer(false);
+						}
+						battleManager.replay();
+					}
+				});
 			}
 		} finally {
 			battleManager.resumeBattle();
@@ -300,24 +303,27 @@ public class MenuBar extends JMenuBar {
 		try {
 			battleManager.pauseBattle();
 
-			String path = windowManager.showBattleOpenDialog(".br.xml", "XML Records");
+			final String path = windowManager.showBattleOpenDialog(".br.xml", "XML Records");
 
 			if (path != null) {
-				battleManager.stopAsync(true);
+				battleManager.stopAsync(true).then(new Runnable() {
+					@Override
+					public void run() {
+						robocodeFrame.getReplayButton().setVisible(true);
+						robocodeFrame.getReplayButton().setEnabled(true);
 
-				robocodeFrame.getReplayButton().setVisible(true);
-				robocodeFrame.getReplayButton().setEnabled(true);
+						getBattleSaveRecordAsMenuItem().setEnabled(true);
+						getBattleExportRecordMenuItem().setEnabled(true);
 
-				getBattleSaveRecordAsMenuItem().setEnabled(true);
-				getBattleExportRecordMenuItem().setEnabled(true);
-
-				try {
-					robocodeFrame.setBusyPointer(true);
-					recordManager.loadRecord(path, BattleRecordFormat.XML);
-				} finally {
-					robocodeFrame.setBusyPointer(false);
-				}
-				battleManager.replay();
+						try {
+							robocodeFrame.setBusyPointer(true);
+							recordManager.loadRecord(path, BattleRecordFormat.XML);
+						} finally {
+							robocodeFrame.setBusyPointer(false);
+						}
+						battleManager.replay();
+					}
+				});
 			}
 		} finally {
 			battleManager.resumeBattle();
