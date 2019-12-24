@@ -89,8 +89,11 @@ public class BattleManager implements IBattleManager {
 					@Override
 					public void run() {
 						if (battle != null) {
+							boolean old = isManagedTPS();
+							setManagedTPS(false);
 							battle.waitTillOver();
 							battle.cleanup();
+							setManagedTPS(old);
 						}
 						battle = null;
 					}
@@ -212,7 +215,10 @@ public class BattleManager implements IBattleManager {
 
 	public void waitTillOver() {
 		if (battle != null) {
+			boolean old = isManagedTPS();
+			setManagedTPS(false);
 			battle.waitTillOver();
+			setManagedTPS(old);
 		}
 	}
 
@@ -223,7 +229,10 @@ public class BattleManager implements IBattleManager {
 		logMessage("Preparing replay...");
 
 		if (battle != null && battle.isRunning()) {
+			boolean old = isManagedTPS();
+			setManagedTPS(false);
 			battle.stop(true);
+			setManagedTPS(old);
 		}
 
 		Logger.setLogListener(battleEventDispatcher);
@@ -364,7 +373,10 @@ public class BattleManager implements IBattleManager {
 	@Override
 	public synchronized void stopSync(boolean waitTillEnd) {
 		if (battle != null && battle.isRunning()) {
+			boolean old = isManagedTPS();
+			setManagedTPS(false);
 			battle.stop(waitTillEnd);
+			setManagedTPS(old);
 		}
 		if (hostManager != null && battleThread != null) {
 			hostManager.removeSafeThread(battleThread);
