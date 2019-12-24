@@ -132,28 +132,22 @@ public class BattleManager implements IBattleManager {
 	}
 
 	private Promise startNewBattleAsync(final RobotSpecification[] battlingRobotsList, final boolean waitTillOver, final boolean enableCLIRecording) {
-		return busyPromise = busyPromise.then(new PromiseSupplier() {
+		return busyPromise = stopAsyncInternal(busyPromise, true).then(new PromiseSupplier() {
 			@Override
 			public Promise get() {
-				return stopAsync(true)
+				final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
+
+				// Start the realBattle thread
+				battleThread.start();
+
+				// Wait until the realBattle is running and ended.
+				// This must be done as a new realBattle could be started immediately after this one causing
+				// multiple realBattle threads to run at the same time, which must be prevented!
+				return realBattle.asyncWaitTillStarted()
 					.then(new PromiseSupplier() {
 						@Override
 						public Promise get() {
-							final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
-
-							// Start the realBattle thread
-							battleThread.start();
-
-							// Wait until the realBattle is running and ended.
-							// This must be done as a new realBattle could be started immediately after this one causing
-							// multiple realBattle threads to run at the same time, which must be prevented!
-							return realBattle.asyncWaitTillStarted()
-								.then(new PromiseSupplier() {
-									@Override
-									public Promise get() {
-										return waitTillOver ? realBattle.asyncWaitTillOver() : Promise.resolved();
-									}
-								});
+							return waitTillOver ? realBattle.asyncWaitTillOver() : Promise.resolved();
 						}
 					});
 			}
@@ -342,7 +336,11 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized Promise stopAsync(final boolean waitTillEnd) {
-		return busyPromise = busyPromise.then(new PromiseSupplier() {
+		return busyPromise =  stopAsyncInternal(busyPromise, waitTillEnd);
+	}
+
+	private Promise stopAsyncInternal(final Promise condition, final boolean waitTillEnd) {
+		return condition.then(new PromiseSupplier() {
 			@Override
 			public Promise get() {
 				if (battle != null && battle.isRunning()) {
