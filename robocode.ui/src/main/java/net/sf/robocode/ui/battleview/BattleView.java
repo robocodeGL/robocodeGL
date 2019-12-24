@@ -9,6 +9,7 @@ package net.sf.robocode.ui.battleview;
 
 
 import com.jogamp.opengl.util.Animator;
+import com.jogamp.opengl.util.FPSAnimator;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
 import net.sf.robocode.robotpaint.IGraphicsProxy;
@@ -146,7 +147,7 @@ public class BattleView extends GLG2DCanvas {
 		setDrawableComponent(new MyPanel());
 		setGLDrawing(true);
 
-		Animator animator = new Animator();
+		FPSAnimator animator = new FPSAnimator(60, true);
 		animator.add(this.getGLDrawable());
 
 		animator.start();
