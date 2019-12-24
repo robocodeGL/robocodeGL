@@ -8,7 +8,6 @@
 package net.sf.robocode.ui.dialog;
 
 
-import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.recording.IRecordManager;
@@ -727,7 +726,7 @@ public class RobocodeFrame extends JFrame {
 				battleManager.stopAsync(true).then(new Runnable() {
 					@Override
 					public void run() {
-						getRestartButton().setEnabled(battleManager.getBattleProperties().getSelectedRobots() != null);
+						updateRestartButtonStatus();
 					}
 				});
 			} else if (source == getRestartButton()) {
@@ -849,7 +848,7 @@ public class RobocodeFrame extends JFrame {
 			isBattleReplay = event.isReplay();
 
 			getStopButton().setEnabled(true);
-			getRestartButton().setEnabled(battleManager.getBattleProperties().getSelectedRobots() != null);
+			updateRestartButtonStatus();
 			getReplayButton().setEnabled(event.isReplay());
 			menuBar.getBattleSaveRecordAsMenuItem().setEnabled(false);
 			menuBar.getBattleExportRecordMenuItem().setEnabled(false);
@@ -1051,4 +1050,8 @@ public class RobocodeFrame extends JFrame {
 		}
 	}
 
+	public void updateRestartButtonStatus() {
+		String robots = battleManager.getBattleProperties().getSelectedRobots();
+		getRestartButton().setEnabled(robots != null && robots.length() > 0);
+	}
 }
