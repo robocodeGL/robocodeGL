@@ -392,9 +392,9 @@ public class BattleManager implements IBattleManager {
 	}
 
 
-	public synchronized void restart() {
+	public synchronized Promise restart() {
 		// Start new battle. The old battle is automatically stopped
-		startNewBattleAsync(battleProperties, false, false);
+		return startNewBattleAsync(battleProperties, false, false);
 	}
 
 	public synchronized void replay() {
