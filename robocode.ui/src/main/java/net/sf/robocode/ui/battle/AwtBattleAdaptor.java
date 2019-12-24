@@ -99,7 +99,7 @@ public final class AwtBattleAdaptor {
 	}
 
 	public ITurnSnapshot getLastSnapshot() {
-		return lastSnapshot;
+		return isRunning.get() ? lastSnapshot : null;
 	}
 
 	// this is always dispatched on AWT thread
@@ -360,11 +360,7 @@ public final class AwtBattleAdaptor {
 	}
 
 	private void putSnapshot(ITurnSnapshot turnSnapshot, boolean blocking) {
-		if (!isRunning.get()) {
-			turnSnapshot = null;
-		}
-
-		if (blocking && frameSync && properties.getOptionsBattleDesiredTPS() < 60.1) {
+		if (blocking && frameSync && battleManager.isManagedTPS() && properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
 				snapshot.offer(new Turn(turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
