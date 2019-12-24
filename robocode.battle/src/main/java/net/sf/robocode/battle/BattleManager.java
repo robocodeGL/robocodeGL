@@ -135,8 +135,7 @@ public class BattleManager implements IBattleManager {
 		return busyPromise = busyPromise.then(new PromiseSupplier() {
 			@Override
 			public Promise get() {
-				stop(false);
-				return (battle != null ? battle.asyncWaitTillOver() : Promise.resolved())
+				return stopAsync(true)
 					.then(new PromiseSupplier() {
 						@Override
 						public Promise get() {
@@ -162,7 +161,7 @@ public class BattleManager implements IBattleManager {
 	}
 
 	private void startNewBattleSync(RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableCLIRecording) {
-		stop(true);
+		stopSync(true);
 
 		Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
 
@@ -342,7 +341,30 @@ public class BattleManager implements IBattleManager {
 		battleEventDispatcher.removeListener(listener);
 	}
 
-	public synchronized void stop(boolean waitTillEnd) {
+	public synchronized Promise stopAsync(final boolean waitTillEnd) {
+		return busyPromise = busyPromise.then(new PromiseSupplier() {
+			@Override
+			public Promise get() {
+				if (battle != null && battle.isRunning()) {
+					battle.stop(false);
+					return waitTillEnd ? battle.asyncWaitTillOver() : Promise.resolved();
+				} else {
+					return Promise.resolved();
+				}
+			}
+		}).then(new Runnable() {
+			@Override
+			public void run() {
+				if (hostManager != null && battleThread != null) {
+					hostManager.removeSafeThread(battleThread);
+				}
+				battleThread = null;
+			}
+		});
+	}
+
+	@Override
+	public synchronized void stopSync(boolean waitTillEnd) {
 		if (battle != null && battle.isRunning()) {
 			battle.stop(waitTillEnd);
 		}
@@ -351,6 +373,7 @@ public class BattleManager implements IBattleManager {
 		}
 		battleThread = null;
 	}
+
 
 	public synchronized void restart() {
 		// Start new battle. The old battle is automatically stopped
