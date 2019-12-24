@@ -82,7 +82,7 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized void cleanup() {
-		busyPromise = busyPromise.then(new PromiseSupplier() {
+		busyPromise.then(new PromiseSupplier() {
 			@Override
 			public Promise get() {
 				return Promise.fromSync(new Runnable() {
@@ -135,7 +135,7 @@ public class BattleManager implements IBattleManager {
 	}
 
 	private Promise startNewBattleAsync(final RobotSpecification[] battlingRobotsList, final boolean waitTillOver, final boolean enableCLIRecording) {
-		return busyPromise = stopAsyncInternal(busyPromise, true).then(new PromiseSupplier() {
+		return stopAsyncInternal(busyPromise, true).then(new PromiseSupplier() {
 			@Override
 			public Promise get() {
 				final Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
@@ -345,7 +345,7 @@ public class BattleManager implements IBattleManager {
 	}
 
 	public synchronized Promise stopAsync(final boolean waitTillEnd) {
-		return busyPromise =  stopAsyncInternal(busyPromise, waitTillEnd);
+		return stopAsyncInternal(busyPromise, waitTillEnd);
 	}
 
 	private Promise stopAsyncInternal(final Promise condition, final boolean waitTillEnd) {
@@ -353,8 +353,15 @@ public class BattleManager implements IBattleManager {
 			@Override
 			public Promise get() {
 				if (battle != null && battle.isRunning()) {
+					final boolean old = isManagedTPS();
+					setManagedTPS(false);
 					battle.stop(false);
-					return waitTillEnd ? battle.asyncWaitTillOver() : Promise.resolved();
+					return (waitTillEnd ? battle.asyncWaitTillOver() : Promise.resolved()).then(new Runnable() {
+						@Override
+						public void run() {
+							setManagedTPS(old);
+						}
+					});
 				} else {
 					return Promise.resolved();
 				}
