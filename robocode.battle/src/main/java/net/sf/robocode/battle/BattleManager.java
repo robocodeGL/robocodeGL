@@ -129,7 +129,7 @@ public class BattleManager implements IBattleManager {
 		isBusy = true;
 
 		stop(false);
-		return battle.asyncWaitTillOver()
+		return (battle != null ? battle.asyncWaitTillOver() : Promise.resolved())
 			.then(new PromiseSupplier() {
 				@Override
 				public Promise get() {
