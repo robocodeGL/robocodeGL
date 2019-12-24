@@ -52,7 +52,7 @@ public class GLG2DRenderingHints {
    * <li>any integer for the maximum size of the cache</li>
    * </ul>
    */
-  public static final Key KEY_CLEAR_TEXTURES_CACHE = new RenderingHints.Key(keyId++) {
+  public static final Key KEY_CLEAR_TEXTURES_CACHE = new Key(keyId++) {
     public boolean isCompatibleValue(Object val) {
       return val == VALUE_CLEAR_TEXTURES_CACHE_DEFAULT ||
           val == VALUE_CLEAR_TEXTURES_CACHE_EACH_PAINT ||
