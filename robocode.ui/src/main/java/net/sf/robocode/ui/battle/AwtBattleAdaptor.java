@@ -351,7 +351,7 @@ public final class AwtBattleAdaptor {
 	private void putSnapshot(ITurnSnapshot turnSnapshot) {
 		if (battleManager.isManagedTPS() && properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
-				snapshot.offer(new Turn(turnSnapshot), 1500, TimeUnit.MILLISECONDS); // prevent deadlock
+				snapshot.put(new Turn(turnSnapshot));
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
