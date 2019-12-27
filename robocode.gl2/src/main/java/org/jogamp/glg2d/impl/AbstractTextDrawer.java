@@ -16,7 +16,8 @@
 package org.jogamp.glg2d.impl;
 
 
-import static java.lang.Math.ceil;
+import org.jogamp.glg2d.GLG2DTextHelper;
+import org.jogamp.glg2d.GLGraphics2D;
 
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -27,11 +28,10 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayDeque;
 import java.util.Deque;
 
-import org.jogamp.glg2d.GLG2DTextHelper;
-import org.jogamp.glg2d.GLGraphics2D;
+import static java.lang.Math.ceil;
 
 public abstract class AbstractTextDrawer implements GLG2DTextHelper {
-  private static final ThreadLocal<Font> DEFAULT_FONT = new ThreadLocal<Font>();
+  public static final Font DEFAULT_FONT = new Font("Arial", Font.PLAIN, 10);
 
   protected GLGraphics2D g2d;
 
@@ -43,11 +43,19 @@ public abstract class AbstractTextDrawer implements GLG2DTextHelper {
 
     stack.clear();
     stack.push(new FontState());
+
+    initFontState(g2d);
+  }
+
+  private void initFontState(GLGraphics2D g2d) {
+    peek().surfaceScale = 1f * g2d.getSurfaceHeight() / g2d.getLogicalHeight();
   }
 
   @Override
   public void push(GLGraphics2D newG2d) {
-    stack.push(stack.peek().clone());
+    stack.push(peek().clone());
+
+    initFontState(g2d);
   }
 
   @Override
@@ -69,13 +77,13 @@ public abstract class AbstractTextDrawer implements GLG2DTextHelper {
 
   @Override
   public void setFont(Font font) {
-    if (font == null) font = getDefaultFont();
-    stack.peek().font = font;
+    if (font == null) font = DEFAULT_FONT;
+    peek().font = font;
   }
 
   @Override
   public Font getFont() {
-    return stack.peek().font;
+    return peek().font;
   }
 
   @Override
@@ -85,7 +93,13 @@ public abstract class AbstractTextDrawer implements GLG2DTextHelper {
 
   @Override
   public FontRenderContext getFontRenderContext() {
-    return new FontRenderContext(g2d.getTransform(), stack.peek().antiAlias, false);
+    return new FontRenderContext(g2d.getTransform(), peek().antiAlias, false);
+  }
+
+  protected FontState peek() {
+    FontState peek = stack.peek();
+    assert peek != null;
+    return peek;
   }
 
   /**
@@ -118,8 +132,9 @@ public abstract class AbstractTextDrawer implements GLG2DTextHelper {
   }
 
   protected static class FontState implements Cloneable {
-    public Font font = getDefaultFont();
+    public Font font = DEFAULT_FONT;
     public boolean antiAlias = true;
+    public float surfaceScale = 1f;
 
     @Override
     public FontState clone() {
@@ -129,13 +144,5 @@ public abstract class AbstractTextDrawer implements GLG2DTextHelper {
         throw new AssertionError(e);
       }
     }
-  }
-
-  public static Font getDefaultFont() {
-    Font arial = DEFAULT_FONT.get();
-    if (arial == null) {
-      DEFAULT_FONT.set(arial = new Font("Arial", Font.PLAIN, 10));
-    }
-    return arial;
   }
 }
