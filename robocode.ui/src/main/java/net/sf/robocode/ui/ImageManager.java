@@ -8,7 +8,6 @@
 package net.sf.robocode.ui;
 
 
-import net.sf.robocode.io.Logger;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.gfx.ImageAtlas;
 import net.sf.robocode.ui.gfx.ImageUtil;
@@ -252,7 +251,12 @@ public class ImageManager implements IImageManager {
 		RenderObject img = robotGunImageCache.get(color);
 
 		if (img == null) {
-			img = new RenderImage(ImageUtil.createColouredRobotImage(getGunImage(), new Color(color, true)));
+			if (USE_GL2_IMAGE) {
+				img = new RenderImageRegion(getColoredGl2RobotImage(color),
+					2, 2, 121, 300, .18);
+			} else {
+				img = new RenderImage(ImageUtil.createColouredRobotImage(getGunImage(), new Color(color, true)));
+			}
 			robotGunImageCache.put(color, img);
 		}
 		return img;
@@ -262,7 +266,12 @@ public class ImageManager implements IImageManager {
 		RenderObject img = robotRadarImageCache.get(color);
 
 		if (img == null) {
-			img = new RenderImage(ImageUtil.createColouredRobotImage(getRadarImage(), new Color(color, true)));
+			if (USE_GL2_IMAGE) {
+				img = new RenderImageRegion(getColoredGl2RobotImage(color),
+					324, 206, 151, 96, .18);
+			} else {
+				img = new RenderImage(ImageUtil.createColouredRobotImage(getRadarImage(), new Color(color, true)));
+			}
 			robotRadarImageCache.put(color, img);
 		}
 		return img;
