@@ -19,7 +19,7 @@ import net.sf.robocode.ui.IImageManager;
 import net.sf.robocode.ui.IWindowManager;
 import net.sf.robocode.ui.IWindowManagerExt;
 import net.sf.robocode.ui.gfx.GraphicsState;
-import net.sf.robocode.ui.gfx.RenderImage;
+import net.sf.robocode.ui.gfx.RenderObject;
 import net.sf.robocode.ui.gfx.RobocodeLogo;
 import org.jogamp.glg2d.GLG2DCanvas;
 import robocode.BattleRules;
@@ -378,7 +378,7 @@ public class BattleView extends GLG2DCanvas {
 		int battleFieldHeight = battleField.getHeight();
 
 		if (drawGround && drawExplosionDebris) {
-			RenderImage explodeDebrise = imageManager.getExplosionDebriseRenderImage();
+			RenderObject explodeDebrise = imageManager.getExplosionDebriseRenderImage();
 
 			for (IRobotSnapshot robotSnapshot : snapShot.getRobots()) {
 				if (robotSnapshot.getState().isDead()) {
@@ -401,7 +401,7 @@ public class BattleView extends GLG2DCanvas {
 				at = AffineTransform.getTranslateInstance(x, y);
 				at.rotate(robotSnapshot.getBodyHeading());
 
-				RenderImage robotRenderImage = imageManager.getColoredBodyRenderImage(robotSnapshot.getBodyColor());
+				RenderObject robotRenderImage = imageManager.getColoredBodyRenderImage(robotSnapshot.getBodyColor());
 
 				robotRenderImage.setTransform(at);
 				robotRenderImage.paint(g);
@@ -409,7 +409,7 @@ public class BattleView extends GLG2DCanvas {
 				at = AffineTransform.getTranslateInstance(x, y);
 				at.rotate(robotSnapshot.getGunHeading());
 
-				RenderImage gunRenderImage = imageManager.getColoredGunRenderImage(robotSnapshot.getGunColor());
+				RenderObject gunRenderImage = imageManager.getColoredGunRenderImage(robotSnapshot.getGunColor());
 
 				gunRenderImage.setTransform(at);
 				gunRenderImage.paint(g);
@@ -418,7 +418,7 @@ public class BattleView extends GLG2DCanvas {
 					at = AffineTransform.getTranslateInstance(x, y);
 					at.rotate(robotSnapshot.getRadarHeading());
 
-					RenderImage radarRenderImage = imageManager.getColoredRadarRenderImage(robotSnapshot.getRadarColor());
+					RenderObject radarRenderImage = imageManager.getColoredRadarRenderImage(robotSnapshot.getRadarColor());
 
 					radarRenderImage.setTransform(at);
 					radarRenderImage.paint(g);
@@ -550,7 +550,7 @@ public class BattleView extends GLG2DCanvas {
 						double scale = sqrt(1000 * bulletSnapshot.getPower()) / 128;
 						at.scale(scale, scale);
 					}
-					RenderImage explosionRenderImage = imageManager.getExplosionRenderImage(explosionIndex, frame);
+					RenderObject explosionRenderImage = imageManager.getExplosionRenderImage(explosionIndex, frame);
 					explosionRenderImage.setTransform(at);
 					explosionRenderImage.paint(g);
 				}
