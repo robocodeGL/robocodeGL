@@ -15,17 +15,15 @@
  */
 package org.jogamp.glg2d.impl.gl2;
 
-import java.awt.Color;
-import java.awt.geom.AffineTransform;
-
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GL2ES1;
-
+import com.jogamp.opengl.util.texture.Texture;
 import org.jogamp.glg2d.GLGraphics2D;
 import org.jogamp.glg2d.impl.AbstractImageHelper;
 
-import com.jogamp.opengl.util.texture.Texture;
+import java.awt.Color;
+import java.awt.geom.AffineTransform;
 
 public class GL2ImageDrawer extends AbstractImageHelper {
   protected GL2 gl;
@@ -40,6 +38,7 @@ public class GL2ImageDrawer extends AbstractImageHelper {
 
   @Override
   protected void begin(Texture texture, AffineTransform xform, Color bgcolor) {
+
     gl.glTexEnvi(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL2ES1.GL_MODULATE);
     gl.glTexParameterf(GL2ES1.GL_TEXTURE_ENV, GL2ES1.GL_TEXTURE_ENV_MODE, GL.GL_BLEND);
 
@@ -48,7 +47,7 @@ public class GL2ImageDrawer extends AbstractImageHelper {
      * cases it interacts poorly with multiple split panes, scroll panes and the
      * text renderer to disable blending.
      */
-    g2d.setComposite(g2d.getComposite());
+    // g2d.setComposite(g2d.getComposite());
 
     texture.enable(gl);
     texture.bind(gl);
@@ -60,6 +59,8 @@ public class GL2ImageDrawer extends AbstractImageHelper {
     }
 
     g2d.getColorHelper().setColorRespectComposite(bgcolor == null ? Color.white : bgcolor);
+
+    gl.glBlendFunc(GL.GL_ONE, GL.GL_ONE_MINUS_SRC_ALPHA);
   }
 
   @Override
