@@ -257,7 +257,8 @@ public class RobocodeFrame extends JFrame {
 		if (battleViewPanel == null) {
 			battleViewPanel = new JPanel();
 			battleViewPanel.setPreferredSize(new Dimension(800, 600));
-			battleViewPanel.setLayout(null);
+			// battleViewPanel.setLayout(null);
+			battleViewPanel.setLayout(new BorderLayout());
 			battleViewPanel.add(battleView);
 			battleViewPanel.addComponentListener(eventHandler);
 		}
@@ -741,9 +742,9 @@ public class RobocodeFrame extends JFrame {
 		}
 
 		public void componentResized(ComponentEvent e) {
-			if (e.getSource() == getBattleViewPanel()) {
-				battleViewPanelResized();
-			}
+			// if (e.getSource() == getBattleViewPanel()) {
+			// 	battleViewPanelResized();
+			// }
 		}
 
 		public void componentShown(ComponentEvent e) {}
