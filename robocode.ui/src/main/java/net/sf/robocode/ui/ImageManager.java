@@ -11,10 +11,16 @@ package net.sf.robocode.ui;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.gfx.ImageUtil;
 import net.sf.robocode.ui.gfx.RenderImage;
+import net.sf.robocode.ui.gfx.RenderImageRegion;
+import net.sf.robocode.ui.gfx.RenderObject;
 
-import java.awt.*;
-import java.util.*;
+import java.awt.Color;
+import java.awt.Image;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -23,6 +29,7 @@ import java.util.List;
  * @author Titus Chen (contributor)
  */
 public class ImageManager implements IImageManager {
+	private static final boolean USE_GL2_IMAGE = true;
 
 	private final ISettingsManager properties;
 
@@ -31,15 +38,18 @@ public class ImageManager implements IImageManager {
 	private RenderImage[][] explosionRenderImages;
 	private RenderImage debriseRenderImage;
 
+	private Image gl2RobotImage;
 	private Image bodyImage;
 	private Image gunImage;
 	private Image radarImage;
 
 	private static final int MAX_NUM_COLORS = 256;
 
-	private HashMap<Integer, RenderImage> robotBodyImageCache;
-	private HashMap<Integer, RenderImage> robotGunImageCache;
-	private HashMap<Integer, RenderImage> robotRadarImageCache;
+	private HashMap<Integer, Image> gl2RobotImageCache;
+
+	private HashMap<Integer, RenderObject> robotBodyImageCache;
+	private HashMap<Integer, RenderObject> robotGunImageCache;
+	private HashMap<Integer, RenderObject> robotRadarImageCache;
 
 	public ImageManager(ISettingsManager properties) {
 		this.properties = properties;
@@ -55,9 +65,10 @@ public class ImageManager implements IImageManager {
 		bodyImage = null;
 		gunImage = null;
 		radarImage = null;
-		robotBodyImageCache = new RenderCache<Integer, RenderImage>();
-		robotGunImageCache = new RenderCache<Integer, RenderImage>();
-		robotRadarImageCache = new RenderCache<Integer, RenderImage>();
+		gl2RobotImageCache = new RenderCache<Integer, Image>();
+		robotBodyImageCache = new RenderCache<Integer, RenderObject>();
+		robotGunImageCache = new RenderCache<Integer, RenderObject>();
+		robotRadarImageCache = new RenderCache<Integer, RenderObject>();
 
 		// Read images into the cache
 		getBodyImage();
@@ -127,6 +138,15 @@ public class ImageManager implements IImageManager {
 		return image;
 	}
 
+
+	private Image getGl2RobotImage() {
+		if (gl2RobotImage == null) {
+			gl2RobotImage = getImage("/net/sf/robocode/ui/images/gl2/robot.png");
+		}
+		return gl2RobotImage;
+	}
+
+
 	/**
 	 * Gets the body image
 	 * Loads from disk if necessary.
@@ -166,18 +186,31 @@ public class ImageManager implements IImageManager {
 		return radarImage;
 	}
 
-	public RenderImage getColoredBodyRenderImage(Integer color) {
-		RenderImage img = robotBodyImageCache.get(color);
-
+	private Image getColoredGl2RobotImage(Integer color) {
+		Image img = gl2RobotImageCache.get(color);
 		if (img == null) {
-			img = new RenderImage(ImageUtil.createColouredRobotImage(getBodyImage(), new Color(color, true)));
+			img = ImageUtil.createColouredRobotImage(getGl2RobotImage(), new Color(color, true));
+			gl2RobotImageCache.put(color, img);
+		}
+		return img;
+	}
+
+	public RenderObject getColoredBodyRenderImage(Integer color) {
+		RenderObject img = robotBodyImageCache.get(color);
+		if (img == null) {
+			if (USE_GL2_IMAGE) {
+				img = new RenderImageRegion(getColoredGl2RobotImage(color),
+					125, 88, 197, 214, .18);
+			} else {
+				img = new RenderImage(ImageUtil.createColouredRobotImage(getBodyImage(), new Color(color, true)));
+			}
 			robotBodyImageCache.put(color, img);
 		}
 		return img;
 	}
 
-	public RenderImage getColoredGunRenderImage(Integer color) {
-		RenderImage img = robotGunImageCache.get(color);
+	public RenderObject getColoredGunRenderImage(Integer color) {
+		RenderObject img = robotGunImageCache.get(color);
 
 		if (img == null) {
 			img = new RenderImage(ImageUtil.createColouredRobotImage(getGunImage(), new Color(color, true)));
@@ -186,8 +219,8 @@ public class ImageManager implements IImageManager {
 		return img;
 	}
 
-	public RenderImage getColoredRadarRenderImage(Integer color) {
-		RenderImage img = robotRadarImageCache.get(color);
+	public RenderObject getColoredRadarRenderImage(Integer color) {
+		RenderObject img = robotRadarImageCache.get(color);
 
 		if (img == null) {
 			img = new RenderImage(ImageUtil.createColouredRobotImage(getRadarImage(), new Color(color, true)));

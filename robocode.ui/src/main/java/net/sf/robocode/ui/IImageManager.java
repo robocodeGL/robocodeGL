@@ -8,9 +8,9 @@
 package net.sf.robocode.ui;
 
 
-import net.sf.robocode.ui.gfx.RenderImage;
+import net.sf.robocode.ui.gfx.RenderObject;
 
-import java.awt.*;
+import java.awt.Image;
 
 
 /**
@@ -21,13 +21,13 @@ public interface IImageManager {
 
 	Image getGroundTileImage(int index);
 
-	RenderImage getExplosionRenderImage(int which, int frame);
+	RenderObject getExplosionRenderImage(int which, int frame);
 
-	RenderImage getExplosionDebriseRenderImage();
+	RenderObject getExplosionDebriseRenderImage();
 
-	RenderImage getColoredBodyRenderImage(Integer color);
+	RenderObject getColoredBodyRenderImage(Integer color);
 
-	RenderImage getColoredGunRenderImage(Integer color);
+	RenderObject getColoredGunRenderImage(Integer color);
 
-	RenderImage getColoredRadarRenderImage(Integer color);
+	RenderObject getColoredRadarRenderImage(Integer color);
 }
