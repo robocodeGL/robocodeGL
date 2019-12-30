@@ -54,6 +54,10 @@ public interface ISettingsManager {
 
 	void setOptionsViewExplosionDebris(boolean optionsViewExplosionDebris);
 
+	boolean getOptionsAllowScaleUp();
+
+	void setOptionsAllowScaleUp(boolean optionsAllowScaleUp);
+
 	boolean getOptionsViewSentryBorder();
 
 	void setOptionsViewSentryBorder(boolean optionsViewSentryBorder);
@@ -253,6 +257,7 @@ public interface ISettingsManager {
 			OPTIONS_VIEW_FPS = "robocode.options.view.FPS",
 			OPTIONS_VIEW_EXPLOSIONS = "robocode.options.view.explosions",
 			OPTIONS_VIEW_EXPLOSION_DEBRIS = "robocode.options.view.explosionDebris",
+			OPTIONS_ALLOW_SCALE_UP = "robocode.options.view.allowScaleUp",
 			OPTIONS_VIEW_SENTRY_BORDER = "robocode.options.view.sentryBorder",
 
 			OPTIONS_BATTLE_DESIREDTPS = "robocode.options.battle.desiredTPS",

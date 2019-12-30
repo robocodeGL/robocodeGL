@@ -40,6 +40,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox visibleExplosionsCheckBox;
 	private JCheckBox visibleGroundCheckBox;
 	private JCheckBox visibleExplosionDebrisCheckBox;
+	private JCheckBox allowScaleUpCheckBox;
 	private JCheckBox visibleSentryBorderCheckBox;
 
 	private JButton defaultViewOptionsButton;
@@ -115,6 +116,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		getVisibleExplosionsCheckBox().setSelected(enabled);
 		getVisibleGroundCheckBox().setSelected(enabled);
 		getVisibleExplosionDebrisCheckBox().setSelected(enabled);
+		getAllowScaleUpCheckBox().setSelected(enabled);
 		getVisibleSentryBorderCheckBox().setSelected(enabled);
 	}
 
@@ -331,6 +333,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 			visibleOptionsPanel.add(getVisibleExplosionsCheckBox(), c);
 			visibleOptionsPanel.add(getVisibleGroundCheckBox(), c);
 			visibleOptionsPanel.add(getVisibleExplosionDebrisCheckBox(), c);
+			visibleOptionsPanel.add(getAllowScaleUpCheckBox(), c);
 			visibleOptionsPanel.add(getVisibleSentryBorderCheckBox(), c);
 
 			c.insets = new Insets(10, 0, 0, 10);
@@ -397,6 +400,15 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		}
 		return visibleExplosionDebrisCheckBox;
 	}
+
+	private JCheckBox getAllowScaleUpCheckBox() {
+		if (allowScaleUpCheckBox == null) {
+			allowScaleUpCheckBox = new JCheckBox("Allow Scale Up");
+			// allowScaleUpCheckBox.setMnemonic('S');
+			// allowScaleUpCheckBox.setDisplayedMnemonicIndex(8);
+		}
+		return allowScaleUpCheckBox;
+	}
 	
 	private JCheckBox getVisibleSentryBorderCheckBox() {
 		if (visibleSentryBorderCheckBox == null) {
@@ -434,6 +446,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		getVisibleExplosionsCheckBox().setSelected(robocodeProperties.getOptionsViewExplosions());
 		getVisibleGroundCheckBox().setSelected(robocodeProperties.getOptionsViewGround());
 		getVisibleExplosionDebrisCheckBox().setSelected(robocodeProperties.getOptionsViewExplosionDebris());
+		getAllowScaleUpCheckBox().setSelected(robocodeProperties.getOptionsAllowScaleUp());
 		getVisibleSentryBorderCheckBox().setSelected(robocodeProperties.getOptionsViewSentryBorder());
 		getDesiredTpsTextField().setText("" + robocodeProperties.getOptionsBattleDesiredTPS());
 		getPreventSpeedupWhenMinimizedCheckBox().setSelected(
@@ -451,6 +464,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		props.setOptionsViewExplosions(getVisibleExplosionsCheckBox().isSelected());
 		props.setOptionsViewGround(getVisibleGroundCheckBox().isSelected());
 		props.setOptionsViewExplosionDebris(getVisibleExplosionDebrisCheckBox().isSelected());
+		props.setOptionsAllowScaleUp(getAllowScaleUpCheckBox().isSelected());
 		props.setOptionsViewSentryBorder(getVisibleSentryBorderCheckBox().isSelected());
 		props.setOptionsBattleDesiredTPS(Integer.parseInt(getDesiredTpsTextField().getText()));
 		props.setOptionsViewPreventSpeedupWhenMinimized(getPreventSpeedupWhenMinimizedCheckBox().isSelected());
