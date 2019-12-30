@@ -31,6 +31,7 @@ import robocode.control.events.TurnEndedEvent;
 import robocode.control.snapshot.IBulletSnapshot;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
+import robocode.util.Utils;
 
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
@@ -407,11 +408,23 @@ public class BattleView extends GLG2DCanvas {
 				double rx = robotSnapshot.getX();
 				double ry = robotSnapshot.getY();
 
+				double bodyHeading = robotSnapshot.getBodyHeading();
+				double gunHeading = robotSnapshot.getGunHeading();
+				double radarHeading = robotSnapshot.getRadarHeading();
+
 				if (t != 1.) {
 					IRobotSnapshot l = (IRobotSnapshot) last.get(robotSnapshot.getRobotIndex());
 					if (l != null) {
 						rx = l.getX() * (1. - t) + rx * t;
 						ry = l.getY() * (1. - t) + ry * t;
+
+						double lBodyHeading = l.getBodyHeading();
+						double lGunHeading = l.getGunHeading();
+						double lRadarHeading = l.getRadarHeading();
+
+						bodyHeading = lBodyHeading + Utils.normalRelativeAngle(bodyHeading - lBodyHeading) * t;
+						gunHeading = lGunHeading + Utils.normalRelativeAngle(gunHeading - lGunHeading) * t;
+						radarHeading = lRadarHeading + Utils.normalRelativeAngle(radarHeading - lRadarHeading) * t;
 					}
 				}
 
@@ -419,7 +432,7 @@ public class BattleView extends GLG2DCanvas {
 				y = battleFieldHeight - ry;
 
 				at = AffineTransform.getTranslateInstance(x, y);
-				at.rotate(robotSnapshot.getBodyHeading());
+				at.rotate(bodyHeading);
 
 				RenderObject robotRenderImage = imageManager.getColoredBodyRenderImage(robotSnapshot.getBodyColor());
 
@@ -427,7 +440,7 @@ public class BattleView extends GLG2DCanvas {
 				robotRenderImage.paint(g);
 
 				at = AffineTransform.getTranslateInstance(x, y);
-				at.rotate(robotSnapshot.getGunHeading());
+				at.rotate(gunHeading);
 
 				RenderObject gunRenderImage = imageManager.getColoredGunRenderImage(robotSnapshot.getGunColor());
 
@@ -436,7 +449,7 @@ public class BattleView extends GLG2DCanvas {
 
 				if (!robotSnapshot.isDroid()) {
 					at = AffineTransform.getTranslateInstance(x, y);
-					at.rotate(robotSnapshot.getRadarHeading());
+					at.rotate(radarHeading);
 
 					RenderObject radarRenderImage = imageManager.getColoredRadarRenderImage(robotSnapshot.getRadarColor());
 
