@@ -686,26 +686,29 @@ public class BattleView extends GLG2DCanvas {
 				lastDesiredTPS = desiredTPS;
 			}
 
+			boolean updated = false;
+
 			int mod = 1;
 			if (eq(desiredTPS, 30)) {
 				mod = 2;
 				if ((frameCount & 1) == 0) {
-					frameCount = 0L;
-					windowManager.pollSnapshot();
+					updated = windowManager.pollSnapshot();
 				}
 			} else if (desiredTPS >= 59.9) {
-				frameCount = 0L;
-				windowManager.pollSnapshot();
+				updated = windowManager.pollSnapshot();
 			} else {
 				mod = (int) Math.floor(60 / desiredTPS + 0.001);
 				if (mod == 0) {
 					throw new IllegalStateException();
 				} else {
 					if ((frameCount % mod) == 0) {
-						frameCount = 0L;
-						windowManager.pollSnapshot();
+						updated = windowManager.pollSnapshot();
 					}
 				}
+			}
+
+			if (updated) {
+				frameCount = 0L;
 			}
 			frameCount += 1L;
 
@@ -714,7 +717,7 @@ public class BattleView extends GLG2DCanvas {
 			final ITurnSnapshot lastSnapshot = windowManager.getLastSnapshot();
 			final ITurnSnapshot lastLastSnapshot = windowManager.getLastLastSnapshot();
 			if (lastSnapshot != null) {
-				update(lastSnapshot, lastLastSnapshot, g, 1. * frameCount / mod);
+				update(lastSnapshot, lastLastSnapshot, g, Math.min(1., 1. * frameCount / mod));
 			} else {
 				paintRobocodeLogo((Graphics2D) g);
 			}

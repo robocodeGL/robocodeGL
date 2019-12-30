@@ -139,8 +139,8 @@ public class WindowManager implements IWindowManagerExt {
 	}
 
 	@Override
-	public void pollSnapshot() {
-		awtAdaptor.pollFrame(false, true);
+	public boolean pollSnapshot() {
+		return awtAdaptor.pollFrame(false, true);
 	}
 
 	public int getFPS() {
