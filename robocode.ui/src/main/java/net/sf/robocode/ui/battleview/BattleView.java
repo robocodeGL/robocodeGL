@@ -304,7 +304,7 @@ public class BattleView extends GLG2DCanvas {
 			drawBullets(g, snapShot, lastSnapshot, t);
 
 			// Draw all text
-			drawText(g, snapShot);
+			drawText(g, snapShot, lastSnapshot, t);
 		}
 
 		// Restore the graphics state
@@ -458,7 +458,12 @@ public class BattleView extends GLG2DCanvas {
 		return last;
 	}
 
-	private void drawText(Graphics2D g, ITurnSnapshot snapShot) {
+	private void drawText(Graphics2D g, ITurnSnapshot snapShot, ITurnSnapshot lastSnapshot, double t) {
+		IntObjectHashMap last = null;
+		if (t != 1.) {
+			last = getRobotMap(lastSnapshot);
+		}
+
 		final Shape savedClip = g.getClip();
 
 		g.setClip(null);
@@ -467,8 +472,19 @@ public class BattleView extends GLG2DCanvas {
 			if (robotSnapshot.getState().isDead()) {
 				continue;
 			}
-			int x = (int) robotSnapshot.getX();
-			int y = battleField.getHeight() - (int) robotSnapshot.getY();
+			double rx = robotSnapshot.getX();
+			double ry = robotSnapshot.getY();
+
+			if (t != 1.) {
+				IRobotSnapshot l = (IRobotSnapshot) last.get(robotSnapshot.getRobotIndex());
+				if (l != null) {
+					rx = l.getX() * (1. - t) + rx * t;
+					ry = l.getY() * (1. - t) + ry * t;
+				}
+			}
+
+			float x = (float) rx;
+			float y = battleField.getHeight() - (float) ry;
 
 			if (drawRobotEnergy) {
 				g.setColor(Color.white);
@@ -483,13 +499,13 @@ public class BattleView extends GLG2DCanvas {
 				if (robotSnapshot.getEnergy() == 0 && robotSnapshot.getState().isAlive()) {
 					energyString = "Disabled";
 				}
-				centerString(g, energyString, x, y - ROBOT_TEXT_Y_OFFSET - smallFontMetrics.getHeight() / 2, smallFont,
+				centerString(g, energyString, x, y - ROBOT_TEXT_Y_OFFSET - smallFontMetrics.getHeight() * .5f, smallFont,
 					smallFontMetrics);
 			}
 			if (drawRobotName) {
 				g.setColor(Color.white);
 				centerString(g, robotSnapshot.getVeryShortName(), x,
-					y + ROBOT_TEXT_Y_OFFSET + smallFontMetrics.getHeight() / 2, smallFont, smallFontMetrics);
+					y + ROBOT_TEXT_Y_OFFSET + smallFontMetrics.getHeight() * .5f, smallFont, smallFontMetrics);
 			}
 		}
 
@@ -654,21 +670,21 @@ public class BattleView extends GLG2DCanvas {
 		g.setClip(savedClip);
 	}
 
-	private void centerString(Graphics2D g, String s, int x, int y, Font font, FontMetrics fm) {
+	private void centerString(Graphics2D g, String s, float x, float y, Font font, FontMetrics fm) {
 		g.setFont(font);
 
 		int width = fm.stringWidth(s);
 		int height = fm.getHeight();
 		int descent = fm.getDescent();
 
-		double left = x - width / 2;
-		double top = y - height / 2;
+		float left = x - width * .5f;
+		float top = y - height * .5f;
 
-		double scaledViewWidth = getWidth() / scale;
-		double scaledViewHeight = getHeight() / scale;
+		float scaledViewWidth = getWidth() / (float) scale;
+		float scaledViewHeight = getHeight() / (float) scale;
 
-		double borderWidth = (scaledViewWidth - battleField.getWidth()) / 2;
-		double borderHeight = (scaledViewHeight - battleField.getHeight()) / 2;
+		float borderWidth = (scaledViewWidth - battleField.getWidth()) * .5f;
+		float borderHeight = (scaledViewHeight - battleField.getHeight()) * .5f;
 
 		if (left + width > scaledViewWidth) {
 			left = scaledViewWidth - width;
@@ -682,7 +698,7 @@ public class BattleView extends GLG2DCanvas {
 		if (top < -borderHeight) {
 			top = -borderHeight;
 		}
-		g.drawString(s, (int) (left + 0.5), (int) (top + height - descent + 0.5));
+		g.drawString(s, (left + 0.5f), (top + height - descent + 0.5f));
 	}
 
 	private void drawScanArc(Graphics2D g, IRobotSnapshot robotSnapshot) {
