@@ -98,6 +98,7 @@ public class BattleView extends GLG2DCanvas {
 	private boolean drawExplosions;
 	private boolean drawGround;
 	private boolean drawExplosionDebris;
+	private boolean allowScaleUp = true;
 
 	private RenderingHints renderingHints;
 
@@ -184,7 +185,7 @@ public class BattleView extends GLG2DCanvas {
 		loadDisplayOptions();
 
 		// If we are scaled...
-		if (getWidth() < battleField.getWidth() || getHeight() < battleField.getHeight()) {
+		if (allowScaleUp || getWidth() < battleField.getWidth() || getHeight() < battleField.getHeight()) {
 			// Use the smaller scale.
 			// Actually we don't need this, since
 			// the RobocodeFrame keeps our aspect ratio intact.
@@ -195,8 +196,8 @@ public class BattleView extends GLG2DCanvas {
 		}
 
 		// Scale font
-		smallFont = new Font("Dialog", Font.PLAIN, (int) (10 / scale));
-		smallFontMetrics = getGraphics().getFontMetrics();
+		smallFont = new Font("Dialog", Font.PLAIN, (int) (10 / Math.min(1., scale)));
+		smallFontMetrics = getGraphics().getFontMetrics(smallFont);
 
 		// Initialize ground image
 		if (drawGround) {
