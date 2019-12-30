@@ -123,11 +123,11 @@ public final class AwtBattleAdaptor {
 		}
 	}
 
-	public void pollFrame(boolean forceRepaint, boolean readoutText) {
+	public boolean pollFrame(boolean forceRepaint, boolean readoutText) {
 		try {
 			Turn turn = snapshot.poll();
 
-			if (turn == null) return;
+			if (turn == null) return forceRepaint;
 
 			ITurnSnapshot current = turn.current;
 
@@ -169,11 +169,14 @@ public final class AwtBattleAdaptor {
 					}
 
 					calculateFPS();
+
+					return true;
 				}
 			}
 		} catch (Throwable t) {
 			Logger.logError(t);
 		}
+		return false;
 	}
 
 	public int getFPS() {
