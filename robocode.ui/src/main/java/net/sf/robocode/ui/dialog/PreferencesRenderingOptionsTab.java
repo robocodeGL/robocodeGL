@@ -35,6 +35,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JComboBox optionsRenderingNoBuffersComboBox;
 	private JCheckBox optionsRenderingBufferImagesCheckBox;
 	private JCheckBox optionsRenderingForceBulletColorCheckBox;
+	private JCheckBox optionsRenderingAllowScaleUpCheckBox;
 
 	private JButton predefinedPlaformDefaultButton;
 	private JButton predefinedSpeedButton;
@@ -153,6 +154,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 			otherSettingsPanel.setLayout(new BoxLayout(otherSettingsPanel, BoxLayout.Y_AXIS));
 			otherSettingsPanel.add(getOptionsRenderingBufferImagesCheckBox());
 			otherSettingsPanel.add(getOptionsRenderingForceBulletColorCheckBox());
+			otherSettingsPanel.add(getOptionsRenderingAllowScaleUpCheckBox());
 		}
 		return otherSettingsPanel;
 	}
@@ -238,6 +240,15 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		return optionsRenderingForceBulletColorCheckBox;
 	}
 
+	private JCheckBox getOptionsRenderingAllowScaleUpCheckBox() {
+		if (optionsRenderingAllowScaleUpCheckBox == null) {
+			optionsRenderingAllowScaleUpCheckBox = new JCheckBox("Allow scaling battle view up");
+			optionsRenderingAllowScaleUpCheckBox.setMnemonic('S');
+			optionsRenderingAllowScaleUpCheckBox.addActionListener(eventHandler);
+		}
+		return optionsRenderingAllowScaleUpCheckBox;
+	}
+
 	private void loadPreferences(ISettingsManager props) {
 		getOptionsRenderingAntialiasingComboBox().setSelectedIndex(props.getOptionsRenderingAntialiasing());
 		getOptionsRenderingTextAntialiasingComboBox().setSelectedIndex(props.getOptionsRenderingTextAntialiasing());
@@ -245,6 +256,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		getOptionsRenderingNoBuffersComboBox().setSelectedIndex(props.getOptionsRenderingNoBuffers() - 1);
 		getOptionsRenderingBufferImagesCheckBox().setSelected(props.getOptionsRenderingBufferImages());
 		getOptionsRenderingForceBulletColorCheckBox().setSelected(props.getOptionsRenderingForceBulletColor());
+		getOptionsRenderingAllowScaleUpCheckBox().setSelected(props.getOptionsRenderingAllowScaleUp());
 	}
 
 	public void storePreferences() {
@@ -256,6 +268,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		props.setOptionsRenderingNoBuffers(optionsRenderingNoBuffersComboBox.getSelectedIndex() + 1);
 		props.setOptionsRenderingBufferImages(optionsRenderingBufferImagesCheckBox.isSelected());
 		props.setOptionsRenderingForceBulletColor(optionsRenderingForceBulletColorCheckBox.isSelected());
+		props.setOptionsRenderingAllowScaleUp(optionsRenderingAllowScaleUpCheckBox.isSelected());
 		properties.saveProperties();
 	}
 

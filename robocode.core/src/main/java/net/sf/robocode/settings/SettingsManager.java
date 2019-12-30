@@ -47,7 +47,7 @@ public class SettingsManager implements ISettingsManager {
 			optionsViewExplosions = true,
 			optionsViewGround = true,
 			optionsViewExplosionDebris = true,
-			optionsAllowScaleUp = true,
+			optionsRenderingAllowScaleUp = true,
 			optionsViewSentryBorder = false;
 
 	// View Options (Turns Per Second)
@@ -251,16 +251,6 @@ public class SettingsManager implements ISettingsManager {
 		props.setProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "" + optionsViewExplosionDebris);
 	}
 
-	@Override
-	public boolean getOptionsAllowScaleUp() {
-		return optionsAllowScaleUp;
-	}
-
-	public void setOptionsAllowScaleUp(boolean optionsAllowScaleUp) {
-		this.optionsAllowScaleUp = optionsAllowScaleUp;
-		props.setProperty(OPTIONS_ALLOW_SCALE_UP, "" + optionsAllowScaleUp);
-	}
-
 	public boolean getOptionsViewPreventSpeedupWhenMinimized() {
 		return optionsViewPreventSpeedupWhenMinimized;
 	}
@@ -386,6 +376,15 @@ public class SettingsManager implements ISettingsManager {
 	public void setOptionsRenderingForceBulletColor(boolean optionsRenderingForceBulletColor) {
 		this.optionsRenderingForceBulletColor = optionsRenderingForceBulletColor;
 		props.setProperty(OPTIONS_RENDERING_FORCE_BULLET_COLOR, "" + optionsRenderingForceBulletColor);
+	}
+
+	public boolean getOptionsRenderingAllowScaleUp() {
+		return optionsRenderingAllowScaleUp;
+	}
+
+	public void setOptionsRenderingAllowScaleUp(boolean optionsRenderingAllowScaleUp) {
+		this.optionsRenderingAllowScaleUp = optionsRenderingAllowScaleUp;
+		props.setProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "" + optionsRenderingAllowScaleUp);
 	}
 
 	public int getOptionsBattleDesiredTPS() {
@@ -727,7 +726,7 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewFPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_FPS, "true"));
 		optionsViewExplosions = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSIONS, "true"));
 		optionsViewExplosionDebris = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "true"));
-		optionsAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_ALLOW_SCALE_UP, "true"));
+		optionsRenderingAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "true"));
 		optionsViewSentryBorder = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_SENTRY_BORDER, "false"));
 		optionsViewPreventSpeedupWhenMinimized = Boolean.valueOf(
 				props.getProperty(OPTIONS_VIEW_PREVENT_SPEEDUP_WHEN_MINIMIZED, "false"));

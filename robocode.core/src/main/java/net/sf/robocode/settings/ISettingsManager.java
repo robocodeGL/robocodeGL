@@ -54,9 +54,9 @@ public interface ISettingsManager {
 
 	void setOptionsViewExplosionDebris(boolean optionsViewExplosionDebris);
 
-	boolean getOptionsAllowScaleUp();
+	boolean getOptionsRenderingAllowScaleUp();
 
-	void setOptionsAllowScaleUp(boolean optionsAllowScaleUp);
+	void setOptionsRenderingAllowScaleUp(boolean optionsAllowScaleUp);
 
 	boolean getOptionsViewSentryBorder();
 
@@ -257,7 +257,6 @@ public interface ISettingsManager {
 			OPTIONS_VIEW_FPS = "robocode.options.view.FPS",
 			OPTIONS_VIEW_EXPLOSIONS = "robocode.options.view.explosions",
 			OPTIONS_VIEW_EXPLOSION_DEBRIS = "robocode.options.view.explosionDebris",
-			OPTIONS_ALLOW_SCALE_UP = "robocode.options.view.allowScaleUp",
 			OPTIONS_VIEW_SENTRY_BORDER = "robocode.options.view.sentryBorder",
 
 			OPTIONS_BATTLE_DESIREDTPS = "robocode.options.battle.desiredTPS",
@@ -270,6 +269,7 @@ public interface ISettingsManager {
 			OPTIONS_RENDERING_NO_BUFFERS = "robocode.options.rendering.noBuffers",
 			OPTIONS_RENDERING_BUFFER_IMAGES = "robocode.options.rendering.bufferImages",
 			OPTIONS_RENDERING_FORCE_BULLET_COLOR = "robocode.options.rendering.forceBulletColor",
+			OPTIONS_RENDERING_ALLOW_SCALE_UP = "robocode.options.rendering.allowScaleUp",
 
 			OPTIONS_SOUND_ENABLESOUND = "robocode.options.sound.enableSound",
 			OPTIONS_SOUND_ENABLEGUNSHOT = "robocode.options.sound.enableGunshot",
