@@ -246,10 +246,13 @@ public final class AwtBattleAdaptor {
 
 		@Override
 		public void onRoundStarted(final RoundStartedEvent event) {
-			if (lastMajorEvent.get() == majorEvent.get()) {
-				last = null;
-				putSnapshot(event.getStartSnapshot(), true);
-			}
+			last = null;
+			lastSnapshot = null;
+			lastLastSnapshot = null;
+			snapshot.clear();
+			putSnapshot(event.getStartSnapshot(), true);
+			// if (lastMajorEvent.get() == majorEvent.get()) {
+			// }
 			majorEvent.incrementAndGet();
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
@@ -262,24 +265,26 @@ public final class AwtBattleAdaptor {
 
 		@Override
 		public void onBattleStarted(final BattleStartedEvent event) {
+			snapshot.clear();
+			lastSnapshot = null;
+			lastLastSnapshot = null;
+			frameSync = true;
+			isRunning.set(true);
+			isPaused.set(false);
+
 			majorEvent.incrementAndGet();
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					isRunning.set(true);
-					isPaused.set(false);
 					synchronized (snapshot) {
 						outCache = new StringBuilder[event.getRobotsCount()];
 						for (int i = 0; i < event.getRobotsCount(); i++) {
 							outCache[i] = new StringBuilder(1024);
 						}
 					}
-					lastSnapshot = null;
-					lastLastSnapshot = null;
 
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
 					awtOnTurnEnded(true, false);
-					frameSync = true;
 				}
 			});
 		}
@@ -321,6 +326,7 @@ public final class AwtBattleAdaptor {
 		@Override
 		public void onRoundEnded(final RoundEndedEvent event) {
 			majorEvent.incrementAndGet();
+			// last = null;
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					battleEventDispatcher.onRoundEnded(event);
