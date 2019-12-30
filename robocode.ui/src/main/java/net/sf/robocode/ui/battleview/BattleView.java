@@ -173,7 +173,7 @@ public class BattleView extends GLG2DCanvas {
 		drawGround = props.getOptionsViewGround();
 		drawExplosions = props.getOptionsViewExplosions();
 		drawExplosionDebris = props.getOptionsViewExplosionDebris();
-		allowScaleUp = props.getOptionsAllowScaleUp();
+		allowScaleUp = props.getOptionsRenderingAllowScaleUp();
 
 		renderingHints = props.getRenderingHints();
 	}
