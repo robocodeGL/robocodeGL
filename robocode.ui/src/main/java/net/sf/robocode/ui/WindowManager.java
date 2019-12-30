@@ -134,6 +134,10 @@ public class WindowManager implements IWindowManagerExt {
 		return awtAdaptor.getLastSnapshot();
 	}
 
+	public ITurnSnapshot getLastLastSnapshot() {
+		return awtAdaptor.getLastLastSnapshot();
+	}
+
 	@Override
 	public void pollSnapshot() {
 		awtAdaptor.pollFrame(false, true);
