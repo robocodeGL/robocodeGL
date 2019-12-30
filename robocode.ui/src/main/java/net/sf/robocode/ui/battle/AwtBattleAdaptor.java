@@ -52,7 +52,10 @@ public final class AwtBattleAdaptor {
 	private final AtomicInteger majorEvent;
 	private final AtomicInteger lastMajorEvent;
 	private ITurnSnapshot lastSnapshot;
+	private ITurnSnapshot lastLastSnapshot;
 	private StringBuilder[] outCache;
+
+	private ITurnSnapshot last;
 
 	private volatile boolean frameSync = false;
 
@@ -102,14 +105,20 @@ public final class AwtBattleAdaptor {
 		return isRunning.get() ? lastSnapshot : null;
 	}
 
+	public ITurnSnapshot getLastLastSnapshot() {
+		return isRunning.get() ? lastLastSnapshot : null;
+	}
+
 	// this is always dispatched on AWT thread
 	private void awtOnTurnEnded(boolean forceRepaint, boolean readoutText) {
 	}
 
 	private static final class Turn {
+		final ITurnSnapshot last;
 		final ITurnSnapshot current;
 
-		private Turn(ITurnSnapshot current) {
+		private Turn(ITurnSnapshot last, ITurnSnapshot current) {
+			this.last = last;
 			this.current = current;
 		}
 	}
@@ -125,10 +134,12 @@ public final class AwtBattleAdaptor {
 			if (current == null) { // !isRunning.get() ||
 				// paint logo
 				lastSnapshot = null;
+				lastLastSnapshot = null;
 				battleEventDispatcher.onTurnEnded(new TurnEndedEvent(null));
 			} else {
 				if (lastSnapshot != current || !skipSameFrames || forceRepaint) {
 					lastSnapshot = current;
+					lastLastSnapshot = turn.last;
 
 					IRobotSnapshot[] robots = null;
 
@@ -233,6 +244,7 @@ public final class AwtBattleAdaptor {
 		@Override
 		public void onRoundStarted(final RoundStartedEvent event) {
 			if (lastMajorEvent.get() == majorEvent.get()) {
+				last = null;
 				putSnapshot(event.getStartSnapshot(), true);
 			}
 			majorEvent.incrementAndGet();
@@ -259,7 +271,7 @@ public final class AwtBattleAdaptor {
 						}
 					}
 					lastSnapshot = null;
-					putSnapshot(null, false);
+					lastLastSnapshot = null;
 
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
@@ -283,7 +295,7 @@ public final class AwtBattleAdaptor {
 					battleEventDispatcher.onBattleFinished(event);
 					lastMajorEvent.incrementAndGet();
 					lastSnapshot = null;
-					putSnapshot(null, false);
+					lastLastSnapshot = null;
 
 					// paint logo
 					awtOnTurnEnded(true, true);
@@ -360,14 +372,17 @@ public final class AwtBattleAdaptor {
 	}
 
 	private void putSnapshot(ITurnSnapshot turnSnapshot, boolean blocking) {
+		ITurnSnapshot last = this.last;
+		this.last = turnSnapshot;
+
 		if (blocking && frameSync && battleManager.isManagedTPS() && properties.getOptionsBattleDesiredTPS() < 60.1) {
 			try {
-				snapshot.offer(new Turn(turnSnapshot), 1500, TimeUnit.MILLISECONDS);
+				snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		} else {
-			snapshot.offer(new Turn(turnSnapshot));
+			snapshot.offer(new Turn(last, turnSnapshot));
 		}
 	}
 }

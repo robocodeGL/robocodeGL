@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.battleview;
 
 
+import com.jogamp.common.util.IntObjectHashMap;
 import com.jogamp.opengl.util.Animator;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
@@ -159,7 +160,7 @@ public class BattleView extends GLG2DCanvas {
 		if (windowManager.getLastSnapshot() == null) {
 			paintRobocodeLogo((Graphics2D) screenshot.getGraphics());
 		} else {
-			drawBattle((Graphics2D) screenshot.getGraphics(), windowManager.getLastSnapshot());
+			drawBattle((Graphics2D) screenshot.getGraphics(), windowManager.getLastSnapshot(), null, 1);
 		}
 		return screenshot;
 	}
@@ -252,7 +253,7 @@ public class BattleView extends GLG2DCanvas {
 		}
 	}
 
-	private void drawBattle(Graphics2D g, ITurnSnapshot snapShot) {
+	private void drawBattle(Graphics2D g, ITurnSnapshot snapShot, ITurnSnapshot lastSnapshot, double t) {
 		// Save the graphics state
 		graphicsState.save(g);
 
@@ -287,7 +288,7 @@ public class BattleView extends GLG2DCanvas {
 			drawScanArcs(g, snapShot);
 
 			// Draw robots
-			drawRobots(g, snapShot);
+			drawRobots(g, snapShot, lastSnapshot, t);
 
 			// Draw robot (debug) paintings
 			drawRobotPaint(g, snapShot);
@@ -373,7 +374,7 @@ public class BattleView extends GLG2DCanvas {
 		}
 	}
 
-	private void drawRobots(Graphics2D g, ITurnSnapshot snapShot) {
+	private void drawRobots(Graphics2D g, ITurnSnapshot snapShot, ITurnSnapshot lastSnapshot, double t) {
 		double x, y;
 		AffineTransform at;
 		int battleFieldHeight = battleField.getHeight();
@@ -394,10 +395,31 @@ public class BattleView extends GLG2DCanvas {
 			}
 		}
 
+		IntObjectHashMap last = null;
+		if (t != 1.) {
+			last = new IntObjectHashMap();
+			if (lastSnapshot != null) {
+				for (IRobotSnapshot robot : lastSnapshot.getRobots()) {
+					last.put(robot.getRobotIndex(), robot);
+				}
+			}
+		}
+
 		for (IRobotSnapshot robotSnapshot : snapShot.getRobots()) {
 			if (robotSnapshot.getState().isAlive()) {
-				x = robotSnapshot.getX();
-				y = battleFieldHeight - robotSnapshot.getY();
+				double rx = robotSnapshot.getX();
+				double ry = robotSnapshot.getY();
+
+				if (t != 1.) {
+					IRobotSnapshot l = (IRobotSnapshot) last.get(robotSnapshot.getRobotIndex());
+					if (l != null) {
+						rx = l.getX() * (1. - t) + rx * t;
+						ry = l.getY() * (1. - t) + ry * t;
+					}
+				}
+
+				x = rx;
+				y = battleFieldHeight - ry;
 
 				at = AffineTransform.getTranslateInstance(x, y);
 				at.rotate(robotSnapshot.getBodyHeading());
@@ -664,7 +686,9 @@ public class BattleView extends GLG2DCanvas {
 				lastDesiredTPS = desiredTPS;
 			}
 
+			int mod = 1;
 			if (eq(desiredTPS, 30)) {
+				mod = 2;
 				if ((frameCount & 1) == 0) {
 					frameCount = 0L;
 					windowManager.pollSnapshot();
@@ -673,7 +697,7 @@ public class BattleView extends GLG2DCanvas {
 				frameCount = 0L;
 				windowManager.pollSnapshot();
 			} else {
-				int mod = (int) Math.floor(60 / desiredTPS + 0.001);
+				mod = (int) Math.floor(60 / desiredTPS + 0.001);
 				if (mod == 0) {
 					throw new IllegalStateException();
 				} else {
@@ -688,14 +712,15 @@ public class BattleView extends GLG2DCanvas {
 			// windowManager.pollSnapshot();
 
 			final ITurnSnapshot lastSnapshot = windowManager.getLastSnapshot();
+			final ITurnSnapshot lastLastSnapshot = windowManager.getLastLastSnapshot();
 			if (lastSnapshot != null) {
-				update(lastSnapshot, g);
+				update(lastSnapshot, lastLastSnapshot, g, 1. * frameCount / mod);
 			} else {
 				paintRobocodeLogo((Graphics2D) g);
 			}
 		}
 
-		private void update(ITurnSnapshot snapshot, Graphics g) {
+		private void update(ITurnSnapshot snapshot, ITurnSnapshot lastSnapshot, Graphics g, double t) {
 			if (!initialized) {
 				initialize();
 			}
@@ -704,7 +729,7 @@ public class BattleView extends GLG2DCanvas {
 				return;
 			}
 
-			drawBattle((Graphics2D) g, snapshot);
+			drawBattle((Graphics2D) g, snapshot, lastSnapshot, t);
 		}
 	}
 
