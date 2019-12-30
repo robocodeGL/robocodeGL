@@ -135,7 +135,7 @@ public class FastLineVisitor extends SimplePathVisitor {
     }
 
     // we'll only try if it's a thin line
-    return glLineWidth <= 2;
+    return glLineWidth <= 1;
   }
 
   @Override
