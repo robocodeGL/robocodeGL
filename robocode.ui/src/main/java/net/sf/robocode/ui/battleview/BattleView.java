@@ -23,6 +23,7 @@ import net.sf.robocode.ui.gfx.RenderObject;
 import net.sf.robocode.ui.gfx.RobocodeLogo;
 import org.jogamp.glg2d.GLG2DCanvas;
 import robocode.BattleRules;
+import robocode.Rules;
 import robocode.control.events.BattleAdaptor;
 import robocode.control.events.BattleFinishedEvent;
 import robocode.control.events.BattleStartedEvent;
@@ -51,6 +52,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
+import java.util.HashMap;
 import java.util.Random;
 
 import static java.lang.Math.abs;
@@ -299,7 +301,7 @@ public class BattleView extends GLG2DCanvas {
 
 		if (snapShot != null) {
 			// Draw all bullets
-			drawBullets(g, snapShot);
+			drawBullets(g, snapShot, lastSnapshot, t);
 
 			// Draw all text
 			drawText(g, snapShot);
@@ -397,12 +399,7 @@ public class BattleView extends GLG2DCanvas {
 
 		IntObjectHashMap last = null;
 		if (t != 1.) {
-			last = new IntObjectHashMap();
-			if (lastSnapshot != null) {
-				for (IRobotSnapshot robot : lastSnapshot.getRobots()) {
-					last.put(robot.getRobotIndex(), robot);
-				}
-			}
+			last = getRobotMap(lastSnapshot);
 		}
 
 		for (IRobotSnapshot robotSnapshot : snapShot.getRobots()) {
@@ -448,6 +445,17 @@ public class BattleView extends GLG2DCanvas {
 				}
 			}
 		}
+	}
+
+	private IntObjectHashMap getRobotMap(ITurnSnapshot lastSnapshot) {
+		IntObjectHashMap last;
+		last = new IntObjectHashMap();
+		if (lastSnapshot != null) {
+			for (IRobotSnapshot robot : lastSnapshot.getRobots()) {
+				last.put(robot.getRobotIndex(), robot);
+			}
+		}
+		return last;
 	}
 
 	private void drawText(Graphics2D g, ITurnSnapshot snapShot) {
@@ -532,7 +540,48 @@ public class BattleView extends GLG2DCanvas {
 		return robotGraphics[robotIndex];
 	}
 
-	private void drawBullets(Graphics2D g, ITurnSnapshot snapShot) {
+	private static final class IntPair {
+		public final int a;
+		public final int b;
+
+		private IntPair(int a, int b) {
+			this.a = a;
+			this.b = b;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o) return true;
+			if (o == null || getClass() != o.getClass()) return false;
+			IntPair intPair = (IntPair) o;
+			return a == intPair.a &&
+				b == intPair.b;
+		}
+
+		@Override
+		public int hashCode() {
+			int result = 1;
+
+			result = 31 * result + a;
+			result = 31 * result + b;
+
+			return result;
+		}
+	}
+
+	private void drawBullets(Graphics2D g, ITurnSnapshot snapShot, ITurnSnapshot lastSnapshot, double t) {
+		HashMap<IntPair, IBulletSnapshot> last = null;
+		if (t != 1.) {
+			last = new HashMap<IntPair, IBulletSnapshot>();
+			if (lastSnapshot != null) {
+				for (IBulletSnapshot bullet : lastSnapshot.getBullets()) {
+					last.put(new IntPair(bullet.getOwnerIndex(), bullet.getBulletId()), bullet);
+				}
+			}
+		}
+
+		IntObjectHashMap robotMap = null;
+
 		final Shape savedClip = g.getClip();
 
 		g.setClip(null);
@@ -540,8 +589,31 @@ public class BattleView extends GLG2DCanvas {
 		double x, y;
 
 		for (IBulletSnapshot bulletSnapshot : snapShot.getBullets()) {
-			x = bulletSnapshot.getPaintX();
-			y = battleField.getHeight() - bulletSnapshot.getPaintY();
+			double bx = bulletSnapshot.getPaintX();
+			double by = bulletSnapshot.getPaintY();
+
+			if (t != 1.) {
+				if (bulletSnapshot.getBulletId() == 0) {
+					if (robotMap == null) {
+						robotMap = getRobotMap(lastSnapshot);
+					}
+
+					IRobotSnapshot l = (IRobotSnapshot) robotMap.get(bulletSnapshot.getOwnerIndex());
+					if (l != null) {
+						bx = l.getX() * (1. - t) + bx * t;
+						by = l.getY() * (1. - t) + by * t;
+					}
+				} else {
+					IBulletSnapshot l = last.get(new IntPair(bulletSnapshot.getOwnerIndex(), bulletSnapshot.getBulletId()));
+					if (l != null) {
+						bx = l.getPaintX() * (1. - t) + bx * t;
+						by = l.getPaintY() * (1. - t) + by * t;
+					}
+				}
+			}
+
+			x = bx;
+			y = battleField.getHeight() - by;
 
 			AffineTransform at = AffineTransform.getTranslateInstance(x, y);
 
@@ -625,7 +697,7 @@ public class BattleView extends GLG2DCanvas {
 		g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.2f));
 
 		scanArc.setAngleStart((360 - scanArc.getAngleStart() - scanArc.getAngleExtent()) % 360);
-		scanArc.y = battleField.getHeight() - robotSnapshot.getY() - robocode.Rules.RADAR_SCAN_RADIUS;
+		scanArc.y = battleField.getHeight() - robotSnapshot.getY() - Rules.RADAR_SCAN_RADIUS;
 
 		int scanColor = robotSnapshot.getScanColor();
 
