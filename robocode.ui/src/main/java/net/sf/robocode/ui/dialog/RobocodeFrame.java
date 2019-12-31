@@ -969,7 +969,7 @@ public class RobocodeFrame extends JFrame {
 		}
 
 		private void updateTitle() {
-			StringBuffer title = new StringBuffer("Robocode");
+			StringBuffer title = new StringBuffer("RobocodeGL");
 
 			if (isBattleRunning) {
 				title.append(": ");
