@@ -24,8 +24,8 @@ final class FPSGraph {
 	private final float fpsH = 75;
 
 	private boolean fpsDrag = false;
-	private float fpsLX;
-	private float fpsLY;
+	private float fpsDX;
+	private float fpsDY;
 
 	public void init(JComponent component) {
 		this.component = component;
@@ -35,8 +35,8 @@ final class FPSGraph {
 			public void mousePressed(MouseEvent e) {
 				if (getFPSRect().contains(e.getX(), e.getY())) {
 					fpsDrag = true;
-					fpsLX = e.getX();
-					fpsLY = e.getY();
+					fpsDX = fpsX - e.getX();
+					fpsDY = fpsY - e.getY();
 					e.consume();
 				}
 			}
@@ -54,10 +54,8 @@ final class FPSGraph {
 			@Override
 			public void mouseDragged(MouseEvent e) {
 				if (fpsDrag) {
-					fpsX += e.getX() - fpsLX;
-					fpsY += e.getY() - fpsLY;
-					fpsLX = e.getX();
-					fpsLY = e.getY();
+					fpsX = e.getX() + fpsDX;
+					fpsY = e.getY() + fpsDY;
 					limitFPSRect();
 					e.consume();
 				}
