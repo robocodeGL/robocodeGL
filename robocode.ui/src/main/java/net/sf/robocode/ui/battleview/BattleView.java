@@ -121,6 +121,8 @@ public class BattleView extends GLG2DCanvas {
 	private final GraphicsState graphicsState = new GraphicsState();
 	private IGraphicsProxy[] robotGraphics;
 
+	private final FPSGraph fpsGraph = new FPSGraph();
+
 	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager) {
 
 		this.properties = properties;
@@ -155,6 +157,8 @@ public class BattleView extends GLG2DCanvas {
 		animator.add(this.getGLDrawable());
 
 		animator.start();
+
+		fpsGraph.init(this);
 	}
 
 	public BufferedImage getScreenshot() {
@@ -772,9 +776,16 @@ public class BattleView extends GLG2DCanvas {
 
 	private class MyPanel extends JPanel {
 		private double lastDesiredTPS = 0.;
+		private long timeLastPaint = -1;
 
 		@Override
 		public void paint(Graphics g) {
+			long now = System.nanoTime();
+			long delta = timeLastPaint == -1 ? 0 : now - timeLastPaint;
+			timeLastPaint = now;
+
+			fpsGraph.recordFPS(1e9 / delta);
+
 			double desiredTPS = properties.getOptionsBattleDesiredTPS();
 
 			if (lastDesiredTPS != desiredTPS) {
@@ -822,6 +833,8 @@ public class BattleView extends GLG2DCanvas {
 			} else {
 				paintRobocodeLogo((Graphics2D) g);
 			}
+
+			fpsGraph.paint((Graphics2D) g);
 		}
 
 		private void update(ITurnSnapshot snapshot, ITurnSnapshot lastSnapshot, Graphics g, double t) {
