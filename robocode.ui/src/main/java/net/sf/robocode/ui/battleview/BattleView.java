@@ -44,7 +44,6 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.SystemColor;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
@@ -73,7 +72,8 @@ public class BattleView extends GLG2DCanvas {
 
 	private final static String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
 
-	private final static Color CANVAS_BG_COLOR = SystemColor.controlDkShadow;
+	private final static Color CANVAS_BG_COLOR = new Color(45, 45, 45); // SystemColor.controlDkShadow;
+	private static final Color GROUND_COLOR = new Color(45, 45, 45);
 
 	private final static Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
 
@@ -339,7 +339,7 @@ public class BattleView extends GLG2DCanvas {
 			}
 		} else {
 			// Ground should not be drawn
-			g.setColor(Color.BLACK);
+			g.setColor(GROUND_COLOR);
 			g.fillRect(0, 0, battleField.getWidth(), battleField.getHeight());
 		}
 
@@ -779,7 +779,14 @@ public class BattleView extends GLG2DCanvas {
 		private long timeLastPaint = -1;
 
 		@Override
-		public void paint(Graphics g) {
+		public void paint(Graphics g0) {
+			Graphics2D g = (Graphics2D) g0;
+
+			if (timeLastPaint == -1) {
+				warmPaint(g, imageManager.getExplosionDebriseRenderImage());
+				warmPaint(g, imageManager.getExplosionRenderImage(1, 1));
+			}
+
 			long now = System.nanoTime();
 			long delta = timeLastPaint == -1 ? 0 : now - timeLastPaint;
 			timeLastPaint = now;
@@ -831,10 +838,10 @@ public class BattleView extends GLG2DCanvas {
 			if (lastSnapshot != null) {
 				update(lastSnapshot, lastLastSnapshot, g, Math.min(1., 1. * frameCount / mod));
 			} else {
-				paintRobocodeLogo((Graphics2D) g);
+				paintRobocodeLogo(g);
 			}
 
-			fpsGraph.paint((Graphics2D) g);
+			fpsGraph.paint(g);
 		}
 
 		private void update(ITurnSnapshot snapshot, ITurnSnapshot lastSnapshot, Graphics g, double t) {
@@ -848,6 +855,11 @@ public class BattleView extends GLG2DCanvas {
 
 			drawBattle((Graphics2D) g, snapshot, lastSnapshot, t);
 		}
+	}
+
+	private void warmPaint(Graphics2D g, RenderObject image) {
+		image.setTransform(AffineTransform.getTranslateInstance(0, 0));
+		image.paint(g);
 	}
 
 	private class BattleObserver extends BattleAdaptor {
