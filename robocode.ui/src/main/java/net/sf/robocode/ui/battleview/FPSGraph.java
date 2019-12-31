@@ -22,13 +22,16 @@ import static java.lang.Math.abs;
 
 final class FPSGraph {
 	private static final int MAX_HISTORY = 120;
+	private static final int SHORT_HISTORY = 3;
 	private static final float FPS_PADDING = 5f;
 	private static final int FPS_MARGIN = 15;
 
-	private static final Color MAIN_COLOR = Color.GREEN;
+	private static final Color MAIN_COLOR = new Color(0f, 1f, 0f, .7f);
+	private static final Color BACK_COLOR = new Color(0f, 0f, 0f, .7f);
 	private static final Font FONT = new Font("Arial", Font.PLAIN, 10);
 
 	private final Queue<Double> deltaHistory = new ArrayDeque<Double>(MAX_HISTORY);
+	private final Queue<Double> deltaHistoryShort = new ArrayDeque<Double>(SHORT_HISTORY);
 
 	private float fpsX = FPS_MARGIN;
 	private float fpsY = FPS_MARGIN;
@@ -85,8 +88,20 @@ final class FPSGraph {
 	}
 
 	public void recordFrameDelta(double deltaNano) {
+		if (deltaHistoryShort.size() >= SHORT_HISTORY) deltaHistoryShort.remove();
+		deltaHistoryShort.add(deltaNano * 1e-6);
+
+		double avgDelta = 0.;
+		{
+			int i = 0;
+			for (double delta : deltaHistoryShort) {
+				avgDelta = 1. / (1 + i) * (avgDelta * i + delta);
+				++i;
+			}
+		}
+
 		if (deltaHistory.size() >= MAX_HISTORY) deltaHistory.remove();
-		deltaHistory.add(deltaNano * 1e-6);
+		deltaHistory.add(avgDelta);
 	}
 
 	public void paint(Graphics2D g) {
@@ -94,7 +109,7 @@ final class FPSGraph {
 		g.setTransform(new AffineTransform());
 		Rectangle2D rect = getFPSRect();
 
-		g.setColor(new Color(0f, 0f, 0f, .8f));
+		g.setColor(BACK_COLOR);
 		g.fill(rect);
 		g.setColor(MAIN_COLOR);
 		g.setStroke(new BasicStroke(1f));
@@ -141,13 +156,15 @@ final class FPSGraph {
 			float baseX = fpsX + FPS_PADDING;
 			float baseY = fpsY + FPS_PADDING + contentH * .5f;
 
+			int n = deltaHistory.size();
+
 			int i = 0;
 			for (double delta : deltaHistory) {
 				double fps = 1e3 / delta;
 				if (!isFinite(fps)) {
 					fps = mid;
 				}
-				double x = baseX + i / (1e-18 + MAX_HISTORY - 1.) * contentW;
+				double x = baseX + (i + MAX_HISTORY - n) / (1e-18 + MAX_HISTORY - 1.) * contentW;
 				double y = baseY - contentH / range * (fps - mid);
 
 				if (i == 0) p.moveTo(x, y);
