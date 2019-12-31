@@ -47,6 +47,7 @@ final class FPSGraph {
 	private float oldHeight = 0;
 
 	private JComponent component;
+	private boolean visible;
 
 	public void init(JComponent c) {
 		this.component = c;
@@ -57,6 +58,8 @@ final class FPSGraph {
 		component.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				if (!visible) return;
+
 				if (getFPSRect().contains(e.getX(), e.getY())) {
 					fpsDrag = true;
 					fpsDX = fpsX - e.getX();
@@ -67,6 +70,8 @@ final class FPSGraph {
 
 			@Override
 			public void mouseReleased(MouseEvent e) {
+				if (!visible) return;
+
 				if (fpsDrag) {
 					fpsDrag = false;
 					e.consume();
@@ -77,6 +82,8 @@ final class FPSGraph {
 		component.addMouseMotionListener(new MouseMotionAdapter() {
 			@Override
 			public void mouseDragged(MouseEvent e) {
+				if (!visible) return;
+
 				if (fpsDrag) {
 					fpsX = e.getX() + fpsDX;
 					fpsY = e.getY() + fpsDY;
@@ -89,6 +96,8 @@ final class FPSGraph {
 		component.addComponentListener(new ComponentAdapter() {
 			@Override
 			public void componentResized(ComponentEvent e) {
+				if (!visible) return;
+
 				limitFPSRect();
 
 				oldWidth = component.getWidth();
@@ -98,6 +107,8 @@ final class FPSGraph {
 	}
 
 	public void recordFrameDelta(double deltaNano) {
+		if (!visible) return;
+
 		if (deltaHistoryShort.size() >= SHORT_HISTORY) deltaHistoryShort.remove();
 		deltaHistoryShort.add(deltaNano * 1e-6);
 
@@ -114,7 +125,28 @@ final class FPSGraph {
 		deltaHistory.add(avgDelta);
 	}
 
+	public void setVisible(boolean visible) {
+		// System.out.println("FPSMeter.setVisible " + visible);
+		if (visible != this.visible) {
+			this.visible = visible;
+
+			if (!visible) {
+				reset();
+			}
+		}
+	}
+
+	private void reset() {
+		fpsX = FPS_MARGIN;
+		fpsY = FPS_MARGIN;
+		deltaHistoryShort.clear();
+		deltaHistory.clear();
+		fpsDrag = false;
+	}
+
 	public void paint(Graphics2D g) {
+		if (!visible) return;
+
 		AffineTransform at = g.getTransform();
 		g.setTransform(new AffineTransform());
 		Rectangle2D rect = getFPSRect();

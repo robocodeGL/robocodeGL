@@ -155,6 +155,8 @@ public class BattleView extends GLG2DCanvas {
 	}
 
 	public void init() {
+		loadDisplayOptions();
+
 		fpsGraph.init(this);
 
 		Animator animator = new Animator();
@@ -184,6 +186,7 @@ public class BattleView extends GLG2DCanvas {
 		drawExplosions = props.getOptionsViewExplosions();
 		drawExplosionDebris = props.getOptionsViewExplosionDebris();
 		allowScaleUp = props.getOptionsRenderingAllowScaleUp();
+		fpsGraph.setVisible(props.getOptionsViewFPSMeter());
 
 		renderingHints = props.getRenderingHints();
 	}
