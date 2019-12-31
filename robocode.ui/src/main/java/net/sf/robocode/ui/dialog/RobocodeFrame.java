@@ -47,6 +47,8 @@ import java.util.List;
 @SuppressWarnings("serial")
 public class RobocodeFrame extends JFrame {
 
+	private final static String ROBOCODE_TITLE = "RobocodeGL";
+
 	private final static int MAX_TPS = 10000;
 	private final static int MAX_TPS_SLIDER_VALUE = 61;
 
@@ -550,7 +552,7 @@ public class RobocodeFrame extends JFrame {
 		}
 
 		setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-		setTitle("Robocode");
+		setTitle(ROBOCODE_TITLE);
 		setIconImage(ImageUtil.getImage("/net/sf/robocode/ui/icons/robocode-icon.png"));
 		setResizable(true);
 		setVisible(false);
@@ -969,7 +971,7 @@ public class RobocodeFrame extends JFrame {
 		}
 
 		private void updateTitle() {
-			StringBuffer title = new StringBuffer("RobocodeGL");
+			StringBuffer title = new StringBuffer(ROBOCODE_TITLE);
 
 			if (isBattleRunning) {
 				title.append(": ");
