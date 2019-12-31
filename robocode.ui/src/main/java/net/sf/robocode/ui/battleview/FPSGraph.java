@@ -25,7 +25,7 @@ final class FPSGraph {
 	private static final float FPS_PADDING = 5f;
 	public static final int FPS_MARGIN = 15;
 
-	private final Queue<Double> fpsHistory = new ArrayDeque<Double>(MAX_HISTORY);
+	private final Queue<Double> deltaHistory = new ArrayDeque<Double>(MAX_HISTORY);
 	private JComponent component;
 
 	private float fpsX = FPS_MARGIN;
@@ -36,10 +36,6 @@ final class FPSGraph {
 	private boolean fpsDrag = false;
 	private float fpsDX;
 	private float fpsDY;
-
-	private double rollingDelta = 0.;
-	private long rollingCount = 0;
-	private static final double ROLLING_DEPTH = 60.;
 
 	public void init(JComponent component) {
 		this.component = component;
@@ -84,59 +80,55 @@ final class FPSGraph {
 		});
 	}
 
-	public void recordFPS(double fps) {
-		double delta = 1. / fps;
-		if (isFinite(delta)) {
-			if (ROLLING_DEPTH > 0) {
-				double depth = Math.min(rollingCount, ROLLING_DEPTH);
-				rollingDelta = 1. / (depth + 1.) * (rollingDelta * depth + delta);
-			} else {
-				rollingDelta = 1. / fps;
-			}
-			rollingCount += 1;
-			fps = 1. / rollingDelta;
-		}
-
-		if (fpsHistory.size() >= MAX_HISTORY) fpsHistory.remove();
-		fpsHistory.add(fps);
+	public void recordFrameDelta(double deltaNano) {
+		if (deltaHistory.size() >= MAX_HISTORY) deltaHistory.remove();
+		deltaHistory.add(deltaNano * 1e-6);
 	}
 
 	public void paint(Graphics2D g) {
 		AffineTransform at = g.getTransform();
 		g.setTransform(new AffineTransform());
+		Rectangle2D rect = getFPSRect();
 
+		g.setColor(new Color(0f,0f,0f,.8f));
+		g.fill(rect);
 		g.setColor(Color.RED);
 		g.setStroke(new BasicStroke(1f));
-		g.draw(getFPSRect());
+		g.draw(rect);
 		Font font = new Font("Arial", Font.PLAIN, 10);
 		g.setFont(font);
 
 		float contentW = fpsW - FPS_PADDING * 2f;
 		float contentH = fpsH - FPS_PADDING * 2f;
 
-		double avg = 0.;
+		double avgDelta = 0.;
+		double avgFps = 0.;
 		double min = Double.POSITIVE_INFINITY;
 		double max = Double.NEGATIVE_INFINITY;
 		{
+			int i = 0;
 			int count = 0;
-			for (double fps : fpsHistory) {
+			for (double delta : deltaHistory) {
+				avgDelta = 1. / (1 + i) * (avgDelta * i + delta);
+				double fps = 1e3 / delta;
 				if (isFinite(fps)) {
-					avg = 1. / (1 + count) * (avg * count + fps);
+					avgFps = 1. / (1 + count) * (avgFps * count + fps);
 					if (fps > max) max = fps;
 					if (fps < min) min = fps;
 					++count;
 				}
+				++i;
 			}
 		}
+
+		double avg = 1e3 / avgDelta;
 
 		{
 			Path2D p = new Path2D.Double();
 
-			double realAvg = avg;
+			double mid = 60; // 10. * Math.round(avg / 10.);
 
-			avg = 10. * Math.round(avg / 10.);
-
-			double range = 1e-18 + 2 * Math.max(max - avg, avg - min);
+			double range = 1e-18 + 2 * Math.max(max - mid, mid - min);
 			if (!isFinite(range)) {
 				range = 10;
 			} else {
@@ -147,12 +139,13 @@ final class FPSGraph {
 			float baseY = fpsY + FPS_PADDING + contentH * .5f;
 
 			int i = 0;
-			for (double fps : fpsHistory) {
+			for (double delta : deltaHistory) {
+				double fps = 1e3 / delta;
 				if (!isFinite(fps)) {
-					fps = avg;
+					fps = mid;
 				}
 				double x = baseX + i / (1e-18 + MAX_HISTORY - 1.) * contentW;
-				double y = baseY - contentH / range * (fps - avg);
+				double y = baseY - contentH / range * (fps - mid);
 
 				if (i == 0) p.moveTo(x, y);
 				else p.lineTo(x, y);
@@ -168,11 +161,11 @@ final class FPSGraph {
 			g.setColor(Color.RED);
 
 			g.draw(p);
-			g.drawString(String.format("%.1f", avg + .5 * range), baseX, fpsY + FPS_PADDING + fontH);
-			g.drawString(String.format("%.1f", avg), baseX, fpsY + FPS_PADDING + contentH * .5f + fontH * .5f);
-			g.drawString(String.format("%.1f", avg - .5 * range), baseX, fpsY + FPS_PADDING + contentH);
+			g.drawString(String.format("%.1f", mid + .5 * range), baseX, fpsY + FPS_PADDING + fontH);
+			// g.drawString(String.format("%.1f", mid), baseX, fpsY + FPS_PADDING + contentH * .5f + fontH * .5f);
+			g.drawString(String.format("%.1f", mid - .5 * range), baseX, fpsY + FPS_PADDING + contentH);
 
-			drawRightAlign(g, String.format("%.1f", realAvg), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + contentH, fm);
+			drawRightAlign(g, String.format("%.1f", avg), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + contentH, fm);
 		}
 
 		g.setTransform(at);
