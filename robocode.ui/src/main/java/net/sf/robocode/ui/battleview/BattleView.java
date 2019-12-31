@@ -784,7 +784,7 @@ public class BattleView extends GLG2DCanvas {
 			long delta = timeLastPaint == -1 ? 0 : now - timeLastPaint;
 			timeLastPaint = now;
 
-			fpsGraph.recordFPS(1e9 / delta);
+			fpsGraph.recordFrameDelta(delta);
 
 			double desiredTPS = properties.getOptionsBattleDesiredTPS();
 
