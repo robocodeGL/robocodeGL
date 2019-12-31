@@ -72,8 +72,9 @@ public class BattleView extends GLG2DCanvas {
 
 	private final static String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
 
-	private final static Color CANVAS_BG_COLOR = new Color(45, 45, 45); // SystemColor.controlDkShadow;
-	private static final Color GROUND_COLOR = new Color(45, 45, 45);
+	private final static Color CANVAS_BG_COLOR = new Color(32, 32, 32); // SystemColor.controlDkShadow;
+	private static final Color GROUND_COLOR = new Color(25, 25, 25); // Color.BLACK
+	private static final Color EDGE_COLOR = new Color(0, 0, 0); // Color.RED;
 
 	private final static Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
 
@@ -111,6 +112,7 @@ public class BattleView extends GLG2DCanvas {
 	private FontMetrics smallFontMetrics;
 
 	private final IImageManager imageManager;
+
 	private final ISettingsManager properties;
 	private final IWindowManagerExt windowManager;
 
@@ -370,7 +372,7 @@ public class BattleView extends GLG2DCanvas {
 
 		g.setClip(null);
 
-		g.setColor(Color.RED);
+		g.setColor(EDGE_COLOR);
 		g.drawRect(-1, -1, battleField.getWidth() + 2, battleField.getHeight() + 2);
 
 		g.setClip(savedClip);
