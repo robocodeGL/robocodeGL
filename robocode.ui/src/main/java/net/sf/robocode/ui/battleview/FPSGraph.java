@@ -23,10 +23,12 @@ import static java.lang.Math.abs;
 final class FPSGraph {
 	private static final int MAX_HISTORY = 120;
 	private static final float FPS_PADDING = 5f;
-	public static final int FPS_MARGIN = 15;
+	private static final int FPS_MARGIN = 15;
+
+	private static final Color MAIN_COLOR = Color.GREEN;
+	private static final Font FONT = new Font("Arial", Font.PLAIN, 10);
 
 	private final Queue<Double> deltaHistory = new ArrayDeque<Double>(MAX_HISTORY);
-	private JComponent component;
 
 	private float fpsX = FPS_MARGIN;
 	private float fpsY = FPS_MARGIN;
@@ -36,6 +38,8 @@ final class FPSGraph {
 	private boolean fpsDrag = false;
 	private float fpsDX;
 	private float fpsDY;
+
+	private JComponent component;
 
 	public void init(JComponent component) {
 		this.component = component;
@@ -90,13 +94,12 @@ final class FPSGraph {
 		g.setTransform(new AffineTransform());
 		Rectangle2D rect = getFPSRect();
 
-		g.setColor(new Color(0f,0f,0f,.8f));
+		g.setColor(new Color(0f, 0f, 0f, .8f));
 		g.fill(rect);
-		g.setColor(Color.RED);
+		g.setColor(MAIN_COLOR);
 		g.setStroke(new BasicStroke(1f));
 		g.draw(rect);
-		Font font = new Font("Arial", Font.PLAIN, 10);
-		g.setFont(font);
+		g.setFont(FONT);
 
 		float contentW = fpsW - FPS_PADDING * 2f;
 		float contentH = fpsH - FPS_PADDING * 2f;
@@ -153,19 +156,19 @@ final class FPSGraph {
 				++i;
 			}
 
-			FontMetrics fm = g.getFontMetrics(font);
+			FontMetrics fm = g.getFontMetrics(FONT);
 			float fontH = fm.getHeight() - fm.getDescent();
 
 			g.setColor(Color.YELLOW);
 			g.draw(new Line2D.Double(baseX, baseY, baseX + contentW, baseY));
-			g.setColor(Color.RED);
+			g.setColor(MAIN_COLOR);
 
 			g.draw(p);
 			g.drawString(String.format("%.1f", mid + .5 * range), baseX, fpsY + FPS_PADDING + fontH);
 			// g.drawString(String.format("%.1f", mid), baseX, fpsY + FPS_PADDING + contentH * .5f + fontH * .5f);
 			g.drawString(String.format("%.1f", mid - .5 * range), baseX, fpsY + FPS_PADDING + contentH);
 
-			drawRightAlign(g, String.format("%.1f", avg), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + contentH, fm);
+			drawRightAlign(g, String.format("%.1f", .1 * Math.round(avg * 10)), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + contentH, fm);
 		}
 
 		g.setTransform(at);
