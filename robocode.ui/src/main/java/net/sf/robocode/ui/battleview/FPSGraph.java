@@ -1,7 +1,5 @@
 package net.sf.robocode.ui.battleview;
 
-import sun.misc.DoubleConsts;
-
 import javax.swing.JComponent;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -14,10 +12,13 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayDeque;
 import java.util.Queue;
+
+import static java.lang.Math.abs;
 
 final class FPSGraph {
 	private static final int MAX_HISTORY = 120;
@@ -35,6 +36,10 @@ final class FPSGraph {
 	private boolean fpsDrag = false;
 	private float fpsDX;
 	private float fpsDY;
+
+	private double rollingDelta = 0.;
+	private long rollingCount = 0;
+	private static final double ROLLING_DEPTH = 60.;
 
 	public void init(JComponent component) {
 		this.component = component;
@@ -80,6 +85,18 @@ final class FPSGraph {
 	}
 
 	public void recordFPS(double fps) {
+		double delta = 1. / fps;
+		if (isFinite(delta)) {
+			if (ROLLING_DEPTH > 0) {
+				double depth = Math.min(rollingCount, ROLLING_DEPTH);
+				rollingDelta = 1. / (depth + 1.) * (rollingDelta * depth + delta);
+			} else {
+				rollingDelta = 1. / fps;
+			}
+			rollingCount += 1;
+			fps = 1. / rollingDelta;
+		}
+
 		if (fpsHistory.size() >= MAX_HISTORY) fpsHistory.remove();
 		fpsHistory.add(fps);
 	}
@@ -126,13 +143,16 @@ final class FPSGraph {
 				range = 10 * Math.ceil(.1 * range);
 			}
 
+			float baseX = fpsX + FPS_PADDING;
+			float baseY = fpsY + FPS_PADDING + contentH * .5f;
+
 			int i = 0;
 			for (double fps : fpsHistory) {
 				if (!isFinite(fps)) {
 					fps = avg;
 				}
-				double x = fpsX + FPS_PADDING + i / (1e-18 + MAX_HISTORY - 1.) * contentW;
-				double y = fpsY + FPS_PADDING + contentH * .5 - contentH / range * (fps - avg);
+				double x = baseX + i / (1e-18 + MAX_HISTORY - 1.) * contentW;
+				double y = baseY - contentH / range * (fps - avg);
 
 				if (i == 0) p.moveTo(x, y);
 				else p.lineTo(x, y);
@@ -143,10 +163,14 @@ final class FPSGraph {
 			FontMetrics fm = g.getFontMetrics(font);
 			float fontH = fm.getHeight() - fm.getDescent();
 
+			g.setColor(Color.YELLOW);
+			g.draw(new Line2D.Double(baseX, baseY, baseX + contentW, baseY));
+			g.setColor(Color.RED);
+
 			g.draw(p);
-			g.drawString(String.format("%.1f", avg + .5 * range), fpsX + FPS_PADDING, fpsY + FPS_PADDING + fontH);
-			g.drawString(String.format("%.1f", avg), fpsX + FPS_PADDING, fpsY + FPS_PADDING + contentH * .5f + fontH * .5f);
-			g.drawString(String.format("%.1f", avg - .5 * range), fpsX + FPS_PADDING, fpsY + FPS_PADDING + contentH);
+			g.drawString(String.format("%.1f", avg + .5 * range), baseX, fpsY + FPS_PADDING + fontH);
+			g.drawString(String.format("%.1f", avg), baseX, fpsY + FPS_PADDING + contentH * .5f + fontH * .5f);
+			g.drawString(String.format("%.1f", avg - .5 * range), baseX, fpsY + FPS_PADDING + contentH);
 
 			drawRightAlign(g, String.format("%.1f", realAvg), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + contentH, fm);
 		}
@@ -172,7 +196,7 @@ final class FPSGraph {
 		return new Rectangle2D.Double(fpsX, fpsY, fpsW, fpsH);
 	}
 
-	public static boolean isFinite(double d) {
-		return Math.abs(d) <= DoubleConsts.MAX_VALUE;
+	private static boolean isFinite(double d) {
+		return abs(d) <= Double.MAX_VALUE;
 	}
 }
