@@ -46,6 +46,10 @@ public interface ISettingsManager {
 
 	void setOptionsViewFPS(boolean optionsViewFPS);
 
+	boolean getOptionsViewFPSMeter();
+
+	void setOptionsViewFPSMeter(boolean optionsViewFPSMeter);
+
 	boolean getOptionsViewExplosions();
 
 	void setOptionsViewExplosions(boolean optionsViewExplosions);
@@ -255,6 +259,7 @@ public interface ISettingsManager {
 			OPTIONS_VIEW_GROUND = "robocode.options.view.ground",
 			OPTIONS_VIEW_TPS = "robocode.options.view.TPS",
 			OPTIONS_VIEW_FPS = "robocode.options.view.FPS",
+			OPTIONS_VIEW_FPS_METER = "robocode.options.view.FPSMeter",
 			OPTIONS_VIEW_EXPLOSIONS = "robocode.options.view.explosions",
 			OPTIONS_VIEW_EXPLOSION_DEBRIS = "robocode.options.view.explosionDebris",
 			OPTIONS_VIEW_SENTRY_BORDER = "robocode.options.view.sentryBorder",

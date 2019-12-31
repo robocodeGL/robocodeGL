@@ -53,7 +53,8 @@ public class SettingsManager implements ISettingsManager {
 	// View Options (Turns Per Second)
 	private boolean
 			optionsViewTPS = true,
-			optionsViewFPS = true;
+			optionsViewFPS = true,
+			optionsViewFPSMeter = false;
 
 	// Prevent speedup when view is minimized
 	private boolean
@@ -231,6 +232,15 @@ public class SettingsManager implements ISettingsManager {
 	public void setOptionsViewFPS(boolean optionsViewFPS) {
 		this.optionsViewFPS = optionsViewFPS;
 		props.setProperty(OPTIONS_VIEW_FPS, "" + optionsViewFPS);
+	}
+
+	public boolean getOptionsViewFPSMeter() {
+		return optionsViewFPSMeter;
+	}
+
+	public void setOptionsViewFPSMeter(boolean optionsViewFPSMeter) {
+		this.optionsViewFPSMeter = optionsViewFPSMeter;
+		props.setProperty(OPTIONS_VIEW_FPS_METER, "" + optionsViewFPSMeter);
 	}
 
 	public boolean getOptionsViewExplosions() {
@@ -724,6 +734,7 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewGround = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_GROUND, "true"));
 		optionsViewTPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_TPS, "true"));
 		optionsViewFPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_FPS, "true"));
+		optionsViewFPSMeter = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_FPS_METER, "false"));
 		optionsViewExplosions = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSIONS, "true"));
 		optionsViewExplosionDebris = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "true"));
 		optionsRenderingAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "true"));
