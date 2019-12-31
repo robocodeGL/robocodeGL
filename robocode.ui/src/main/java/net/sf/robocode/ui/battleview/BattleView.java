@@ -152,13 +152,15 @@ public class BattleView extends GLG2DCanvas {
 
 		setDrawableComponent(new MyPanel());
 		setGLDrawing(true);
+	}
+
+	public void init() {
+		fpsGraph.init(this);
 
 		Animator animator = new Animator();
 		animator.add(this.getGLDrawable());
 
 		animator.start();
-
-		fpsGraph.init(this);
 	}
 
 	public BufferedImage getScreenshot() {
