@@ -562,6 +562,7 @@ public class RobocodeFrame extends JFrame {
 
 		addWindowListener(eventHandler);
 
+		battleView.init();
 		battleView.addMouseListener(interactiveHandler);
 		battleView.addMouseMotionListener(interactiveHandler);
 		battleView.addMouseWheelListener(interactiveHandler);

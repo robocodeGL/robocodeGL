@@ -29,6 +29,7 @@ final class FPSGraph {
 	private static final Color MAIN_COLOR = new Color(0f, 1f, 0f, .7f);
 	private static final Color BACK_COLOR = new Color(0f, 0f, 0f, .7f);
 	private static final Font FONT = new Font("Arial", Font.PLAIN, 10);
+	public static final float STICK_MARGIN = 5f;
 
 	private final Queue<Double> deltaHistory = new ArrayDeque<Double>(MAX_HISTORY);
 	private final Queue<Double> deltaHistoryShort = new ArrayDeque<Double>(SHORT_HISTORY);
@@ -42,10 +43,16 @@ final class FPSGraph {
 	private float fpsDX;
 	private float fpsDY;
 
+	private float oldWidth = 0;
+	private float oldHeight = 0;
+
 	private JComponent component;
 
-	public void init(JComponent component) {
-		this.component = component;
+	public void init(JComponent c) {
+		this.component = c;
+
+		oldWidth = component.getWidth();
+		oldHeight = component.getHeight();
 
 		component.addMouseListener(new MouseAdapter() {
 			@Override
@@ -83,6 +90,9 @@ final class FPSGraph {
 			@Override
 			public void componentResized(ComponentEvent e) {
 				limitFPSRect();
+
+				oldWidth = component.getWidth();
+				oldHeight = component.getHeight();
 			}
 		});
 	}
@@ -197,12 +207,18 @@ final class FPSGraph {
 	}
 
 	private void limitFPSRect() {
+		float x10 = oldWidth - FPS_MARGIN - fpsW;
+		float y10 = oldHeight - FPS_MARGIN - fpsH;
+
 		float x1 = component.getWidth() - FPS_MARGIN - fpsW;
 		float y1 = component.getHeight() - FPS_MARGIN - fpsH;
-		if (fpsX > x1) fpsX = x1;
-		if (fpsY > y1) fpsY = y1;
-		if (fpsX < FPS_MARGIN) fpsX = FPS_MARGIN;
-		if (fpsY < FPS_MARGIN) fpsY = FPS_MARGIN;
+
+		if (oldWidth > fpsW + (FPS_MARGIN + STICK_MARGIN + 1) * 2 && fpsX > x10 - STICK_MARGIN) fpsX = x1;
+		else if (fpsX > x1) fpsX = x1;
+		if (oldHeight > fpsH + (FPS_MARGIN + STICK_MARGIN + 1) * 2 && fpsY > y10 - STICK_MARGIN) fpsY = y1;
+		else if (fpsY > y1) fpsY = y1;
+		if (fpsX < FPS_MARGIN + STICK_MARGIN) fpsX = FPS_MARGIN;
+		if (fpsY < FPS_MARGIN + STICK_MARGIN) fpsY = FPS_MARGIN;
 	}
 
 	private Rectangle2D getFPSRect() {
