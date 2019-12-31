@@ -70,15 +70,16 @@ import static java.lang.Math.sqrt;
 @SuppressWarnings("serial")
 public class BattleView extends GLG2DCanvas {
 
-	private final static String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
+	private static final String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
 
-	private final static Color CANVAS_BG_COLOR = new Color(32, 32, 32); // SystemColor.controlDkShadow;
-	private static final Color GROUND_COLOR = new Color(25, 25, 25); // Color.BLACK
+	private static final Color CANVAS_BG_COLOR = new Color(12, 12, 12); // SystemColor.controlDkShadow;
+	private static final Color GROUND_COLOR = new Color(23, 23, 23); // Color.BLACK
 	private static final Color EDGE_COLOR = new Color(0, 0, 0); // Color.RED;
+	private static final Color LOGO_BG_COLOR = Color.BLACK; // Color.BLACK;
 
-	private final static Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
+	private static final Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
 
-	private final static int ROBOT_TEXT_Y_OFFSET = 24;
+	private static final int ROBOT_TEXT_Y_OFFSET = 24;
 
 	private BattleRules battleRules;
 
@@ -753,7 +754,7 @@ public class BattleView extends GLG2DCanvas {
 	}
 
 	private void paintRobocodeLogo(Graphics2D g) {
-		setBackground(Color.BLACK);
+		g.setBackground(LOGO_BG_COLOR);
 		g.clearRect(0, 0, getWidth(), getHeight());
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
