@@ -1,8 +1,8 @@
 package net.sf.robocode.ui.battleview;
 
-import javax.swing.JComponent;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -46,10 +46,10 @@ final class FPSGraph {
 	private float oldWidth = 0;
 	private float oldHeight = 0;
 
-	private JComponent component;
+	private Component component;
 	private boolean visible;
 
-	public void init(JComponent c) {
+	public void init(Component c) {
 		this.component = c;
 
 		oldWidth = component.getWidth();
@@ -58,6 +58,8 @@ final class FPSGraph {
 		component.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
+				System.out.println("mousePressed");
+
 				if (!visible) return;
 
 				if (getFPSRect().contains(e.getX(), e.getY())) {
