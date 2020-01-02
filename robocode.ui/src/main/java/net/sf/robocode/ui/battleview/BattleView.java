@@ -36,6 +36,7 @@ import robocode.util.Utils;
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Composite;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -157,15 +158,19 @@ public class BattleView extends GLG2DCanvas {
 		setGLDrawing(true);
 	}
 
-	public void init() {
+	public Component init() {
 		loadDisplayOptions();
 
-		fpsGraph.init(this);
+		Component comp = (Component) getGLDrawable();
+		comp.setEnabled(true);
+		fpsGraph.init(comp);
 
 		Animator animator = new Animator();
 		animator.add(this.getGLDrawable());
 
 		animator.start();
+
+		return comp;
 	}
 
 	public BufferedImage getScreenshot() {

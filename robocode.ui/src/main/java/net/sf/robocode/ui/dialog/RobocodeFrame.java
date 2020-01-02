@@ -564,11 +564,11 @@ public class RobocodeFrame extends JFrame {
 
 		addWindowListener(eventHandler);
 
-		battleView.init();
-		battleView.addMouseListener(interactiveHandler);
-		battleView.addMouseMotionListener(interactiveHandler);
-		battleView.addMouseWheelListener(interactiveHandler);
-		battleView.setFocusable(true);
+		Component battleViewComp = battleView.init();
+		battleViewComp.addMouseListener(interactiveHandler);
+		battleViewComp.addMouseMotionListener(interactiveHandler);
+		battleViewComp.addMouseWheelListener(interactiveHandler);
+		battleViewComp.setFocusable(true);
 		KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(interactiveHandler);
 
 		if (windowManager.isSlave()) {
