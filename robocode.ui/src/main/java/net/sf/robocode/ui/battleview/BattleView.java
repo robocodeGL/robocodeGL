@@ -69,7 +69,7 @@ import static java.lang.Math.sqrt;
  * @author Pavel Savara (contributor)
  */
 @SuppressWarnings("serial")
-public class BattleView extends GLG2DCanvas {
+public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private static final String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
 
@@ -201,6 +201,10 @@ public class BattleView extends GLG2DCanvas {
 
 	private void reinitialize() {
 		initialized = false;
+	}
+
+	public double getScale() {
+		return scale;
 	}
 
 	private void initialize() {
