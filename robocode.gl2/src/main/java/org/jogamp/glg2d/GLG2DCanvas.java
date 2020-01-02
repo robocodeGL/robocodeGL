@@ -227,7 +227,7 @@ public class GLG2DCanvas extends JComponent {
 
     if (!(comp instanceof JComponent)) {
       Logger.getLogger(GLG2DCanvas.class.getName()).warning("Drawable component and children should be pure Swing: " +
-        comp + " does not inherit JComponent");
+          comp + " does not inherit JComponent");
     }
 
     if (comp instanceof JViewport) {
@@ -268,7 +268,7 @@ public class GLG2DCanvas extends JComponent {
   protected GLAutoDrawable createGLComponent(GLCapabilitiesImmutable capabilities, GLContext shareWith) {
     GLCanvas canvas = new GLCanvas(capabilities);
     if (shareWith != null) {
-      canvas.setSharedContext(shareWith);
+        canvas.setSharedContext(shareWith);
     }
 
     canvas.setEnabled(false);
