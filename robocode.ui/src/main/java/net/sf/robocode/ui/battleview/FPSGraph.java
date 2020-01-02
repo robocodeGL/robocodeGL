@@ -58,8 +58,6 @@ final class FPSGraph {
 		component.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mousePressed(MouseEvent e) {
-				System.out.println("mousePressed");
-
 				if (!visible) return;
 
 				if (getFPSRect().contains(e.getX(), e.getY())) {
