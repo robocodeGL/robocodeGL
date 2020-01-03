@@ -21,6 +21,7 @@ import net.sf.robocode.ui.IWindowManagerExt;
 import net.sf.robocode.ui.gfx.GraphicsState;
 import net.sf.robocode.ui.gfx.RenderObject;
 import net.sf.robocode.ui.gfx.RobocodeLogo;
+import org.jogamp.glg2d.Defaults;
 import org.jogamp.glg2d.GLG2DCanvas;
 import robocode.BattleRules;
 import robocode.Rules;
@@ -565,8 +566,8 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			g.setBackground(Color.WHITE);
 			g.setColor(Color.BLACK);
-			g.setFont(Font.getFont(Font.SANS_SERIF));
-			g.setStroke(new BasicStroke());
+			g.setFont(Defaults.FONT);
+			g.setStroke(Defaults.STROKE);
 
 			g.setClip(null);
 			g.setComposite(AlphaComposite.SrcAtop);
