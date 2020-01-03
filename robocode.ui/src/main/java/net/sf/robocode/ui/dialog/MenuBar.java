@@ -64,6 +64,7 @@ public class MenuBar extends JMenuBar {
 	private JMenu optionsMenu;
 	private JMenuItem optionsPreferencesMenuItem;
 	private JMenuItem optionsFitWindowMenuItem;
+	private JMenuItem optionsFitBattleFieldMenuItem;
 	private JMenuItem optionsAdjustTPSMenuItem;
 	private JCheckBoxMenuItem optionsShowRankingCheckBoxMenuItem;
 	private JMenuItem optionsRecalculateCpuConstantMenuItem;
@@ -128,6 +129,8 @@ public class MenuBar extends JMenuBar {
 				optionsPreferencesActionPerformed();
 			} else if (source == mb.getOptionsFitWindowMenuItem()) {
 				optionsFitWindowActionPerformed();
+			} else if (source == mb.getOptionsFitBattleFieldMenuItem()) {
+				optionsFitBattleFieldActionPerformed();
 			} else if (source == mb.getOptionsAdjustTPSMenuItem()) {
 				optionsAdjustTPSActionPerformed();
 			} else if (source == mb.getOptionsShowRankingCheckBoxMenuItem()) {
@@ -717,6 +720,16 @@ public class MenuBar extends JMenuBar {
 		return optionsFitWindowMenuItem;
 	}
 
+	private JMenuItem getOptionsFitBattleFieldMenuItem() {
+		if (optionsFitBattleFieldMenuItem == null) {
+			optionsFitBattleFieldMenuItem = new JMenuItem();
+			optionsFitBattleFieldMenuItem.setText("Fit battle field size");
+			optionsFitBattleFieldMenuItem.setMnemonic('F');
+			optionsFitBattleFieldMenuItem.addActionListener(eventHandler);
+		}
+		return optionsFitBattleFieldMenuItem;
+	}
+
 	private JMenuItem getOptionsAdjustTPSMenuItem() {
 		if (optionsAdjustTPSMenuItem == null) {
 			optionsAdjustTPSMenuItem = new JMenuItem();
@@ -767,6 +780,7 @@ public class MenuBar extends JMenuBar {
 			optionsMenu.setMnemonic('O');
 			optionsMenu.add(getOptionsPreferencesMenuItem());
 			optionsMenu.add(getOptionsFitWindowMenuItem());
+			optionsMenu.add(getOptionsFitBattleFieldMenuItem());
 			optionsMenu.add(getOptionsAdjustTPSMenuItem());
 			optionsMenu.add(new JSeparator());
 			optionsMenu.add(getOptionsShowRankingCheckBoxMenuItem());
@@ -903,8 +917,19 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitWindowActionPerformed() {
 		JFrame robocodeFrame = windowManager.getRobocodeFrame();
 
-		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
+		// robocodeFrame.setSize(robocodeFrame.getPreferredSize());
 		WindowUtil.fitWindow(robocodeFrame);
+	}
+
+	private void optionsFitBattleFieldActionPerformed() {
+		RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
+
+		robocodeFrame.fitPreferredSize();
+		try {
+			WindowUtil.fitWindow(robocodeFrame);
+		} finally {
+			robocodeFrame.resetPreferredSize();
+		}
 	}
 
 	private void optionsAdjustTPSActionPerformed() {
