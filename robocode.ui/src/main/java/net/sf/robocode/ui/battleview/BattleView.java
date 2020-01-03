@@ -21,7 +21,6 @@ import net.sf.robocode.ui.IWindowManagerExt;
 import net.sf.robocode.ui.gfx.GraphicsState;
 import net.sf.robocode.ui.gfx.RenderObject;
 import net.sf.robocode.ui.gfx.RobocodeLogo;
-import org.jogamp.glg2d.Defaults;
 import org.jogamp.glg2d.GLG2DCanvas;
 import robocode.BattleRules;
 import robocode.Rules;
@@ -730,11 +729,11 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		float borderWidth = (scaledViewWidth - battleField.getWidth()) * .5f;
 		float borderHeight = (scaledViewHeight - battleField.getHeight()) * .5f;
 
-		if (left + width > scaledViewWidth) {
-			left = scaledViewWidth - width;
+		if (left + width > scaledViewWidth - borderWidth) {
+			left = scaledViewWidth - borderWidth - width;
 		}
-		if (top + height > scaledViewHeight) {
-			top = scaledViewHeight - height;
+		if (top + height > scaledViewHeight - borderHeight) {
+			top = scaledViewHeight - borderHeight - height;
 		}
 		if (left < -borderWidth) {
 			left = -borderWidth;
@@ -742,7 +741,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		if (top < -borderHeight) {
 			top = -borderHeight;
 		}
-		g.drawString(s, (left + 0.5f), (top + height - descent + 0.5f));
+		g.drawString(s, left, top + height - descent);
 	}
 
 	private void drawScanArc(Graphics2D g, IRobotSnapshot robotSnapshot) {
