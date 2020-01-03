@@ -171,7 +171,7 @@ public class GLG2DSimpleEventListener implements GLEventListener {
       g2d.glDispose();
       g2d = null;
 
-      System.exit(0);
+      // System.exit(0);
     }
   }
 }
