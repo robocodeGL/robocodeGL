@@ -35,6 +35,7 @@ import robocode.util.Utils;
 
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
@@ -561,6 +562,11 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			GraphicsState gfxState = new GraphicsState();
 
 			gfxState.save(g);
+
+			g.setBackground(Color.WHITE);
+			g.setColor(Color.BLACK);
+			g.setFont(Font.getFont(Font.SANS_SERIF));
+			g.setStroke(new BasicStroke());
 
 			g.setClip(null);
 			g.setComposite(AlphaComposite.SrcAtop);
