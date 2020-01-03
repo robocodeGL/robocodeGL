@@ -36,6 +36,7 @@ import robocode.util.Utils;
 
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
@@ -82,7 +83,9 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	private static final Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
 
 	private static final int ROBOT_TEXT_Y_OFFSET = 24;
+
 	private static final Font SMALL_FONT = new Font("Dialog", Font.PLAIN, 10);
+	private static final BasicStroke DEFAULT_STROKE = new BasicStroke();
 
 	private BattleRules battleRules;
 
@@ -566,8 +569,8 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			g.setBackground(Color.WHITE);
 			g.setColor(Color.BLACK);
-			g.setFont(Defaults.FONT);
-			g.setStroke(Defaults.STROKE);
+			g.setFont(SMALL_FONT);
+			g.setStroke(DEFAULT_STROKE);
 
 			g.setClip(null);
 			g.setComposite(AlphaComposite.SrcAtop);
