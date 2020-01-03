@@ -98,10 +98,13 @@ public final class InteractiveHandler implements KeyEventDispatcher, MouseListen
 	}
 
 	private void handleInteractiveEvent(robocode.Event event) {
+		if (event == null) return;
+
 		battleManager.sendInteractiveEvent(event);
 	}
 
 	private MouseEvent mirroredMouseEvent(final MouseEvent e) {
+		if (e.isConsumed()) return null;
 
 		double scale;
 		BattleProperties battleProps = battleManager.getBattleProperties();
