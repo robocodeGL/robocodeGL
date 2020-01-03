@@ -74,9 +74,9 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private static final String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
 
-	private static final Color CANVAS_BG_COLOR = new Color(12, 12, 12); // SystemColor.controlDkShadow;
+	private static final Color CANVAS_BG_COLOR = new Color(23, 23, 23); // new Color(12, 12, 12); // SystemColor.controlDkShadow;
 	private static final Color GROUND_COLOR = new Color(23, 23, 23); // Color.BLACK
-	private static final Color EDGE_COLOR = new Color(0, 0, 0); // Color.RED;
+	private static final Color EDGE_COLOR = new Color(32, 32, 32); // Color.RED;
 	private static final Color LOGO_BG_COLOR = Color.BLACK; // Color.BLACK;
 
 	private static final Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
