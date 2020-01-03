@@ -36,7 +36,6 @@ import robocode.util.Utils;
 
 import javax.swing.JPanel;
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
@@ -83,6 +82,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	private static final Area BULLET_AREA = new Area(new Ellipse2D.Double(-0.5, -0.5, 1, 1));
 
 	private static final int ROBOT_TEXT_Y_OFFSET = 24;
+	private static final Font SMALL_FONT = new Font("Dialog", Font.PLAIN, 10);
 
 	private BattleRules battleRules;
 
@@ -224,7 +224,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		}
 
 		// Scale font
-		smallFont = new Font("Dialog", Font.PLAIN, (int) Math.round(10 / Math.min(1., scale)));
+		smallFont = SMALL_FONT.deriveFont((float) (SMALL_FONT.getSize2D() / Math.min(1., scale)));
 		smallFontMetrics = getGraphics().getFontMetrics(smallFont);
 
 		// Initialize ground image
