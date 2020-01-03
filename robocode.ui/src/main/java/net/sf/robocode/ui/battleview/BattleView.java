@@ -165,6 +165,12 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private void setBattleFieldSize(int w, int h) {
 		battleField = new BattleField(w, h);
+
+		if (w > 1000 || h > 1000) {
+			float scale = Math.min(1000f / w, 1000f / h);
+			w *= scale;
+			h *= scale;
+		}
 		setPreferredSize(new Dimension(w, h));
 	}
 
