@@ -39,6 +39,7 @@ import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Composite;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -138,6 +139,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		this.imageManager = imageManager;
 
 		battleField = new BattleField(800, 600);
+		setPreferredSize(new Dimension(battleField.getWidth(), battleField.getHeight()));
 
 		new BattleObserver(windowManager);
 
@@ -900,6 +902,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			battleRules = event.getBattleRules();
 
 			battleField = new BattleField(battleRules.getBattlefieldWidth(), battleRules.getBattlefieldHeight());
+			setPreferredSize(new Dimension(battleField.getWidth(), battleField.getHeight()));
 
 			initialized = false;
 			setVisible(true);
