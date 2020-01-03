@@ -224,7 +224,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		}
 
 		// Scale font
-		smallFont = new Font("Dialog", Font.PLAIN, (int) (10 / Math.min(1., scale)));
+		smallFont = new Font("Dialog", Font.PLAIN, (int) Math.round(10 / Math.min(1., scale)));
 		smallFontMetrics = getGraphics().getFontMetrics(smallFont);
 
 		// Initialize ground image
