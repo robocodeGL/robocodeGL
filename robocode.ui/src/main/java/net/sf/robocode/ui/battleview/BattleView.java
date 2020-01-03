@@ -138,8 +138,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		this.windowManager = (IWindowManagerExt) windowManager;
 		this.imageManager = imageManager;
 
-		battleField = new BattleField(800, 600);
-		setPreferredSize(new Dimension(battleField.getWidth(), battleField.getHeight()));
+		setBattleFieldSize(800, 600);
 
 		new BattleObserver(windowManager);
 
@@ -162,6 +161,11 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 		setDrawableComponent(new MyPanel());
 		setGLDrawing(true);
+	}
+
+	private void setBattleFieldSize(int w, int h) {
+		battleField = new BattleField(w, h);
+		setPreferredSize(new Dimension(w, h));
 	}
 
 	public Component init() {
@@ -901,8 +905,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			battleRules = event.getBattleRules();
 
-			battleField = new BattleField(battleRules.getBattlefieldWidth(), battleRules.getBattlefieldHeight());
-			setPreferredSize(new Dimension(battleField.getWidth(), battleField.getHeight()));
+			setBattleFieldSize(battleRules.getBattlefieldWidth(), battleRules.getBattlefieldHeight());
 
 			initialized = false;
 			setVisible(true);
