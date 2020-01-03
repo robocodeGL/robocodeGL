@@ -322,6 +322,7 @@ public class RobocodeFrame extends JFrame {
 	private JScrollPane getRobotButtonsScrollPane() {
 		if (robotButtonsScrollPane == null) {
 			robotButtonsScrollPane = new JScrollPane();
+			robotButtonsScrollPane.setBorder(BorderFactory.createEmptyBorder());
 			robotButtonsScrollPane.setAutoscrolls(false);
 			robotButtonsScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
 			robotButtonsScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

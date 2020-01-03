@@ -201,6 +201,8 @@ public class MenuBar extends JMenuBar {
 		// adding any menu to the menubar.
 		JPopupMenu.setDefaultLightWeightPopupEnabled(false);
 
+		setBorder(BorderFactory.createEmptyBorder(0, 0, 2, 0));
+
 		add(getBattleMenu());
 		add(getRobotMenu());
 		add(getOptionsMenu());
