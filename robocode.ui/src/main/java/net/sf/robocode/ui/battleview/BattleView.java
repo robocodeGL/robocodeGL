@@ -181,7 +181,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	public void fitPreferredSize() {
 		float scale = Math.min(1f * getWidth() / battleField.getWidth(), 1f * getHeight() / battleField.getHeight());
 
-		updatePreferredSize((int) Math.ceil(battleField.getWidth() * scale), (int) Math.ceil(battleField.getHeight() * scale));
+		setPreferredSize(new Dimension((int) Math.ceil(battleField.getWidth() * scale), (int) Math.ceil(battleField.getHeight() * scale)));
 	}
 
 	public void resetPreferredSize() {
