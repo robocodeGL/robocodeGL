@@ -1061,4 +1061,12 @@ public class RobocodeFrame extends JFrame {
 		String robots = battleManager.getBattleProperties().getSelectedRobots();
 		getRestartButton().setEnabled(robots != null && robots.length() > 0);
 	}
+
+	public void fitPreferredSize() {
+		battleView.fitPreferredSize();
+	}
+
+	public void resetPreferredSize() {
+		battleView.resetPreferredSize();
+	}
 }
