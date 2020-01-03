@@ -18,6 +18,7 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
@@ -46,9 +47,9 @@ public final class ClassFileReader {
 						done = true;
 						break;
 					}
-					result.position(result.position() + res);
+					((Buffer) result).position(result.position() + res);
 				} while (result.remaining() != 0);
-				result.flip();
+				((Buffer) result).flip();
 				if (!done) {
 					result = ByteBuffer.allocate(result.capacity() * 2).put(result);
 				}

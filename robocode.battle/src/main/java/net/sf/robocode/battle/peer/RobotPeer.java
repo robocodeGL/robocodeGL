@@ -38,6 +38,7 @@ import java.io.IOException;
 
 import static java.lang.Math.*;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -436,7 +437,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 		final ExecResults results = executeImpl(commands);
 
-		bidirectionalBuffer.clear();
+		((Buffer) bidirectionalBuffer).clear();
 		rbSerializer.serializeToBuffer(bidirectionalBuffer, RbSerializer.ExecResults_TYPE, results);
 	}
 
@@ -445,7 +446,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 
 		final ExecResults results = waitForBattleEndImpl(commands);
 
-		bidirectionalBuffer.clear();
+		((Buffer) bidirectionalBuffer).clear();
 		rbSerializer.serializeToBuffer(bidirectionalBuffer, RbSerializer.ExecResults_TYPE, results);
 	}
 

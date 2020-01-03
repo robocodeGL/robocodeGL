@@ -17,6 +17,7 @@ import robocode.Event;
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.*;
@@ -143,7 +144,7 @@ public final class RbSerializer {
 	public ByteBuffer serializeToBuffer(ByteBuffer buffer, byte type, Object object) throws IOException {
 		int length = sizeOf(type, object);
 
-		buffer.limit(SIZEOF_INT + SIZEOF_INT + SIZEOF_INT + length);
+		((Buffer) buffer).limit(SIZEOF_INT + SIZEOF_INT + SIZEOF_INT + length);
 
 		buffer.putInt(BYTE_ORDER);
 		buffer.putInt(currentVersion);
@@ -162,7 +163,7 @@ public final class RbSerializer {
 		ByteBuffer buffer = ByteBuffer.allocate(SIZEOF_INT + SIZEOF_INT + SIZEOF_INT);
 
 		fillBuffer(source, buffer);
-		buffer.flip();
+		((Buffer) buffer).flip();
 		int bo = buffer.getInt();
 
 		if (bo != BYTE_ORDER) {
@@ -178,7 +179,7 @@ public final class RbSerializer {
 		// body
 		buffer = ByteBuffer.allocate(length);
 		fillBuffer(source, buffer);
-		buffer.flip();
+		((Buffer) buffer).flip();
 		final Object res = deserializeAny(buffer);
 
 		if (buffer.remaining() != 0) {
@@ -337,7 +338,7 @@ public final class RbSerializer {
 		}
 		final ByteBuffer slice = buffer.slice();
 
-		slice.limit(bytes);
+		((Buffer) slice).limit(bytes);
 		final String res;
 
 		try {
@@ -345,7 +346,7 @@ public final class RbSerializer {
 		} catch (CharacterCodingException e) {
 			throw new Error("Bad character", e);
 		}
-		buffer.position(buffer.position() + bytes);
+		((Buffer) buffer).position(buffer.position() + bytes);
 		return res;
 	}
 
@@ -470,7 +471,7 @@ public final class RbSerializer {
 		final ByteBuffer slice = ByteBuffer.allocate(data.length() * 3);
 
 		encoder.encode(CharBuffer.wrap(data), slice, false);
-		slice.flip();
+		((Buffer) slice).flip();
 		return slice;
 	}
 
@@ -482,7 +483,7 @@ public final class RbSerializer {
 			if (res == -1) {
 				throw new IOException("Unexpected EOF");
 			}
-			buffer.position(buffer.position() + res);
+			((Buffer) buffer).position(buffer.position() + res);
 		} while (buffer.remaining() != 0);
 	}
 
