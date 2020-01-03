@@ -21,6 +21,7 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
+import java.nio.Buffer;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -199,7 +200,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void translate(int x, int y) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.TRANSLATE_INT);
 				put(x);
@@ -224,7 +225,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setColor(Color c) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_COLOR);
 				put(c);
@@ -243,7 +244,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setPaintMode() {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_PAINT_MODE);
 			} catch (BufferOverflowException e) {
@@ -258,7 +259,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setXORMode(Color c1) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_XOR_MODE);
 				put(c1);
@@ -279,7 +280,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setFont(Font font) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_FONT);
 				put(font);
@@ -308,7 +309,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void clipRect(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.CLIP_RECT);
 				put(x);
@@ -336,7 +337,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setClip(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_CLIP);
 				put(x);
@@ -363,7 +364,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setClip(Shape clip) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_CLIP_SHAPE);
 				put(clip);
@@ -382,7 +383,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void copyArea(int x, int y, int width, int height, int dx, int dy) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.COPY_AREA);
 				put(x);
@@ -403,7 +404,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawLine(int x1, int y1, int x2, int y2) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_LINE);
 				put(x1);
@@ -422,7 +423,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fillRect(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_RECT);
 				put(x);
@@ -441,7 +442,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawRect(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_RECT);
 				put(x);
@@ -460,7 +461,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void clearRect(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.CLEAR_RECT);
 				put(x);
@@ -479,7 +480,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_ROUND_RECT);
 				put(x);
@@ -500,7 +501,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fillRoundRect(int x, int y, int width, int height, int arcWidth, int arcHeight) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_ROUND_RECT);
 				put(x);
@@ -521,7 +522,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void draw3DRect(int x, int y, int width, int height, boolean raised) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_3D_RECT);
 				put(x);
@@ -541,7 +542,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fill3DRect(int x, int y, int width, int height, boolean raised) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_3D_RECT);
 				put(x);
@@ -561,7 +562,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawOval(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_OVAL);
 				put(x);
@@ -580,7 +581,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fillOval(int x, int y, int width, int height) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_OVAL);
 				put(x);
@@ -599,7 +600,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_ARC);
 				put(x);
@@ -620,7 +621,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fillArc(int x, int y, int width, int height, int startAngle, int arcAngle) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_ARC);
 				put(x);
@@ -641,7 +642,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawPolyline(int[] xPoints, int[] yPoints, int npoints) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_POLYLINE);
 				put(xPoints);
@@ -659,7 +660,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawPolygon(int[] xPoints, int[] yPoints, int npoints) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_POLYGON);
 				put(xPoints);
@@ -684,7 +685,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fillPolygon(int[] xPoints, int[] yPoints, int npoints) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_POLYGON);
 				put(xPoints);
@@ -712,7 +713,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			throw new NullPointerException("str is null"); // According to the specification!
 		}
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_STRING_INT);
 				put(str);
@@ -730,7 +731,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawString(AttributedCharacterIterator iterator, int x, int y) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_STRING_ACI_INT);
 				put(iterator);
@@ -748,7 +749,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawChars(char[] data, int offset, int length, int x, int y) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_CHARS);
 				put(data);
@@ -768,7 +769,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawBytes(byte[] data, int offset, int length, int x, int y) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_BYTES);
 				put(data);
@@ -867,7 +868,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void draw(Shape s) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_SHAPE);
 				put(s);
@@ -911,7 +912,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			throw new NullPointerException("str is null"); // According to the specification!
 		}
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_STRING_FLOAT);
 				put(str);
@@ -929,7 +930,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawString(AttributedCharacterIterator iterator, float x, float y) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_STRING_ACI_FLOAT);
 				put(iterator);
@@ -954,7 +955,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void fill(Shape s) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.FILL_SHAPE);
 				put(s);
@@ -994,7 +995,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setComposite(Composite comp) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_COMPOSITE);
 				put(comp);
@@ -1013,7 +1014,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setPaint(Paint paint) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_PAINT);
 				put(paint);
@@ -1032,7 +1033,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setStroke(Stroke s) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_STROKE);
 				put(s);
@@ -1092,7 +1093,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void translate(double tx, double ty) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.TRANSLATE_DOUBLE);
 				put(tx);
@@ -1112,7 +1113,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void rotate(double theta) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.ROTATE);
 				put(theta);
@@ -1131,7 +1132,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void rotate(double theta, double x, double y) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.ROTATE_XY);
 				put(theta);
@@ -1152,7 +1153,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void scale(double sx, double sy) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SCALE);
 				put(sx);
@@ -1172,7 +1173,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void shear(double shx, double shy) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SHEAR);
 				put(shx);
@@ -1192,7 +1193,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void transform(AffineTransform Tx) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.TRANSFORM);
 				put(Tx);
@@ -1211,7 +1212,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setTransform(AffineTransform Tx) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_TRANSFORM);
 				put(Tx);
@@ -1245,7 +1246,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void setBackground(Color color) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.SET_BACKGROUND);
 				put(color);
@@ -1274,7 +1275,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void clip(Shape s) {
 		if (isPaintingEnabled) {
-			calls.mark(); // Mark for rollback
+			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.CLIP);
 				put(s);
@@ -1355,7 +1356,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			isInitialized = true;
 		}
 
-		calls.flip();
+		((Buffer) calls).flip();
 
 		while (calls.remaining() > 0) {
 			processQueuedCall(g);
@@ -1363,21 +1364,21 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	}
 
 	public void processTo(Graphics2D g, Object graphicsCalls) {
-		calls.clear();
+		((Buffer) calls).clear();
 
-		calls.mark(); // Mark for rollback
+		((Buffer) calls).mark(); // Mark for rollback
 		try {
 			calls.put((byte[]) graphicsCalls);
 		} catch (BufferOverflowException e) {
-			calls.reset(); // Rollback buffer
+			((Buffer) calls).reset(); // Rollback buffer
 			if (reallocBuffer()) {
 				processTo(g, graphicsCalls);
 				return; // must exit here
 			}
-			calls.clear();
+			((Buffer) calls).clear();
 		}
 
-		calls.flip();
+		((Buffer) calls).flip();
 		calls.order(calls.get() == 1 ? ByteOrder.BIG_ENDIAN : ByteOrder.LITTLE_ENDIAN);
 
 		while (calls.remaining() > 0) {
@@ -1397,10 +1398,10 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		}
 		byte[] res = new byte[calls.position()];
 
-		calls.flip();
+		((Buffer) calls).flip();
 		calls.get(res);
 
-		calls.clear();
+		((Buffer) calls).clear();
 		calls.put(calls.order() == ByteOrder.BIG_ENDIAN ? (byte) 1 : (byte) 0);
 
 		return res;
@@ -1906,7 +1907,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 
 			byte[] copiedBytes = new byte[calls.position()];
 
-			calls.clear();
+			((Buffer) calls).clear();
 			calls.get(copiedBytes);
 
 			newBuffer.put(copiedBytes);
@@ -1921,7 +1922,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private int unrecoveredBufferOverflowCount;
 
 	private boolean recoverFromBufferOverflow() {
-		calls.reset(); // Rollback buffer
+		((Buffer) calls).reset(); // Rollback buffer
 
 		boolean recovered = reallocBuffer(); 
 
