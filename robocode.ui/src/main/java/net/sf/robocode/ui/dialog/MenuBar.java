@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.dialog;
 
 
+import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.host.ICpuManager;
 import net.sf.robocode.recording.BattleRecordFormat;
@@ -18,9 +19,18 @@ import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.IWindowManagerExt;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.JSeparator;
+import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -915,22 +925,39 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private void optionsFitWindowActionPerformed() {
-		JFrame robocodeFrame = windowManager.getRobocodeFrame();
+		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
+		robocodeFrame.resetPreferredSize();
 		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
-		WindowUtil.fitWindow(robocodeFrame);
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				WindowUtil.fitWindow(robocodeFrame);
+			}
+		});
 	}
 
 	private void optionsFitBattleFieldActionPerformed() {
-		RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
+		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
 		robocodeFrame.fitPreferredSize();
 		try {
 			robocodeFrame.setSize(robocodeFrame.getPreferredSize());
-			WindowUtil.fitWindow(robocodeFrame);
 		} finally {
 			robocodeFrame.resetPreferredSize();
 		}
+
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				robocodeFrame.fitPreferredSize();
+				try {
+					WindowUtil.fitWindow(robocodeFrame);
+				} finally {
+					robocodeFrame.resetPreferredSize();
+				}
+			}
+		});
 	}
 
 	private void optionsAdjustTPSActionPerformed() {
