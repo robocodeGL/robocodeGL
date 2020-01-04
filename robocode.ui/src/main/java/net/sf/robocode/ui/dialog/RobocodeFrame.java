@@ -1062,8 +1062,8 @@ public class RobocodeFrame extends JFrame {
 		getRestartButton().setEnabled(robots != null && robots.length() > 0);
 	}
 
-	public void fitPreferredSize() {
-		battleView.fitPreferredSize();
+	public void calcFitPreferredSize() {
+		battleView.calcFitPreferredSize();
 	}
 
 	public void resetPreferredSize() {
