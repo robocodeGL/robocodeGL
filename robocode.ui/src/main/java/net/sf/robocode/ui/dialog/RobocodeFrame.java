@@ -13,7 +13,11 @@ import net.sf.robocode.io.Logger;
 import net.sf.robocode.recording.IRecordManager;
 import net.sf.robocode.settings.ISettingsListener;
 import net.sf.robocode.settings.ISettingsManager;
-import net.sf.robocode.ui.*;
+import net.sf.robocode.ui.BrowserManager;
+import net.sf.robocode.ui.IRobotDialogManager;
+import net.sf.robocode.ui.IWindowManager;
+import net.sf.robocode.ui.IWindowManagerExt;
+import net.sf.robocode.ui.RobotDialogManager;
 import net.sf.robocode.ui.battleview.BattleView;
 import net.sf.robocode.ui.battleview.InteractiveHandler;
 import net.sf.robocode.ui.battleview.PreferredSizeMode;
@@ -21,20 +25,58 @@ import net.sf.robocode.ui.battleview.ScreenshotUtil;
 import net.sf.robocode.ui.gfx.ImageUtil;
 import net.sf.robocode.version.IVersionManager;
 import net.sf.robocode.version.Version;
-import robocode.control.events.*;
+import robocode.control.events.BattleAdaptor;
+import robocode.control.events.BattleCompletedEvent;
+import robocode.control.events.BattleFinishedEvent;
+import robocode.control.events.BattlePausedEvent;
+import robocode.control.events.BattleResumedEvent;
+import robocode.control.events.BattleStartedEvent;
+import robocode.control.events.RoundStartedEvent;
+import robocode.control.events.TurnEndedEvent;
 import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
 
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JToggleButton;
+import javax.swing.JToolBar;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
+import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
-import java.awt.*;
-import java.awt.event.*;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Cursor;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.KeyboardFocusManager;
+import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
+import java.awt.event.ContainerEvent;
+import java.awt.event.ContainerListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryUsage;
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -82,7 +124,7 @@ public class RobocodeFrame extends JFrame {
 	private JButton restartButton;
 	private JButton replayButton;
 
-	private JSlider tpsSlider;
+	private DoubleJSlider tpsSlider;
 	private JLabel tpsLabel;
 
 	private boolean iconified;
@@ -457,36 +499,28 @@ public class RobocodeFrame extends JFrame {
 	 *
 	 * @return JSlider
 	 */
-	private JSlider getTpsSlider() {
+	private DoubleJSlider getTpsSlider() {
 		if (tpsSlider == null) {
 			final ISettingsManager props = properties;
 
 			int tps = Math.max(props.getOptionsBattleDesiredTPS(), 1);
-
-			tpsSlider = new JSlider(0, MAX_TPS_SLIDER_VALUE, tpsToSliderValue(tps));
+			
+			int scale = 100;
+			tpsSlider = new DoubleJSlider(0, MAX_TPS_SLIDER_VALUE, tpsToSliderValue(tps), scale);
 			tpsSlider.setPaintLabels(true);
 			tpsSlider.setPaintTicks(true);
-			tpsSlider.setMinorTickSpacing(1);
+			tpsSlider.setMinorTickSpacing(1 * scale);
 
 			tpsSlider.addChangeListener(eventHandler);
 
 			Dictionary<Integer, JLabel> labels = new Hashtable<Integer, JLabel>();
 
-			labels.put(0, new JLabel("0"));
-			labels.put(5, new JLabel("5"));
-			labels.put(10, new JLabel("10"));
-			labels.put(15, new JLabel("15"));
-			labels.put(20, new JLabel("20"));
-			labels.put(25, new JLabel("25"));
-			labels.put(30, new JLabel("30"));
-			labels.put(35, new JLabel("40"));
-			labels.put(40, new JLabel("50"));
-			labels.put(45, new JLabel("65"));
-			labels.put(50, new JLabel("90"));
-			labels.put(55, new JLabel("150"));
-			labels.put(60, new JLabel("1000"));
+			for (int i = 0; i < 61; ++i) {
+				int v = i * 5;
+				labels.put(v * scale, new JLabel(String.format("%.0f", sliderToTps(v))));
+			}
 
-			tpsSlider.setMajorTickSpacing(5);
+			tpsSlider.setMajorTickSpacing(5 * scale);
 			tpsSlider.setLabelTable(labels);
 
 			WindowUtil.setFixedSize(tpsSlider, new Dimension((MAX_TPS_SLIDER_VALUE + 1) * 6, 40));
@@ -619,95 +653,83 @@ public class RobocodeFrame extends JFrame {
 		this.iconified = iconified;
 	}
 
-	private int getTpsFromSlider() {
-		final int value = getTpsSlider().getValue();
+	private double getTpsFromSlider() {
+		final double value = getTpsSlider().getScaledValue();
 
-		if (value <= 30) {
-			return value;
-		}
-		if (value <= 40) {
-			return 2 * value - 30;
-		}
-		if (value <= 45) {
-			return 3 * value - 70;
-		}
-		if (value <= 52) {
-			return 5 * value - 160;
-		}
-		switch (value) {
-		case 53:
-			return 110;
+		return sliderToTps(value);
+	}
 
-		case 54:
-			return 130;
-
-		case 55:
-			return 150;
-
-		case 56:
-			return 200;
-
-		case 57:
-			return 300;
-
-		case 58:
-			return 500;
-
-		case 59:
-			return 750;
-
-		case 60:
-			return 1000;
-		}
-		return MAX_TPS;
+	private double sliderToTps(double value) {
+		return linearTicksMapping(value, sliderValues, tpsValues);
 	}
 
 	private void setTpsOnSlider(int tps) {
-		tpsSlider.setValue(tpsToSliderValue(tps));
+		tpsSlider.setScaledValue(tpsToSliderValue(tps));
+	}
+	
+	private final double[] sliderValues = new double[]{
+		0, 30, 40, 45, 53,  54,  56,  57,  58,  59,  60.9, 60.9001, MAX_TPS_SLIDER_VALUE,
+	};
+	private final double[] tpsValues = new double[]{
+		0, 30, 50, 65, 100, 110, 150, 200, 300, 500, 1000, MAX_TPS, MAX_TPS,
+	};
+	
+	private double linearTicksMapping(double x, double[] xs, double[] ys) {
+		int n = xs.length;
+		if (x < xs[0]) {
+			return ys[0];
+		}
+		
+		for (int i = 1; i < n; i++) {
+			double x1 = xs[i];
+			if (x < x1) {
+				double x0 = xs[i - 1];
+				double y0 = ys[i - 1];
+				double y1 = ys[i];
+				return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+			}
+		}
+		return ys[n - 1];
 	}
 
-	private int tpsToSliderValue(int tps) {
-		if (tps <= 30) {
-			return tps;
-		}
-		if (tps <= 50) {
-			return (tps + 30) / 2;
-		}
-		if (tps <= 65) {
-			return (tps + 70) / 3;
-		}
-		if (tps <= 100) {
-			return (tps + 160) / 5;
-		}
-		if (tps <= 110) {
-			return 53;
-		}
-		if (tps <= 130) {
-			return 54;
-		}
-		if (tps <= 150) {
-			return 55;
-		}
-		if (tps <= 200) {
-			return 56;
-		}
-		if (tps <= 300) {
-			return 57;
-		}
-		if (tps <= 500) {
-			return 58;
-		}
-		if (tps <= 750) {
-			return 59;
-		}
-		if (tps <= 1000) {
-			return 60;
-		}
-		return MAX_TPS_SLIDER_VALUE;
+	private double tpsToSliderValue(double tps) {
+		return linearTicksMapping(tps, tpsValues, sliderValues);
+
+		// if (tps <= 30) {
+		// 	return 0 + (tps - 0) / 1;
+		// }
+		// if (tps <= 50) {
+		// 	return 30 + (tps - 30) / 2;
+		// }
+		// if (tps <= 65) {
+		// 	return 40 + (tps - 50) / 3;
+		// }
+		// if (tps <= 100) {
+		// 	return 45 + (tps - 65) / 5;
+		// }
+		// if (tps <= 110) {
+		// 	return 53 + (tps - 100) / 10;
+		// }
+		// if (tps <= 150) {
+		// 	return 54 + (tps - 110) / 20;
+		// }
+		// if (tps <= 200) {
+		// 	return 56 + (tps - 150) / 50;
+		// }
+		// if (tps <= 300) {
+		// 	return 57 + (tps - 200) / 100;
+		// }
+		// if (tps <= 500) {
+		// 	return 58 + (tps - 300) / 200;
+		// }
+		// if (tps <= 1000) {
+		// 	return 59 + (tps - 500) / 250;
+		// }
+		// return MAX_TPS_SLIDER_VALUE;
 	}
 
 	private String getTpsFromSliderAsString() {
-		int tps = getTpsFromSlider();
+		int tps = (int) Math.round(getTpsFromSlider());
 
 		return formatTPS(tps);
 	}
@@ -805,7 +827,7 @@ public class RobocodeFrame extends JFrame {
 
 		public void stateChanged(ChangeEvent e) {
 			if (e.getSource() == getTpsSlider()) {
-				setTPS(getTpsFromSlider(), false);
+				setTPS((int) Math.round(getTpsFromSlider()), false);
 			}
 		}
 	}
