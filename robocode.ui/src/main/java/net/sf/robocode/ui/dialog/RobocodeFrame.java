@@ -1071,4 +1071,17 @@ public class RobocodeFrame extends JFrame {
 	public void setPreferredSizeFit(boolean b) {
 		battleView.setPreferredSizeFit(b);
 	}
+
+	public void toggleControlsVisible() {
+		setControlsVisible(!isControlsVisible());
+	}
+
+	public void setControlsVisible(boolean b) {
+		getToolBar().setVisible(b);
+		getSidePanel().setVisible(b);
+	}
+
+	public boolean isControlsVisible() {
+		return getToolBar().isVisible() && getSidePanel().isVisible();
+	}
 }
