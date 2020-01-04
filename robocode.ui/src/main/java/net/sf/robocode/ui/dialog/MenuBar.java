@@ -73,9 +73,10 @@ public class MenuBar extends JMenuBar {
 	// Options menu
 	private JMenu optionsMenu;
 	private JMenuItem optionsPreferencesMenuItem;
+	private JMenuItem optionsAdjustTPSMenuItem;
+	private JCheckBoxMenuItem optionsHideControlsMenuItem;
 	private JMenuItem optionsFitWindowMenuItem;
 	private JMenuItem optionsFitBattleFieldMenuItem;
-	private JMenuItem optionsAdjustTPSMenuItem;
 	private JCheckBoxMenuItem optionsShowRankingCheckBoxMenuItem;
 	private JMenuItem optionsRecalculateCpuConstantMenuItem;
 	private JMenuItem optionsCleanRobotCacheMenuItem;
@@ -137,12 +138,14 @@ public class MenuBar extends JMenuBar {
 				// Options / Preferences menu
 			} else if (source == mb.getOptionsPreferencesMenuItem()) {
 				optionsPreferencesActionPerformed();
+			} else if (source == mb.getOptionsAdjustTPSMenuItem()) {
+				optionsAdjustTPSActionPerformed();
+			} else if (source == mb.getOptionsHideControlsCheckBoxMenuItem()) {
+				optionsHideControlsActionPerformed();
 			} else if (source == mb.getOptionsFitWindowMenuItem()) {
 				optionsFitWindowActionPerformed();
 			} else if (source == mb.getOptionsFitBattleFieldMenuItem()) {
 				optionsFitBattleFieldActionPerformed();
-			} else if (source == mb.getOptionsAdjustTPSMenuItem()) {
-				optionsAdjustTPSActionPerformed();
 			} else if (source == mb.getOptionsShowRankingCheckBoxMenuItem()) {
 				optionsShowRankingActionPerformed();
 			} else if (source == mb.getOptionsRecalculateCpuConstantMenuItem()) {
@@ -720,6 +723,26 @@ public class MenuBar extends JMenuBar {
 		return helpRoboRumbleMenuItem;
 	}
 
+	private JMenuItem getOptionsAdjustTPSMenuItem() {
+		if (optionsAdjustTPSMenuItem == null) {
+			optionsAdjustTPSMenuItem = new JMenuItem();
+			optionsAdjustTPSMenuItem.setText("Set TPS");
+			optionsAdjustTPSMenuItem.setMnemonic('T');
+			optionsAdjustTPSMenuItem.addActionListener(eventHandler);
+		}
+		return optionsAdjustTPSMenuItem;
+	}
+
+	private JCheckBoxMenuItem getOptionsHideControlsCheckBoxMenuItem() {
+		if (optionsHideControlsMenuItem == null) {
+			optionsHideControlsMenuItem = new JCheckBoxMenuItem();
+			optionsHideControlsMenuItem.setText("Hide controls");
+			optionsHideControlsMenuItem.setMnemonic('H');
+			optionsHideControlsMenuItem.addActionListener(eventHandler);
+		}
+		return optionsHideControlsMenuItem;
+	}
+
 	private JMenuItem getOptionsFitWindowMenuItem() {
 		if (optionsFitWindowMenuItem == null) {
 			optionsFitWindowMenuItem = new JMenuItem();
@@ -738,16 +761,6 @@ public class MenuBar extends JMenuBar {
 			optionsFitBattleFieldMenuItem.addActionListener(eventHandler);
 		}
 		return optionsFitBattleFieldMenuItem;
-	}
-
-	private JMenuItem getOptionsAdjustTPSMenuItem() {
-		if (optionsAdjustTPSMenuItem == null) {
-			optionsAdjustTPSMenuItem = new JMenuItem();
-			optionsAdjustTPSMenuItem.setText("Set TPS");
-			optionsAdjustTPSMenuItem.setMnemonic('T');
-			optionsAdjustTPSMenuItem.addActionListener(eventHandler);
-		}
-		return optionsAdjustTPSMenuItem;
 	}
 
 	public JCheckBoxMenuItem getOptionsShowRankingCheckBoxMenuItem() {
@@ -789,9 +802,11 @@ public class MenuBar extends JMenuBar {
 			optionsMenu.setText("Options");
 			optionsMenu.setMnemonic('O');
 			optionsMenu.add(getOptionsPreferencesMenuItem());
+			optionsMenu.add(getOptionsAdjustTPSMenuItem());
+			optionsMenu.add(new JSeparator());
+			optionsMenu.add(getOptionsHideControlsCheckBoxMenuItem());
 			optionsMenu.add(getOptionsFitWindowMenuItem());
 			optionsMenu.add(getOptionsFitBattleFieldMenuItem());
-			optionsMenu.add(getOptionsAdjustTPSMenuItem());
 			optionsMenu.add(new JSeparator());
 			optionsMenu.add(getOptionsShowRankingCheckBoxMenuItem());
 			optionsMenu.add(new JSeparator());
@@ -964,6 +979,13 @@ public class MenuBar extends JMenuBar {
 				}
 			}
 		});
+	}
+
+	private void optionsHideControlsActionPerformed() {
+		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
+
+		robocodeFrame.toggleControlsVisible();
+		getOptionsHideControlsCheckBoxMenuItem().setState(!robocodeFrame.isControlsVisible());
 	}
 
 	private void optionsAdjustTPSActionPerformed() {
