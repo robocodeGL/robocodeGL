@@ -15,10 +15,12 @@
  */
 package org.jogamp.glg2d;
 
+import com.jogamp.common.os.Platform;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.awt.GLCanvas;
+import jogamp.common.os.PlatformPropsImpl;
 
 import javax.swing.JComponent;
 
@@ -32,7 +34,8 @@ import javax.swing.JComponent;
  * </p>
  */
 public class GLG2DSimpleEventListener implements GLEventListener {
-  private static final boolean LEGACY_HI_DPI = System.getProperty("java.specification.version").startsWith("1.");
+  private static final boolean LEGACY_HI_DPI = PlatformPropsImpl.JAVA_VERSION_NUMBER.getMajor() < 9;
+  private static final boolean IS_MACOS = PlatformPropsImpl.OS_TYPE == Platform.OSType.MACOS;
 
   private final float[] scale = new float[2];
 
@@ -105,8 +108,8 @@ public class GLG2DSimpleEventListener implements GLEventListener {
     } else {
       // drawable.getGL().glViewport(0, 0, (int) (logicWidth * scale[0] * manualScale), (int) (logicHeight * scale[1] * manualScale));
       drawable.getGL().glViewport(0, 0,
-          (int) (logicWidth * manualScale + 0.5),
-          (int) (logicHeight * manualScale + 0.5));
+        (int) (logicWidth * manualScale + 0.5),
+        (int) (logicHeight * manualScale + 0.5));
     }
   }
 
@@ -171,7 +174,9 @@ public class GLG2DSimpleEventListener implements GLEventListener {
       g2d.glDispose();
       g2d = null;
 
-      // System.exit(0);
+      if (IS_MACOS) {
+        System.exit(0);
+      }
     }
   }
 }
