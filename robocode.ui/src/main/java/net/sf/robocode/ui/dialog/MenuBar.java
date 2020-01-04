@@ -30,7 +30,6 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -927,6 +926,7 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitWindowActionPerformed() {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
+		robocodeFrame.setPreferredSize(null);
 		robocodeFrame.resetPreferredSize();
 		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
 		Promise.delayed(100).then(new Runnable() {
@@ -940,7 +940,8 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitBattleFieldActionPerformed() {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
-		robocodeFrame.fitPreferredSize();
+		robocodeFrame.setPreferredSize(null);
+		robocodeFrame.calcFitPreferredSize();
 		try {
 			robocodeFrame.setSize(robocodeFrame.getPreferredSize());
 		} finally {
@@ -950,7 +951,7 @@ public class MenuBar extends JMenuBar {
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
-				robocodeFrame.fitPreferredSize();
+				robocodeFrame.calcFitPreferredSize();
 				try {
 					WindowUtil.fitWindow(robocodeFrame);
 				} finally {
