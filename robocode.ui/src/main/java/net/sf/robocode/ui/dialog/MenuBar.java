@@ -30,6 +30,7 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -926,9 +927,11 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitWindowActionPerformed() {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
-		robocodeFrame.setPreferredSize(null);
-		robocodeFrame.resetPreferredSize();
-		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
+		robocodeFrame.clearPreferredSize();
+		robocodeFrame.setPreferredSizeFit(false);
+		Dimension size = robocodeFrame.getPreferredSize();
+		System.out.println(size);
+		robocodeFrame.setSize(size);
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
@@ -940,22 +943,24 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitBattleFieldActionPerformed() {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
-		robocodeFrame.setPreferredSize(null);
-		robocodeFrame.calcFitPreferredSize();
+		robocodeFrame.clearPreferredSize();
+		robocodeFrame.setPreferredSizeFit(true);
 		try {
-			robocodeFrame.setSize(robocodeFrame.getPreferredSize());
+			Dimension size = robocodeFrame.getPreferredSize();
+			System.out.println(size);
+			robocodeFrame.setSize(size);
 		} finally {
-			robocodeFrame.resetPreferredSize();
+			robocodeFrame.setPreferredSizeFit(false);
 		}
 
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
-				robocodeFrame.calcFitPreferredSize();
+				robocodeFrame.setPreferredSizeFit(true);
 				try {
 					WindowUtil.fitWindow(robocodeFrame);
 				} finally {
-					robocodeFrame.resetPreferredSize();
+					robocodeFrame.setPreferredSizeFit(false);
 				}
 			}
 		});

@@ -132,13 +132,15 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private final FPSGraph fpsGraph = new FPSGraph();
 
+	private boolean preferredSizeFit = false;
+
 	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager) {
 
 		this.properties = properties;
 		this.windowManager = (IWindowManagerExt) windowManager;
 		this.imageManager = imageManager;
 
-		setBattleFieldSize(800, 600);
+		battleField = new BattleField(800, 600);
 
 		new BattleObserver(windowManager);
 
@@ -163,29 +165,35 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		setGLDrawing(true);
 	}
 
-	private void setBattleFieldSize(int w, int h) {
-		battleField = new BattleField(w, h);
-
-		updatePreferredSize(w, h);
+	@Override
+	public Dimension getPreferredSize() {
+		if (preferredSizeFit) {
+			return getPreferredSizeFit();
+		} else {
+			return getPreferredSizeMinimal();
+		}
 	}
 
-	private void updatePreferredSize(int w, int h) {
+	public void setPreferredSizeFit(boolean preferredSizeFit) {
+		this.preferredSizeFit = preferredSizeFit;
+	}
+
+	private Dimension getPreferredSizeFit() {
+		float scale = Math.min(1f * getWidth() / battleField.getWidth(), 1f * getHeight() / battleField.getHeight());
+
+		return new Dimension((int) Math.ceil(battleField.getWidth() * scale), (int) Math.ceil(battleField.getHeight() * scale));
+	}
+
+	private Dimension getPreferredSizeMinimal() {
+		int w = battleField.getWidth();
+		int h = battleField.getHeight();
+
 		if (w > 1000 || h > 1000) {
 			float scale = Math.min(1000f / w, 1000f / h);
 			w *= scale;
 			h *= scale;
 		}
-		setPreferredSize(new Dimension(w, h));
-	}
-
-	public void calcFitPreferredSize() {
-		float scale = Math.min(1f * getWidth() / battleField.getWidth(), 1f * getHeight() / battleField.getHeight());
-
-		setPreferredSize(new Dimension((int) Math.ceil(battleField.getWidth() * scale), (int) Math.ceil(battleField.getHeight() * scale)));
-	}
-
-	public void resetPreferredSize() {
-		updatePreferredSize(battleField.getWidth(), battleField.getHeight());
+		return new Dimension(w, h);
 	}
 
 	public Component init() {
@@ -925,7 +933,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			battleRules = event.getBattleRules();
 
-			setBattleFieldSize(battleRules.getBattlefieldWidth(), battleRules.getBattlefieldHeight());
+			battleField = new BattleField(battleRules.getBattlefieldWidth(), battleRules.getBattlefieldHeight());
 
 			initialized = false;
 			setVisible(true);
