@@ -917,7 +917,7 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitWindowActionPerformed() {
 		JFrame robocodeFrame = windowManager.getRobocodeFrame();
 
-		// robocodeFrame.setSize(robocodeFrame.getPreferredSize());
+		robocodeFrame.setSize(robocodeFrame.getPreferredSize());
 		WindowUtil.fitWindow(robocodeFrame);
 	}
 
@@ -926,6 +926,7 @@ public class MenuBar extends JMenuBar {
 
 		robocodeFrame.fitPreferredSize();
 		try {
+			robocodeFrame.setSize(robocodeFrame.getPreferredSize());
 			WindowUtil.fitWindow(robocodeFrame);
 		} finally {
 			robocodeFrame.resetPreferredSize();
