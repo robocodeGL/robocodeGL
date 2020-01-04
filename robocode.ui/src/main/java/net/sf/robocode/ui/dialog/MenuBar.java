@@ -733,7 +733,7 @@ public class MenuBar extends JMenuBar {
 	private JMenuItem getOptionsFitBattleFieldMenuItem() {
 		if (optionsFitBattleFieldMenuItem == null) {
 			optionsFitBattleFieldMenuItem = new JMenuItem();
-			optionsFitBattleFieldMenuItem.setText("Fit battle field size");
+			optionsFitBattleFieldMenuItem.setText("Fit current battle field size");
 			optionsFitBattleFieldMenuItem.setMnemonic('F');
 			optionsFitBattleFieldMenuItem.addActionListener(eventHandler);
 		}
