@@ -17,10 +17,12 @@ import net.sf.robocode.serialization.SerializableOptions;
 import net.sf.robocode.settings.ISettingsListener;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.IWindowManagerExt;
+import net.sf.robocode.ui.battleview.PreferredSizeMode;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -31,6 +33,7 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -942,10 +945,13 @@ public class MenuBar extends JMenuBar {
 	private void optionsFitWindowActionPerformed() {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
+		if (robocodeFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+			robocodeFrame.setExtendedState(JFrame.NORMAL);
+		}
+
 		robocodeFrame.clearPreferredSize();
-		robocodeFrame.setPreferredSizeFit(false);
+		robocodeFrame.setPreferredSizeMode(PreferredSizeMode.MINIMAL);
 		Dimension size = robocodeFrame.getPreferredSize();
-		System.out.println(size);
 		robocodeFrame.setSize(size);
 		Promise.delayed(100).then(new Runnable() {
 			@Override
@@ -956,26 +962,28 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private void optionsFitBattleFieldActionPerformed() {
+		resetRobocodeFrameSize(PreferredSizeMode.SHRINK_TO_FIT);
+	}
+
+	private void resetRobocodeFrameSize(final PreferredSizeMode preferredSizeMode) {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
-		robocodeFrame.clearPreferredSize();
-		robocodeFrame.setPreferredSizeFit(true);
-		try {
-			Dimension size = robocodeFrame.getPreferredSize();
-			System.out.println(size);
-			robocodeFrame.setSize(size);
-		} finally {
-			robocodeFrame.setPreferredSizeFit(false);
+		if (robocodeFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
+			return;
 		}
+
+		robocodeFrame.clearPreferredSize();
+		robocodeFrame.setPreferredSizeMode(preferredSizeMode);
+		Dimension size = robocodeFrame.getPreferredSize();
+		robocodeFrame.setSize(size);
 
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
-				robocodeFrame.setPreferredSizeFit(true);
 				try {
 					WindowUtil.fitWindow(robocodeFrame);
 				} finally {
-					robocodeFrame.setPreferredSizeFit(false);
+					robocodeFrame.setPreferredSizeMode(PreferredSizeMode.MINIMAL);
 				}
 			}
 		});
@@ -984,7 +992,9 @@ public class MenuBar extends JMenuBar {
 	private void optionsHideControlsActionPerformed() {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
+		robocodeFrame.setPreferredSizeMode(PreferredSizeMode.KEEP_CURRENT);
 		robocodeFrame.toggleControlsVisible();
+		resetRobocodeFrameSize(PreferredSizeMode.KEEP_CURRENT);
 		getOptionsHideControlsCheckBoxMenuItem().setState(!robocodeFrame.isControlsVisible());
 	}
 
