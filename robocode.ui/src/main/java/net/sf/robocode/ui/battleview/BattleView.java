@@ -132,7 +132,8 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private final FPSGraph fpsGraph = new FPSGraph();
 
-	private boolean preferredSizeFit = false;
+	private PreferredSizeMode preferredSizeMode = PreferredSizeMode.MINIMAL;
+	private Dimension lastSize;
 
 	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager) {
 
@@ -167,18 +168,27 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	@Override
 	public Dimension getPreferredSize() {
-		if (allowScaleUp && preferredSizeFit) {
-			return getPreferredSizeFit();
+		if (preferredSizeMode == PreferredSizeMode.KEEP_CURRENT) {
+			return lastSize == null ? getSize() : lastSize;
+		} else if (allowScaleUp && preferredSizeMode == PreferredSizeMode.SHRINK_TO_FIT) {
+			return getPreferredSizeShrinkToFit();
 		} else {
 			return getPreferredSizeMinimal();
 		}
 	}
 
-	public void setPreferredSizeFit(boolean preferredSizeFit) {
-		this.preferredSizeFit = preferredSizeFit;
+	public void setPreferredSizeMode(PreferredSizeMode preferredSizeMode) {
+		if (preferredSizeMode != this.preferredSizeMode) {
+			if (preferredSizeMode == PreferredSizeMode.KEEP_CURRENT) {
+				lastSize = getSize();
+			} else {
+				lastSize = null;
+			}
+			this.preferredSizeMode = preferredSizeMode;
+		}
 	}
 
-	private Dimension getPreferredSizeFit() {
+	private Dimension getPreferredSizeShrinkToFit() {
 		float scale = Math.min(1f * getWidth() / battleField.getWidth(), 1f * getHeight() / battleField.getHeight());
 
 		return new Dimension((int) Math.ceil(battleField.getWidth() * scale), (int) Math.ceil(battleField.getHeight() * scale));

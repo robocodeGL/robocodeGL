@@ -16,6 +16,7 @@ import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.*;
 import net.sf.robocode.ui.battleview.BattleView;
 import net.sf.robocode.ui.battleview.InteractiveHandler;
+import net.sf.robocode.ui.battleview.PreferredSizeMode;
 import net.sf.robocode.ui.battleview.ScreenshotUtil;
 import net.sf.robocode.ui.gfx.ImageUtil;
 import net.sf.robocode.version.IVersionManager;
@@ -1068,8 +1069,8 @@ public class RobocodeFrame extends JFrame {
 		}
 	}
 
-	public void setPreferredSizeFit(boolean b) {
-		battleView.setPreferredSizeFit(b);
+	public void setPreferredSizeMode(PreferredSizeMode b) {
+		battleView.setPreferredSizeMode(b);
 	}
 
 	public void toggleControlsVisible() {
