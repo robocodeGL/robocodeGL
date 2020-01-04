@@ -1001,18 +1001,18 @@ public class MenuBar extends JMenuBar {
 	private void optionsAdjustTPSActionPerformed() {
 		battleManager.pauseBattle();
 
-		String res = JOptionPane.showInputDialog(this, "Input new TPS: ");
+		int tps = properties.getOptionsBattleDesiredTPS();
+		String res = JOptionPane.showInputDialog(this, "Input new TPS: ", tps);
 		if (res != null) {
-			int tps = -1;
 			try {
 				tps = Integer.parseInt(res);
 			} catch (NumberFormatException ex) {
 				JOptionPane.showMessageDialog(this, "Invalid number entered. ",
 					"Failed to change TPS", JOptionPane.ERROR_MESSAGE);
 			}
-			if (tps >= 0) {
-				robocodeFrame.setTPS(tps, true);
-			}
+		}
+		if (tps >= 0) {
+			robocodeFrame.setTPS(tps, true);
 		}
 	}
 
