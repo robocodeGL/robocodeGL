@@ -23,6 +23,7 @@ import net.sf.robocode.ui.mac.MacMenuHandler;
 import net.sf.robocode.ui.mac.MacMenuHelper;
 
 import javax.swing.BorderFactory;
+import javax.swing.ButtonModel;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -35,7 +36,6 @@ import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
 import java.awt.Dimension;
-import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -53,7 +53,7 @@ import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
  * @author Luis Crespo (contributor)
  */
 @SuppressWarnings("serial")
-public class MenuBar extends JMenuBar {
+public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	// Battle menu
 	private JMenu battleMenu;
@@ -236,6 +236,16 @@ public class MenuBar extends JMenuBar {
 		add(getRobotMenu());
 		add(getOptionsMenu());
 		add(getHelpMenu());
+
+		properties.addPropertyListener(this);
+		settingChanged(null);
+	}
+
+	@Override
+	public void settingChanged(String ignore) {
+		boolean hideControls = properties.getOptionsUiHideControls();
+
+		getOptionsHideControlsCheckBoxMenuItem().setState(hideControls);
 	}
 
 	public void setup(RobocodeFrame robocodeFrame) {
@@ -978,40 +988,12 @@ public class MenuBar extends JMenuBar {
 	}
 
 	private void optionsFitBattleFieldActionPerformed() {
-		resetRobocodeFrameSize(PreferredSizeMode.SHRINK_TO_FIT);
-	}
-
-	private void resetRobocodeFrameSize(final PreferredSizeMode preferredSizeMode) {
-		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
-
-		if (robocodeFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-			return;
-		}
-
-		robocodeFrame.clearPreferredSize();
-		robocodeFrame.setPreferredSizeMode(preferredSizeMode);
-		Dimension size = robocodeFrame.getPreferredSize();
-		robocodeFrame.setSize(size);
-
-		Promise.delayed(100).then(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					WindowUtil.fitWindow(robocodeFrame);
-				} finally {
-					robocodeFrame.setPreferredSizeMode(PreferredSizeMode.MINIMAL);
-				}
-			}
-		});
+		robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.SHRINK_TO_FIT);
 	}
 
 	private void optionsHideControlsActionPerformed() {
-		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
-
-		robocodeFrame.setPreferredSizeMode(PreferredSizeMode.KEEP_CURRENT);
-		robocodeFrame.toggleControlsVisible();
-		resetRobocodeFrameSize(PreferredSizeMode.KEEP_CURRENT);
-		getOptionsHideControlsCheckBoxMenuItem().setState(!robocodeFrame.isControlsVisible());
+		properties.setOptionsUiHideControls(!properties.getOptionsUiHideControls());
+		properties.saveProperties();
 	}
 
 	private void optionsAdjustTPSActionPerformed() {
