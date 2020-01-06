@@ -614,6 +614,10 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
+					if (!spacePressed) {
+						nextTurn();
+					}
+
 					spacePressed = true;
 					e.consume();
 				}
