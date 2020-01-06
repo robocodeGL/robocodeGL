@@ -1,0 +1,9 @@
+* text=auto
+*.sh eol=lf
+*.command eol=lf
+*.cmd eol=crlf
+*.bat eol=crlf
+
+*.png binary
+*.jar binary
+*.zip binary
