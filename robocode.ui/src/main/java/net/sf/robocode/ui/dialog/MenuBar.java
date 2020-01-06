@@ -260,6 +260,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	 * Handle battleNew menu item action
 	 */
 	private void battleNewActionPerformed() {
+		battleManager.setBattleFilename(null);
 		windowManager.showNewBattleDialog(battleManager.getBattleProperties());
 	}
 
