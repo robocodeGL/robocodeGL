@@ -265,6 +265,8 @@ public class BattleManager implements IBattleManager {
 			if (!battleFilename.endsWith(".battle")) {
 				battleFilename += ".battle";
 			}
+		} else {
+			battleFilename = newBattleFilename;
 		}
 	}
 
