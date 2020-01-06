@@ -384,7 +384,7 @@ public final class AwtBattleAdaptor {
 		ITurnSnapshot last = this.last;
 		this.last = turnSnapshot;
 
-		if (blocking && frameSync && battleManager.isManagedTPS() && properties.getOptionsBattleDesiredTPS() < 60.1) {
+		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
 				snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
