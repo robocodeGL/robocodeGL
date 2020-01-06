@@ -66,7 +66,10 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
@@ -143,6 +146,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	final List<RobotButton> robotButtons = new ArrayList<RobotButton>();
 	private FileDropHandler fileDropHandler;
+
+	private boolean spacePressed;
 
 	public RobocodeFrame(ISettingsManager properties,
 			IWindowManager windowManager,
@@ -604,6 +609,36 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		interactiveHandler.setScaleProvider(battleView);
 
 		Component battleViewComp = battleView.init();
+
+		battleViewComp.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
+					spacePressed = true;
+					e.consume();
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
+					spacePressed = false;
+					e.consume();
+				}
+			}
+		});
+
+		addWindowFocusListener(new WindowFocusListener() {
+			@Override
+			public void windowGainedFocus(WindowEvent e) {
+			}
+
+			@Override
+			public void windowLostFocus(WindowEvent e) {
+				spacePressed = false;
+			}
+		});
+
 		battleViewComp.addMouseListener(interactiveHandler);
 		battleViewComp.addMouseMotionListener(interactiveHandler);
 		battleViewComp.addMouseWheelListener(interactiveHandler);
