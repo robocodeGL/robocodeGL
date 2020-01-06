@@ -17,3 +17,4 @@ RemoteSystemsTempFiles
 *.iws
 *.iml
 tools/lib
+/config
