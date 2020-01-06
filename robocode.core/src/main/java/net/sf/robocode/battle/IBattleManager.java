@@ -94,4 +94,6 @@ public interface IBattleManager extends IBattleManagerBase {
 	void setDefaultBattleProperties();
 
 	void cleanup();
+
+	int getEffectiveTPS();
 }

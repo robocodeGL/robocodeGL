@@ -316,7 +316,7 @@ public abstract class BaseBattle implements IBattle, Runnable {
 			long delay = 0;
 
 			if (!isAborted() && endTimer < TURNS_DISPLAYED_AFTER_ENDING) {
-				int desiredTPS = properties.getOptionsBattleDesiredTPS();
+				int desiredTPS = battleManager.getEffectiveTPS();
 
 				if (!(desiredTPS < 60.1)) {
 				// if (desiredTPS < MAX_TPS) {

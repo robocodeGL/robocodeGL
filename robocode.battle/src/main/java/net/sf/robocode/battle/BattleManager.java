@@ -499,4 +499,9 @@ public class BattleManager implements IBattleManager {
 			((Battle) battle).sendInteractiveEvent(event);
 		}
 	}
+
+	@Override
+	public int getEffectiveTPS() {
+		return isPaused() ? 10 : properties.getOptionsBattleDesiredTPS();
+	}
 }

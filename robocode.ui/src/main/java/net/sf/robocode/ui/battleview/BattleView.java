@@ -10,6 +10,7 @@ package net.sf.robocode.ui.battleview;
 
 import com.jogamp.common.util.IntObjectHashMap;
 import com.jogamp.opengl.util.Animator;
+import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
 import net.sf.robocode.robotpaint.IGraphicsProxy;
@@ -119,6 +120,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	private FontMetrics smallFontMetrics;
 
 	private final IImageManager imageManager;
+	private final IBattleManager battleManager;
 
 	private final ISettingsManager properties;
 	private final IWindowManagerExt windowManager;
@@ -135,11 +137,12 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	private PreferredSizeMode preferredSizeMode = PreferredSizeMode.MINIMAL;
 	private Dimension lastSize;
 
-	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager) {
+	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager, IBattleManager battleManager) {
 
 		this.properties = properties;
 		this.windowManager = (IWindowManagerExt) windowManager;
 		this.imageManager = imageManager;
+		this.battleManager = battleManager;
 
 		battleField = new BattleField(800, 600);
 
@@ -871,7 +874,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			fpsGraph.recordFrameDelta(delta);
 
-			double desiredTPS = properties.getOptionsBattleDesiredTPS();
+			double desiredTPS = battleManager.getEffectiveTPS();
 
 			if (lastDesiredTPS != desiredTPS) {
 				if (lastDesiredTPS != 0) {
