@@ -63,6 +63,8 @@ public interface IBattleManager extends IBattleManagerBase {
 
 	void resumeBattle();
 
+	boolean isPaused();
+
 	void togglePauseResumeBattle();
 
 	void resumeIfPausedBattle(); // TODO refactor, remove

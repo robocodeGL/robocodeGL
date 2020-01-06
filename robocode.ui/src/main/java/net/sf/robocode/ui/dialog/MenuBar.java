@@ -23,7 +23,6 @@ import net.sf.robocode.ui.mac.MacMenuHandler;
 import net.sf.robocode.ui.mac.MacMenuHelper;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonModel;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -63,6 +62,8 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private JMenuItem battleSaveAsMenuItem;
 	private JMenuItem battleRestartMenuItem;
 	private JMenuItem battleStopMenuItem;
+	private JCheckBoxMenuItem battleTogglePauseMenuItem;
+	private JMenuItem battleNextTurnMenuItem;
 	private JMenuItem battleExitMenuItem;
 	private JMenuItem battleOpenRecordMenuItem;
 	private JMenuItem battleSaveRecordAsMenuItem;
@@ -121,6 +122,10 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 				battleRestartActionPerformed();
 			} else if (source == mb.getBattleStopMenuItem()) {
 				battleStopActionPerformed();
+			} else if (source == mb.getBattleTogglePauseMenuItem()) {
+				battleTogglePauseActionPerformed();
+			} else if (source == mb.getBattleNextTurnMenuItem()) {
+				battleNextTurnActionPerformed();
 			} else if (source == mb.getBattleOpenRecordMenuItem()) {
 				battleOpenRecordActionPerformed();
 			} else if (source == mb.getBattleImportRecordMenuItem()) {
@@ -324,6 +329,14 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		robocodeFrame.stopBattleAsync();
 	}
 
+	private void battleTogglePauseActionPerformed() {
+		robocodeFrame.togglePause();
+	}
+
+	private void battleNextTurnActionPerformed() {
+		robocodeFrame.nextTurn();
+	}
+
 	private void battleOpenRecordActionPerformed() {
 		try {
 			battleManager.pauseBattle();
@@ -454,6 +467,9 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleMenu.add(getBattleRestartMenuItem());
 			battleMenu.add(getBattleStopMenuItem());
 			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleTogglePauseMenuItem());
+			battleMenu.add(getBattleNextTurnMenuItem());
+			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleSaveMenuItem());
 			battleMenu.add(getBattleSaveAsMenuItem());
 			battleMenu.add(new JSeparator());
@@ -540,6 +556,30 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleStopMenuItem.addActionListener(eventHandler);
 		}
 		return battleStopMenuItem;
+	}
+
+	public JCheckBoxMenuItem getBattleTogglePauseMenuItem() {
+		if (battleTogglePauseMenuItem == null) {
+			battleTogglePauseMenuItem = new JCheckBoxMenuItem();
+			battleTogglePauseMenuItem.setText("Pause");
+			battleTogglePauseMenuItem.setMnemonic('P');
+			battleTogglePauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false));
+			battleTogglePauseMenuItem.setEnabled(true);
+			battleTogglePauseMenuItem.addActionListener(eventHandler);
+		}
+		return battleTogglePauseMenuItem;
+	}
+
+	public JMenuItem getBattleNextTurnMenuItem() {
+		if (battleNextTurnMenuItem == null) {
+			battleNextTurnMenuItem = new JMenuItem();
+			battleNextTurnMenuItem.setText("Pause/Next Turn");
+			battleNextTurnMenuItem.setMnemonic('T');
+			battleNextTurnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false));
+			battleNextTurnMenuItem.setEnabled(false);
+			battleNextTurnMenuItem.addActionListener(eventHandler);
+		}
+		return battleNextTurnMenuItem;
 	}
 
 	private JMenuItem getBattleOpenRecordMenuItem() {
