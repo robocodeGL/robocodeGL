@@ -18,3 +18,4 @@ RemoteSystemsTempFiles
 *.iml
 tools/lib
 /config
+/robocode.samples/src/main/resources/*.jar
