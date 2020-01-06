@@ -30,8 +30,8 @@
 <stringAttribute key="org.eclipse.jdt.launching.CLASSPATH_PROVIDER" value="org.eclipse.m2e.launchconfig.classpathProvider"/>
 <booleanAttribute key="org.eclipse.jdt.launching.DEFAULT_CLASSPATH" value="false"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="robocode.Robocode"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="robocode.api"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="robocode.run"/>
 <stringAttribute key="org.eclipse.jdt.launching.SOURCE_PATH_PROVIDER" value="org.eclipse.m2e.launchconfig.sourcepathProvider"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DROBOTPATH=${workspace_loc:robocode.samples/target/classes}&#13;&#10;-Xmx512m&#13;&#10;-XX:+IgnoreUnrecognizedVMOptions&#13;&#10;&quot;--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED&quot;&#13;&#10;&quot;--add-opens=java.base/java.lang.reflect=ALL-UNNAMED&quot;&#13;&#10;&quot;--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED&quot;&#13;&#10;&quot;--add-opens=java.desktop/sun.awt=ALL-UNNAMED&quot;"/>
-<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${workspace_loc:robocode.api/target/launch}"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DROBOTPATH=${workspace_loc:/robocode.samples/target/classes}&#13;&#10;-Xmx512m&#13;&#10;-XX:+IgnoreUnrecognizedVMOptions&#13;&#10;&quot;--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED&quot;&#13;&#10;&quot;--add-opens=java.base/java.lang.reflect=ALL-UNNAMED&quot;&#13;&#10;&quot;--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED&quot;&#13;&#10;&quot;--add-opens=java.desktop/sun.awt=ALL-UNNAMED&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.WORKING_DIRECTORY" value="${project_loc}"/>
 </launchConfiguration>
