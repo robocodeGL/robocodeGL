@@ -12,3 +12,7 @@ Ant and Maven tools:
 CILReader.cs:
 - The file /plugins/dotnet/robocode.dotnet.nhost/src/mono/reflection/CILReader.cs is copyrighted (C) 2009 Novell, Inc.
  (http://www.novell.com)
+
+GLG2D:
+- Files located under the directory /robocode.gl2/src/main/java/org/jogamp/glg2d/ are licensed under the Apache Software Foundation (Apache-2.0):
+  http://www.apache.org/licenses/LICENSE-2.0.html
