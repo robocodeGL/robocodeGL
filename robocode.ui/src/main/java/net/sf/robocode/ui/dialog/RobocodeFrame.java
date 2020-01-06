@@ -580,8 +580,6 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	 * Initialize the class.
 	 */
 	private void initialize() {
-		properties.addPropertyListener(this);
-
 		try {
 			Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
 			Method method = util.getMethod("setWindowCanFullScreen", Window.class, Boolean.TYPE);
@@ -626,6 +624,11 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		fileDropHandler = new FileDropHandler();
 
 		this.setTransferHandler(fileDropHandler);
+
+
+		setControlsVisible(!properties.getOptionsUiHideControls());
+
+		properties.addPropertyListener(this);
 	}
 
 	private void pauseResumeButtonActionPerformed() {
