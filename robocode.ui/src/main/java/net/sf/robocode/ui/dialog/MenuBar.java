@@ -993,7 +993,6 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	private void optionsHideControlsActionPerformed() {
 		properties.setOptionsUiHideControls(!properties.getOptionsUiHideControls());
-		properties.saveProperties();
 	}
 
 	private void optionsAdjustTPSActionPerformed() {
