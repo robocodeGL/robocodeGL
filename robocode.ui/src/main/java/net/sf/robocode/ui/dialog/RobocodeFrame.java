@@ -783,8 +783,6 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	@Override
 	public void settingChanged(String property) {
-		System.out.println("settingChanged " + property);
-
 		onHideControlsChange();
 	}
 
