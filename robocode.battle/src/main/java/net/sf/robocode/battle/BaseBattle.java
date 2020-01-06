@@ -9,7 +9,6 @@ package net.sf.robocode.battle;
 
 
 import net.sf.robocode.async.Promise;
-import net.sf.robocode.async.ResolveConsumer;
 import net.sf.robocode.battle.events.BattleEventDispatcher;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.URLJarCollector;
@@ -68,6 +67,8 @@ public abstract class BaseBattle implements IBattle, Runnable {
 	private boolean runBackward;
 	private boolean roundOver;
 	private final Queue<Command> pendingCommands = new ConcurrentLinkedQueue<Command>();
+
+	private final Object stepNotifier = new Object();
 
 	protected BaseBattle(ISettingsManager properties, IBattleManager battleManager, BattleEventDispatcher eventDispatcher) {
 		stepCount = 0;
@@ -325,12 +326,7 @@ public abstract class BaseBattle implements IBattle, Runnable {
 				}
 			}
 			if (delay > 500000) { // sleep granularity is worse than 500000
-				try {
-					Thread.sleep(delay / 1000000, (int) (delay % 1000000));
-				} catch (InterruptedException e) {
-					// Immediately reasserts the exception by interrupting the caller thread itself
-					Thread.currentThread().interrupt();
-				}
+				notifiableSleep(delay / 1000000, (int) (delay % 1000000));
 			}
 		}
 	}
@@ -427,6 +423,9 @@ public abstract class BaseBattle implements IBattle, Runnable {
 
 	public void step() {
 		sendCommand(new StepCommand());
+		synchronized (stepNotifier) {
+			stepNotifier.notifyAll();
+		}
 	}
 
 	protected void stepBack() {
@@ -495,11 +494,28 @@ public abstract class BaseBattle implements IBattle, Runnable {
 	//
 
 	private void shortSleep() {
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			// Immediately reasserts the exception by interrupting the caller thread itself
-			Thread.currentThread().interrupt();
+		notifiableSleep(100);
+	}
+
+	private void notifiableSleep(int timeout) {
+		synchronized (stepNotifier) {
+			try {
+				stepNotifier.wait(timeout);
+			} catch (InterruptedException e) {
+				// Immediately reasserts the exception by interrupting the caller thread itself
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
+
+	private void notifiableSleep(long millis, int nanos) {
+		synchronized (stepNotifier) {
+			try {
+				stepNotifier.wait(millis, nanos);
+			} catch (InterruptedException e) {
+				// Immediately reasserts the exception by interrupting the caller thread itself
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 }
