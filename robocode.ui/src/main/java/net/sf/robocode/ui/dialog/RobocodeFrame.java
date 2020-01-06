@@ -872,12 +872,13 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 
 	public void saveAndDispose() {
+		properties.saveProperties();
+
 		if (windowManager.closeRobocodeEditor()) {
 			WindowUtil.saveWindowPositions();
 			battleObserver = null;
 			dispose();
 		}
-		properties.saveProperties();
 	}
 
 	public void setTPS(int tps, boolean setSlider) {
