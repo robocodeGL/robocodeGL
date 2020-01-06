@@ -381,6 +381,7 @@ public abstract class BaseBattle implements IBattle, Runnable {
 
 	public void stop(boolean waitTillEnd) {
 		sendCommand(new AbortCommand());
+		notifyBattleThread();
 
 		if (waitTillEnd) {
 			waitTillOver();
@@ -415,14 +416,20 @@ public abstract class BaseBattle implements IBattle, Runnable {
 
 	public void pause() {
 		sendCommand(new PauseCommand());
+		notifyBattleThread();
 	}
 
 	public void resume() {
 		sendCommand(new ResumeCommand());
+		notifyBattleThread();
 	}
 
 	public void step() {
 		sendCommand(new StepCommand());
+		notifyBattleThread();
+	}
+
+	private void notifyBattleThread() {
 		synchronized (stepNotifier) {
 			stepNotifier.notifyAll();
 		}
