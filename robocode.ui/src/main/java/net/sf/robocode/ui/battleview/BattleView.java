@@ -821,7 +821,15 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 		g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		g.transform(AffineTransform.getTranslateInstance((getWidth() - 320) / 2.0, (getHeight() - 46) / 2.0));
+		double logoY = (getHeight() - 46) / 2.0;
+		double sloganY = getHeight() / 2.0 + 50;
+
+		if (properties.getOptionsUiHideControls()) {
+			logoY -= 23.;
+			sloganY -= 23.;
+		}
+
+		g.transform(AffineTransform.getTranslateInstance((getWidth() - 320) / 2.0, logoY));
 		g.setColor(new Color(0, 0x40, 0));
 		g.fill(robocodeTextPath);
 
@@ -831,7 +839,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		g.setTransform(new AffineTransform());
 		g.setFont(font);
 		g.setColor(new Color(0, 0x50, 0));
-		g.drawString(ROBOCODE_SLOGAN, (float) ((getWidth() - width) / 2.0), (float) (getHeight() / 2.0 + 50));
+		g.drawString(ROBOCODE_SLOGAN, (float) ((getWidth() - width) / 2.0), (float) sloganY);
 	}
 
 	private long frameCount = 0L;
