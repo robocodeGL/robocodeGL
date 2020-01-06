@@ -253,7 +253,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	}
 
 	private void battleExitActionPerformed() {
-		robocodeFrame.dispose();
+		robocodeFrame.saveAndDispose();
 	}
 
 	/**

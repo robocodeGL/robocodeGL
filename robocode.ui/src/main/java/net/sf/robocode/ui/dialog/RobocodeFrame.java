@@ -847,12 +847,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				exitOnClose = false;
 				return;
 			}
-			if (windowManager.closeRobocodeEditor()) {
-				WindowUtil.saveWindowPositions();
-				battleObserver = null;
-				dispose();
-			}
-			properties.saveProperties();
+			saveAndDispose();
 		}
 
 		public void windowDeactivated(WindowEvent e) {}
@@ -876,6 +871,15 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				setTPS((int) Math.round(getTpsFromSlider()), false);
 			}
 		}
+	}
+
+	public void saveAndDispose() {
+		if (windowManager.closeRobocodeEditor()) {
+			WindowUtil.saveWindowPositions();
+			battleObserver = null;
+			dispose();
+		}
+		properties.saveProperties();
 	}
 
 	public void setTPS(int tps, boolean setSlider) {
