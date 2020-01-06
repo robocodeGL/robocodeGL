@@ -242,7 +242,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		drawExplosions = props.getOptionsViewExplosions();
 		drawExplosionDebris = props.getOptionsViewExplosionDebris();
 		allowScaleUp = props.getOptionsRenderingAllowScaleUp();
-		fpsGraph.setVisible(props.getOptionsViewFPSMeter());
+		fpsGraph.setVisible(props.getOptionsMiscFPSMeter());
 
 		renderingHints = props.getRenderingHints();
 	}

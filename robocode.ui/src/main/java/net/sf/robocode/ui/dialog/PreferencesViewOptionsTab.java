@@ -49,7 +49,6 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JTextField desiredTpsTextField;
 	private JLabel desiredTpsLabel;
 	private JCheckBox displayFpsCheckBox;
-	private JCheckBox displayFpsMeterCheckBox;
 	private JCheckBox displayTpsCheckBox;
 
 	private JPanel visibleOptionsPanel;
@@ -217,15 +216,6 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		return displayFpsCheckBox;
 	}
 
-	private JCheckBox getDisplayFpsMeterCheckBox() {
-		if (displayFpsMeterCheckBox == null) {
-			displayFpsMeterCheckBox = new JCheckBox("Display FPS Meter");
-			displayFpsMeterCheckBox.setMnemonic('P');
-			displayFpsMeterCheckBox.setDisplayedMnemonicIndex(9);
-		}
-		return displayFpsMeterCheckBox;
-	}
-
 	private JCheckBox getDisplayTpsCheckBox() {
 		if (displayTpsCheckBox == null) {
 			displayTpsCheckBox = new JCheckBox("Display TPS in titlebar");
@@ -289,7 +279,6 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 			tpsOptionsPanel.add(getDisplayTpsCheckBox(), c);
 			c.gridy = 1;
 			tpsOptionsPanel.add(getDisplayFpsCheckBox(), c);
-			tpsOptionsPanel.add(getDisplayFpsMeterCheckBox(), c);
 
 			JPanel tpsPanel = new JPanel();
 
@@ -438,7 +427,6 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 
 	private void loadPreferences(ISettingsManager robocodeProperties) {
 		getDisplayFpsCheckBox().setSelected(robocodeProperties.getOptionsViewFPS());
-		getDisplayFpsMeterCheckBox().setSelected(robocodeProperties.getOptionsViewFPSMeter());
 		getDisplayTpsCheckBox().setSelected(robocodeProperties.getOptionsViewTPS());
 		getVisibleRobotNameCheckBox().setSelected(robocodeProperties.getOptionsViewRobotNames());
 		getVisibleRobotEnergyCheckBox().setSelected(robocodeProperties.getOptionsViewRobotEnergy());
@@ -456,7 +444,6 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		ISettingsManager props = properties;
 
 		props.setOptionsViewFPS(getDisplayFpsCheckBox().isSelected());
-		props.setOptionsViewFPSMeter(getDisplayFpsMeterCheckBox().isSelected());
 		props.setOptionsViewTPS(getDisplayTpsCheckBox().isSelected());
 		props.setOptionsViewRobotNames(getVisibleRobotNameCheckBox().isSelected());
 		props.setOptionsViewRobotEnergy(getVisibleRobotEnergyCheckBox().isSelected());

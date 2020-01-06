@@ -36,6 +36,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox optionsRenderingBufferImagesCheckBox;
 	private JCheckBox optionsRenderingForceBulletColorCheckBox;
 	private JCheckBox optionsRenderingAllowScaleUpCheckBox;
+	private JCheckBox displayFpsMeterCheckBox;
 
 	private JButton predefinedPlaformDefaultButton;
 	private JButton predefinedSpeedButton;
@@ -155,6 +156,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 			otherSettingsPanel.add(getOptionsRenderingBufferImagesCheckBox());
 			otherSettingsPanel.add(getOptionsRenderingForceBulletColorCheckBox());
 			otherSettingsPanel.add(getOptionsRenderingAllowScaleUpCheckBox());
+			otherSettingsPanel.add(getOptionsMiscFpsMeterCheckBox());
 		}
 		return otherSettingsPanel;
 	}
@@ -249,6 +251,15 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		return optionsRenderingAllowScaleUpCheckBox;
 	}
 
+	private JCheckBox getOptionsMiscFpsMeterCheckBox() {
+		if (displayFpsMeterCheckBox == null) {
+			displayFpsMeterCheckBox = new JCheckBox("Display FPS Meter");
+			displayFpsMeterCheckBox.setMnemonic('P');
+			displayFpsMeterCheckBox.setDisplayedMnemonicIndex(9);
+		}
+		return displayFpsMeterCheckBox;
+	}
+
 	private void loadPreferences(ISettingsManager props) {
 		getOptionsRenderingAntialiasingComboBox().setSelectedIndex(props.getOptionsRenderingAntialiasing());
 		getOptionsRenderingTextAntialiasingComboBox().setSelectedIndex(props.getOptionsRenderingTextAntialiasing());
@@ -257,6 +268,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		getOptionsRenderingBufferImagesCheckBox().setSelected(props.getOptionsRenderingBufferImages());
 		getOptionsRenderingForceBulletColorCheckBox().setSelected(props.getOptionsRenderingForceBulletColor());
 		getOptionsRenderingAllowScaleUpCheckBox().setSelected(props.getOptionsRenderingAllowScaleUp());
+		getOptionsMiscFpsMeterCheckBox().setSelected(props.getOptionsMiscFPSMeter());
 	}
 
 	public void storePreferences() {
@@ -269,6 +281,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 		props.setOptionsRenderingBufferImages(optionsRenderingBufferImagesCheckBox.isSelected());
 		props.setOptionsRenderingForceBulletColor(optionsRenderingForceBulletColorCheckBox.isSelected());
 		props.setOptionsRenderingAllowScaleUp(optionsRenderingAllowScaleUpCheckBox.isSelected());
+		props.setOptionsMiscFPSMeter(getOptionsMiscFpsMeterCheckBox().isSelected());
 		properties.saveProperties();
 	}
 
