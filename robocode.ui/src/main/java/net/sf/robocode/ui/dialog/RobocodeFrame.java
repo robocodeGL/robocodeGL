@@ -147,7 +147,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	final List<RobotButton> robotButtons = new ArrayList<RobotButton>();
 	private FileDropHandler fileDropHandler;
 
-	private boolean spacePressed;
+	private long spacePressedTime;
 
 	public RobocodeFrame(ISettingsManager properties,
 			IWindowManager windowManager,
@@ -614,11 +614,11 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
-					if (!spacePressed) {
+					if (spacePressedTime == -1) {
 						nextTurn();
 					}
 
-					spacePressed = true;
+					spacePressedTime = System.nanoTime();
 					e.consume();
 				}
 			}
@@ -626,7 +626,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
-					spacePressed = false;
+					spacePressedTime = -1;
 					e.consume();
 				}
 			}
@@ -639,7 +639,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 			@Override
 			public void windowLostFocus(WindowEvent e) {
-				spacePressed = false;
+				spacePressedTime = -1;
 			}
 		});
 
