@@ -54,7 +54,7 @@ public class SettingsManager implements ISettingsManager {
 	private boolean
 			optionsViewTPS = true,
 			optionsViewFPS = true,
-			optionsViewFPSMeter = false;
+			optionsMiscFPSMeter = false;
 
 	// Prevent speedup when view is minimized
 	private boolean
@@ -234,13 +234,13 @@ public class SettingsManager implements ISettingsManager {
 		props.setProperty(OPTIONS_VIEW_FPS, "" + optionsViewFPS);
 	}
 
-	public boolean getOptionsViewFPSMeter() {
-		return optionsViewFPSMeter;
+	public boolean getOptionsMiscFPSMeter() {
+		return optionsMiscFPSMeter;
 	}
 
-	public void setOptionsViewFPSMeter(boolean optionsViewFPSMeter) {
-		this.optionsViewFPSMeter = optionsViewFPSMeter;
-		props.setProperty(OPTIONS_VIEW_FPS_METER, "" + optionsViewFPSMeter);
+	public void setOptionsMiscFPSMeter(boolean optionsViewFPSMeter) {
+		this.optionsMiscFPSMeter = optionsViewFPSMeter;
+		props.setProperty(OPTIONS_MISC_FPS_METER, "" + optionsViewFPSMeter);
 	}
 
 	public boolean getOptionsViewExplosions() {
@@ -734,10 +734,10 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewGround = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_GROUND, "true"));
 		optionsViewTPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_TPS, "true"));
 		optionsViewFPS = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_FPS, "true"));
-		optionsViewFPSMeter = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_FPS_METER, "false"));
 		optionsViewExplosions = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSIONS, "true"));
 		optionsViewExplosionDebris = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "true"));
 		optionsRenderingAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "true"));
+		optionsMiscFPSMeter = Boolean.valueOf(props.getProperty(OPTIONS_MISC_FPS_METER, "false"));
 		optionsViewSentryBorder = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_SENTRY_BORDER, "false"));
 		optionsViewPreventSpeedupWhenMinimized = Boolean.valueOf(
 				props.getProperty(OPTIONS_VIEW_PREVENT_SPEEDUP_WHEN_MINIMIZED, "false"));
