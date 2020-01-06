@@ -19,6 +19,8 @@ import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.IWindowManagerExt;
 import net.sf.robocode.ui.battleview.PreferredSizeMode;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
+import net.sf.robocode.ui.mac.MacMenuHandler;
+import net.sf.robocode.ui.mac.MacMenuHelper;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
@@ -204,6 +206,8 @@ public class MenuBar extends JMenuBar {
 	private final IRecordManager recordManager;
 	private final ICpuManager cpuManager;
 
+	private final boolean macMenuEnabled;
+
 	public MenuBar(ISettingsManager properties,
 			IWindowManagerExt windowManager,
 			IBattleManager battleManager,
@@ -214,6 +218,12 @@ public class MenuBar extends JMenuBar {
 		this.battleManager = battleManager;
 		this.recordManager = recordManager;
 		this.cpuManager = cpuManager;
+
+		if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+			macMenuEnabled = MacMenuHelper.initMacMenu(new MyMacMenuHandler());
+		} else {
+			macMenuEnabled = false;
+		}
 
 		// FNL: Make sure that menus are heavy-weight components so that the menus are not painted
 		// behind the BattleView which is a heavy-weight component. This must be done before
@@ -425,8 +435,10 @@ public class MenuBar extends JMenuBar {
 			battleMenu.add(getBattleExportRecordMenuItem());
 			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleTakeScreenshotMenuItem());
-			battleMenu.add(new JSeparator());
-			battleMenu.add(getBattleExitMenuItem());
+			if (!macMenuEnabled) {
+				battleMenu.add(new JSeparator());
+				battleMenu.add(getBattleExitMenuItem());
+			}
 			battleMenu.addMenuListener(eventHandler);
 		}
 		return battleMenu;
@@ -613,8 +625,10 @@ public class MenuBar extends JMenuBar {
 			helpMenu.add(new JSeparator());
 			helpMenu.add(getHelpCheckForNewVersionMenuItem());
 			helpMenu.add(getHelpVersionsTxtMenuItem());
-			helpMenu.add(new JSeparator());
-			helpMenu.add(getHelpAboutMenuItem());
+			if (!macMenuEnabled) {
+				helpMenu.add(new JSeparator());
+				helpMenu.add(getHelpAboutMenuItem());
+			}
 			helpMenu.addMenuListener(eventHandler);
 		}
 		return helpMenu;
@@ -804,7 +818,9 @@ public class MenuBar extends JMenuBar {
 			optionsMenu = new JMenu();
 			optionsMenu.setText("Options");
 			optionsMenu.setMnemonic('O');
-			optionsMenu.add(getOptionsPreferencesMenuItem());
+			if (!macMenuEnabled) {
+				optionsMenu.add(getOptionsPreferencesMenuItem());
+			}
 			optionsMenu.add(getOptionsAdjustTPSMenuItem());
 			optionsMenu.add(new JSeparator());
 			optionsMenu.add(getOptionsHideControlsCheckBoxMenuItem());
@@ -1067,5 +1083,22 @@ public class MenuBar extends JMenuBar {
 
 	private void robotPackagerActionPerformed() {
 		windowManager.showRobotPackager();
+	}
+
+	public class MyMacMenuHandler implements MacMenuHandler {
+		@Override
+		public void handleAbout(Object e) {
+			helpAboutActionPerformed();
+		}
+
+		@Override
+		public void handlePreferences(Object e) {
+			optionsPreferencesActionPerformed();
+		}
+
+		@Override
+		public void handleQuitRequestWith(Object e, Object r) {
+			battleExitActionPerformed();
+		}
 	}
 }
