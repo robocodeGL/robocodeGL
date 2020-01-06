@@ -95,5 +95,7 @@ public interface IBattleManager extends IBattleManagerBase {
 
 	void cleanup();
 
+	void setSlowMoMode(boolean slowMoMode);
+
 	int getEffectiveTPS();
 }

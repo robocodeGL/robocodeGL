@@ -68,6 +68,8 @@ public class BattleManager implements IBattleManager {
 	private int pauseCount = 0;
 	private final AtomicBoolean isManagedTPS = new AtomicBoolean(false);
 
+	private boolean slowMoMode = false;
+
 	private Promise busyPromise = Promise.resolved();
 
 	public BattleManager(ISettingsManager properties, IRepositoryManager repositoryManager, IHostManager hostManager, ICpuManager cpuManager, BattleEventDispatcher battleEventDispatcher, IRecordManager recordManager) { // NO_UCD (unused code)
@@ -501,7 +503,12 @@ public class BattleManager implements IBattleManager {
 	}
 
 	@Override
+	public void setSlowMoMode(boolean slowMoMode) {
+		this.slowMoMode = slowMoMode;
+	}
+
+	@Override
 	public int getEffectiveTPS() {
-		return isPaused() ? 10 : properties.getOptionsBattleDesiredTPS();
+		return isPaused() || slowMoMode ? 10 : properties.getOptionsBattleDesiredTPS();
 	}
 }
