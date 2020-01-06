@@ -16,3 +16,4 @@ RemoteSystemsTempFiles
 *.ipr
 *.iws
 *.iml
+tools/lib
