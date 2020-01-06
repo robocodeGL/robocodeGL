@@ -632,6 +632,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
 					if (spacePressedTime == -1) {
 						nextTurn();
+						battleManager.setSlowMoMode(true);
 						spacePressedTime = System.nanoTime();
 						longPressTimer.start();
 					}
@@ -643,7 +644,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
 					if (spacePressedTime != -1) {
-						stopSlowDebugMode();
+						stopSlowMoMode();
 					}
 					e.consume();
 				}
@@ -658,7 +659,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			@Override
 			public void windowLostFocus(WindowEvent e) {
 				if (spacePressedTime != -1) {
-					stopSlowDebugMode();
+					stopSlowMoMode();
 				}
 			}
 		});
@@ -690,9 +691,10 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		properties.addPropertyListener(this);
 	}
 
-	private void stopSlowDebugMode() {
+	private void stopSlowMoMode() {
 		spacePressedTime = -1;
 		longPressTimer.stop();
+		battleManager.setSlowMoMode(false);
 		battleManager.pauseIfResumedBattle();
 	}
 
