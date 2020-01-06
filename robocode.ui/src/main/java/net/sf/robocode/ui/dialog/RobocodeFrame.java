@@ -50,6 +50,7 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -95,6 +96,8 @@ import java.util.List;
 public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	private final static String ROBOCODE_TITLE = "RobocodeGL";
+
+	private static final int SLOW_MO_WAIT_MS = 400;
 
 	private final static int MAX_TPS = 10000;
 	private final static int MAX_TPS_SLIDER_VALUE = 61;
@@ -147,17 +150,18 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	final List<RobotButton> robotButtons = new ArrayList<RobotButton>();
 	private FileDropHandler fileDropHandler;
 
+	private final Timer longPressTimer;
 	private long spacePressedTime;
 
 	public RobocodeFrame(ISettingsManager properties,
-			IWindowManager windowManager,
-			IRobotDialogManager dialogManager,
-			IVersionManager versionManager,
-			IBattleManager battleManager,
-			IRecordManager recordManager,
-			InteractiveHandler interactiveHandler,
-			MenuBar menuBar,
-			BattleView battleView
+	                     IWindowManager windowManager,
+	                     IRobotDialogManager dialogManager,
+	                     IVersionManager versionManager,
+	                     final IBattleManager battleManager,
+	                     IRecordManager recordManager,
+	                     InteractiveHandler interactiveHandler,
+	                     MenuBar menuBar,
+	                     BattleView battleView
 			) {
 		this.windowManager = (IWindowManagerExt) windowManager;
 		this.properties = properties;
@@ -170,6 +174,18 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		this.menuBar = menuBar;
 		menuBar.setup(this);
 		initialize();
+
+		longPressTimer = new Timer(16, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (spacePressedTime == -1) {
+					return;
+				}
+				if (System.nanoTime() - spacePressedTime > SLOW_MO_WAIT_MS * 1000000) {
+					battleManager.resumeIfPausedBattle();
+				}
+			}
+		});
 	}
 
 	protected void finalize() throws Throwable {
@@ -616,9 +632,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
 					if (spacePressedTime == -1) {
 						nextTurn();
+						spacePressedTime = System.nanoTime();
+						longPressTimer.start();
 					}
-
-					spacePressedTime = System.nanoTime();
 					e.consume();
 				}
 			}
@@ -626,7 +642,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			@Override
 			public void keyReleased(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
-					spacePressedTime = -1;
+					if (spacePressedTime != -1) {
+						stopSlowDebugMode();
+					}
 					e.consume();
 				}
 			}
@@ -639,7 +657,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 			@Override
 			public void windowLostFocus(WindowEvent e) {
-				spacePressedTime = -1;
+				if (spacePressedTime != -1) {
+					stopSlowDebugMode();
+				}
 			}
 		});
 
@@ -668,6 +688,12 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		setControlsVisible(!properties.getOptionsUiHideControls());
 
 		properties.addPropertyListener(this);
+	}
+
+	private void stopSlowDebugMode() {
+		spacePressedTime = -1;
+		longPressTimer.stop();
+		battleManager.pauseIfResumedBattle();
 	}
 
 	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
