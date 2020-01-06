@@ -614,8 +614,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			menuBar.getBattleMenu().setEnabled(false);
 			menuBar.getRobotMenu().setEnabled(false);
 			setEnableStopButton(false);
-			getPauseButton().setEnabled(false);
-			getNextTurnButton().setEnabled(false);
+			setEnablePauseButton(false);
+			setEnableNextTurnButton(false, true);
 			setEnableRestartButton(false);
 			getReplayButton().setEnabled(false);
 			exitOnClose = false;
@@ -631,8 +631,19 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		properties.addPropertyListener(this);
 	}
 
+	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
+		getNextTurnButton().setEnabled(b);
+		if (setMenu) {
+			menuBar.getBattleNextTurnMenuItem().setEnabled(b);
+		}
+	}
+
+	private void setEnablePauseButton(boolean b) {
+		getPauseButton().setEnabled(b);
+	}
+
 	private void pauseResumeButtonActionPerformed() {
-		battleManager.togglePauseResumeBattle();
+		togglePause();
 	}
 
 	/**
@@ -784,6 +795,17 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	@Override
 	public void settingChanged(String property) {
 		onHideControlsChange();
+	}
+
+	public void togglePause() {
+		battleManager.togglePauseResumeBattle();
+	}
+
+	public void nextTurn() {
+		if (!battleManager.isPaused()) {
+			battleManager.pauseBattle();
+		}
+		battleManager.nextTurn();
 	}
 
 	private class EventHandler implements ComponentListener, ActionListener, ContainerListener, WindowListener,
@@ -999,7 +1021,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 			setEnableStopButton(false);
 			getReplayButton().setEnabled(canReplayRecord);
-			getNextTurnButton().setEnabled(false);
+			setEnableNextTurnButton(false, true);
 
 			menuBar.getBattleRestartMenuItem().setEnabled(false);
 			menuBar.getBattleSaveRecordAsMenuItem().setEnabled(enableSaveRecord);
@@ -1013,8 +1035,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		public void onBattlePaused(BattlePausedEvent event) {
 			isBattlePaused = true;
 
-			getPauseButton().setSelected(true);
-			getNextTurnButton().setEnabled(true);
+			setPauseButtonSelected(true);
+			setEnableNextTurnButton(true, true);
 
 			updateTitle();
 		}
@@ -1023,8 +1045,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		public void onBattleResumed(BattleResumedEvent event) {
 			isBattlePaused = false;
 
-			getPauseButton().setSelected(false);
-			getNextTurnButton().setEnabled(false);
+			setPauseButtonSelected(false);
+			setEnableNextTurnButton(false, false);
 
 			// TODO: Refactor?
 			if (getTpsFromSlider() == 0) {
@@ -1136,6 +1158,11 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				windowManager.showResultsDialog(event);
 			}
 		}
+	}
+
+	private void setPauseButtonSelected(boolean paused) {
+		menuBar.getBattleTogglePauseMenuItem().setState(paused);
+		getPauseButton().setSelected(paused);
 	}
 
 	private void setEnableRestartButton(boolean b) {

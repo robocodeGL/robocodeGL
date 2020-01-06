@@ -403,7 +403,8 @@ public class BattleManager implements IBattleManager {
 		replayBattle();
 	}
 
-	private boolean isPaused() {
+	@Override
+	public boolean isPaused() {
 		return (pauseCount != 0);
 	}
 
