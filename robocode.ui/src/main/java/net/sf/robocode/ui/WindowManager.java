@@ -719,6 +719,10 @@ public class WindowManager implements IWindowManagerExt {
 	 * If this also fails, the LAF will not be changed.
 	 */
 	private void setLookAndFeel() {
+		if (System.getProperty("apple.laf.useScreenMenuBar") == null) {
+			System.setProperty("apple.laf.useScreenMenuBar", "true");
+		}
+
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Throwable t) {
