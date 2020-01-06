@@ -1,5 +1,6 @@
 package net.sf.robocode.ui.mac;
 
+@SuppressWarnings("unused")
 public interface MacMenuHandler {
 	void handleAbout(Object e);
 

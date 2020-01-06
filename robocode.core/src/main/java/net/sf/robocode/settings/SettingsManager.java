@@ -53,8 +53,7 @@ public class SettingsManager implements ISettingsManager {
 	// View Options (Turns Per Second)
 	private boolean
 			optionsViewTPS = true,
-			optionsViewFPS = true,
-			optionsMiscFPSMeter = false;
+			optionsViewFPS = true;
 
 	// Prevent speedup when view is minimized
 	private boolean
@@ -71,6 +70,10 @@ public class SettingsManager implements ISettingsManager {
 	private boolean
 			optionsRenderingBufferImages = true,
 			optionsRenderingForceBulletColor = false;
+
+	private boolean
+			optionsMiscFPSMeter = false,
+			optionsUiHideControls = false;
 
 	// Sound Options (Sound Effects)
 	private boolean
@@ -238,9 +241,18 @@ public class SettingsManager implements ISettingsManager {
 		return optionsMiscFPSMeter;
 	}
 
-	public void setOptionsMiscFPSMeter(boolean optionsViewFPSMeter) {
-		this.optionsMiscFPSMeter = optionsViewFPSMeter;
-		props.setProperty(OPTIONS_MISC_FPS_METER, "" + optionsViewFPSMeter);
+	public void setOptionsMiscFPSMeter(boolean optionsMiscFPSMeter) {
+		this.optionsMiscFPSMeter = optionsMiscFPSMeter;
+		props.setProperty(OPTIONS_MISC_FPS_METER, "" + optionsMiscFPSMeter);
+	}
+
+	public boolean getOptionsUiHideControls() {
+		return optionsUiHideControls;
+	}
+
+	public void setOptionsUiHideControls(boolean optionsUiHideControls) {
+		this.optionsUiHideControls = optionsUiHideControls;
+		props.setProperty(OPTIONS_UI_HIDE_CONTROLS, "" + optionsUiHideControls);
 	}
 
 	public boolean getOptionsViewExplosions() {
@@ -738,6 +750,7 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewExplosionDebris = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "true"));
 		optionsRenderingAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "true"));
 		optionsMiscFPSMeter = Boolean.valueOf(props.getProperty(OPTIONS_MISC_FPS_METER, "false"));
+		optionsUiHideControls = Boolean.valueOf(props.getProperty(OPTIONS_UI_HIDE_CONTROLS, "false"));
 		optionsViewSentryBorder = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_SENTRY_BORDER, "false"));
 		optionsViewPreventSpeedupWhenMinimized = Boolean.valueOf(
 				props.getProperty(OPTIONS_VIEW_PREVENT_SPEEDUP_WHEN_MINIMIZED, "false"));

@@ -8,6 +8,7 @@
 package net.sf.robocode.ui.dialog;
 
 
+import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.recording.IRecordManager;
@@ -88,7 +89,7 @@ import java.util.List;
  * @author Pavel Savara (contributor)
  */
 @SuppressWarnings("serial")
-public class RobocodeFrame extends JFrame {
+public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	private final static String ROBOCODE_TITLE = "RobocodeGL";
 
@@ -579,6 +580,8 @@ public class RobocodeFrame extends JFrame {
 	 * Initialize the class.
 	 */
 	private void initialize() {
+		properties.addPropertyListener(this);
+
 		try {
 			Class<?> util = Class.forName("com.apple.eawt.FullScreenUtilities");
 			Method method = util.getMethod("setWindowCanFullScreen", Window.class, Boolean.TYPE);
@@ -740,6 +743,46 @@ public class RobocodeFrame extends JFrame {
 
 	public FileDropHandler getFileDropHandler() {
 		return fileDropHandler;
+	}
+
+	public void resetRobocodeFrameSize(final PreferredSizeMode preferredSizeMode) {
+		if (getExtendedState() == MAXIMIZED_BOTH) {
+			return;
+		}
+
+		clearPreferredSize();
+		setPreferredSizeMode(preferredSizeMode);
+		Dimension size = getPreferredSize();
+		setSize(size);
+
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					WindowUtil.fitWindow(RobocodeFrame.this);
+				} finally {
+					setPreferredSizeMode(PreferredSizeMode.MINIMAL);
+				}
+			}
+		});
+	}
+
+	public void onHideControlsChange() {
+		boolean hide = properties.getOptionsUiHideControls();
+		if (isControlsVisible() == !hide) {
+			return;
+		}
+
+		setPreferredSizeMode(PreferredSizeMode.KEEP_CURRENT);
+		setControlsVisible(!hide);
+		resetRobocodeFrameSize(PreferredSizeMode.KEEP_CURRENT);
+	}
+
+	@Override
+	public void settingChanged(String property) {
+		System.out.println("settingChanged " + property);
+
+		onHideControlsChange();
 	}
 
 	private class EventHandler implements ComponentListener, ActionListener, ContainerListener, WindowListener,
