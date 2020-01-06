@@ -613,10 +613,10 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		if (windowManager.isSlave()) {
 			menuBar.getBattleMenu().setEnabled(false);
 			menuBar.getRobotMenu().setEnabled(false);
-			getStopButton().setEnabled(false);
+			setEnableStopButton(false);
 			getPauseButton().setEnabled(false);
 			getNextTurnButton().setEnabled(false);
-			getRestartButton().setEnabled(false);
+			setEnableRestartButton(false);
 			getReplayButton().setEnabled(false);
 			exitOnClose = false;
 		}
@@ -645,7 +645,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 
 	public void afterIntroBattle() {
-		getRestartButton().setEnabled(false);
+		setEnableRestartButton(false);
 		getRobotButtonsPanel().removeAll();
 		getRobotButtonsPanel().repaint();
 	}
@@ -795,18 +795,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			if (source == getPauseButton()) {
 				pauseResumeButtonActionPerformed();
 			} else if (source == getStopButton()) {
-				getRestartButton().setEnabled(false);
-				getStopButton().setEnabled(false);
-				battleManager.stopAsync(true).then(new Runnable() {
-					@Override
-					public void run() {
-						updateRestartButtonStatus();
-					}
-				});
+				stopBattleAsync();
 			} else if (source == getRestartButton()) {
-				getRestartButton().setEnabled(false);
-				getStopButton().setEnabled(false);
-				battleManager.restart();
+				restartBattleAsync();
 			} else if (source == getNextTurnButton()) {
 				battleManager.nextTurn();
 			} else if (source == getReplayButton()) {
@@ -871,6 +862,23 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		}
 	}
 
+	public void restartBattleAsync() {
+		setEnableRestartButton(false);
+		setEnableStopButton(false);
+		battleManager.restart();
+	}
+
+	public void stopBattleAsync() {
+		setEnableRestartButton(false);
+		setEnableStopButton(false);
+		battleManager.stopAsync(true).then(new Runnable() {
+			@Override
+			public void run() {
+				updateRestartButtonStatus();
+			}
+		});
+	}
+
 	public void saveAndDispose() {
 		properties.saveProperties();
 
@@ -896,7 +904,6 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			setTpsOnSlider(tps);
 		}
 	}
-
 
 	private class BattleObserver extends BattleAdaptor {
 		private int tps;
@@ -926,13 +933,14 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			isBattleRunning = true;
 			isBattleReplay = event.isReplay();
 
-			getStopButton().setEnabled(true);
+			setEnableStopButton(true);
 			updateRestartButtonStatus();
 			getReplayButton().setEnabled(event.isReplay());
 			menuBar.getBattleSaveRecordAsMenuItem().setEnabled(false);
 			menuBar.getBattleExportRecordMenuItem().setEnabled(false);
 			menuBar.getBattleSaveAsMenuItem().setEnabled(true);
 			menuBar.getBattleSaveMenuItem().setEnabled(true);
+			menuBar.getBattleRestartMenuItem().setEnabled(true);
 
 			JCheckBoxMenuItem rankingCheckBoxMenuItem = menuBar.getOptionsShowRankingCheckBoxMenuItem();
 
@@ -989,10 +997,11 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			final boolean canReplayRecord = recordManager.hasRecord();
 			final boolean enableSaveRecord = (properties.getOptionsCommonEnableReplayRecording() & canReplayRecord);
 
-			getStopButton().setEnabled(false);
+			setEnableStopButton(false);
 			getReplayButton().setEnabled(canReplayRecord);
 			getNextTurnButton().setEnabled(false);
 
+			menuBar.getBattleRestartMenuItem().setEnabled(false);
 			menuBar.getBattleSaveRecordAsMenuItem().setEnabled(enableSaveRecord);
 			menuBar.getBattleExportRecordMenuItem().setEnabled(enableSaveRecord);
 			menuBar.getOptionsShowRankingCheckBoxMenuItem().setEnabled(false);
@@ -1088,7 +1097,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			}
 
 			MemoryUsage memUsage = ManagementFactory.getMemoryMXBean().getHeapMemoryUsage();
-			
+
 			long usedMem = memUsage.getUsed() / (1024 * 1024);
 
 			title.append(", Used mem: ").append(usedMem);
@@ -1129,9 +1138,20 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		}
 	}
 
+	private void setEnableRestartButton(boolean b) {
+		menuBar.getBattleRestartMenuItem().setEnabled(b);
+		getRestartButton().setEnabled(b);
+	}
+
+	private void setEnableStopButton(boolean b) {
+		menuBar.getBattleStopMenuItem().setEnabled(b);
+		getStopButton().setEnabled(b);
+	}
+
 	public void updateRestartButtonStatus() {
 		String robots = battleManager.getBattleProperties().getSelectedRobots();
-		getRestartButton().setEnabled(robots != null && robots.length() > 0);
+		boolean canRestart = robots != null && robots.length() > 0;
+		setEnableRestartButton(canRestart);
 	}
 
 	public void clearPreferredSize() {

@@ -61,6 +61,8 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private JMenuItem battleOpenMenuItem;
 	private JMenuItem battleSaveMenuItem;
 	private JMenuItem battleSaveAsMenuItem;
+	private JMenuItem battleRestartMenuItem;
+	private JMenuItem battleStopMenuItem;
 	private JMenuItem battleExitMenuItem;
 	private JMenuItem battleOpenRecordMenuItem;
 	private JMenuItem battleSaveRecordAsMenuItem;
@@ -115,6 +117,10 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 				battleSaveActionPerformed();
 			} else if (source == mb.getBattleSaveAsMenuItem()) {
 				battleSaveAsActionPerformed();
+			} else if (source == mb.getBattleRestartMenuItem()) {
+				battleRestartActionPerformed();
+			} else if (source == mb.getBattleStopMenuItem()) {
+				battleStopActionPerformed();
 			} else if (source == mb.getBattleOpenRecordMenuItem()) {
 				battleOpenRecordActionPerformed();
 			} else if (source == mb.getBattleImportRecordMenuItem()) {
@@ -310,6 +316,14 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		}
 	}
 
+	private void battleRestartActionPerformed() {
+		robocodeFrame.restartBattleAsync();
+	}
+
+	private void battleStopActionPerformed() {
+		robocodeFrame.stopBattleAsync();
+	}
+
 	private void battleOpenRecordActionPerformed() {
 		try {
 			battleManager.pauseBattle();
@@ -437,6 +451,9 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleMenu.add(getBattleNewMenuItem());
 			battleMenu.add(getBattleOpenMenuItem());
 			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleRestartMenuItem());
+			battleMenu.add(getBattleStopMenuItem());
+			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleSaveMenuItem());
 			battleMenu.add(getBattleSaveAsMenuItem());
 			battleMenu.add(new JSeparator());
@@ -501,6 +518,28 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleSaveMenuItem.addActionListener(eventHandler);
 		}
 		return battleSaveMenuItem;
+	}
+
+	public JMenuItem getBattleRestartMenuItem() {
+		if (battleRestartMenuItem == null) {
+			battleRestartMenuItem = new JMenuItem();
+			battleRestartMenuItem.setText("Restart");
+			battleRestartMenuItem.setMnemonic('R');
+			battleRestartMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_R, MENU_SHORTCUT_KEY_MASK, false));
+			battleRestartMenuItem.setEnabled(false);
+			battleRestartMenuItem.addActionListener(eventHandler);
+		}
+		return battleRestartMenuItem;
+	}
+
+	public JMenuItem getBattleStopMenuItem() {
+		if (battleStopMenuItem == null) {
+			battleStopMenuItem = new JMenuItem();
+			battleStopMenuItem.setText("Stop");
+			battleStopMenuItem.setEnabled(false);
+			battleStopMenuItem.addActionListener(eventHandler);
+		}
+		return battleStopMenuItem;
 	}
 
 	private JMenuItem getBattleOpenRecordMenuItem() {
