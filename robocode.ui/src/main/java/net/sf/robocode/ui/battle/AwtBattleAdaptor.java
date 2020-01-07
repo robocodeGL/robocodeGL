@@ -102,11 +102,11 @@ public final class AwtBattleAdaptor {
 	}
 
 	public ITurnSnapshot getLastSnapshot() {
-		return isRunning.get() ? lastSnapshot : null;
+		return isRunning.get() && frameSync ? lastSnapshot : null;
 	}
 
 	public ITurnSnapshot getLastLastSnapshot() {
-		return isRunning.get() ? lastLastSnapshot : null;
+		return isRunning.get() && frameSync ? lastLastSnapshot : null;
 	}
 
 	// this is always dispatched on AWT thread
@@ -378,6 +378,11 @@ public final class AwtBattleAdaptor {
 				}
 			});
 		}
+	}
+
+	public void signalStopBattle() {
+		frameSync = false;
+		snapshot.clear();
 	}
 
 	private void putSnapshot(ITurnSnapshot turnSnapshot, boolean blocking) {

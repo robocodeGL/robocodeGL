@@ -954,6 +954,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	public void restartBattleAsync() {
 		setEnableRestartButton(false);
 		setEnableStopButton(false);
+		windowManager.signalStopBattle();
 		battleManager.restart();
 	}
 
@@ -966,6 +967,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				updateRestartButtonStatus();
 			}
 		});
+		windowManager.signalStopBattle();
 	}
 
 	public void saveAndDispose() {
