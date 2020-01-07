@@ -132,7 +132,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	private final GraphicsState graphicsState = new GraphicsState();
 	private IGraphicsProxy[] robotGraphics;
 
-	private final FPSGraph fpsGraph = new FPSGraph();
+	private final FPSMeter fpsMeter = new FPSMeter();
 
 	private PreferredSizeMode preferredSizeMode = PreferredSizeMode.MINIMAL;
 	private Dimension lastSize;
@@ -214,7 +214,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 		Component comp = (Component) getGLDrawable();
 		comp.setEnabled(true);
-		fpsGraph.init(comp);
+		fpsMeter.init(comp);
 
 		Animator animator = new Animator();
 		animator.add(this.getGLDrawable());
@@ -245,7 +245,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		drawExplosions = props.getOptionsViewExplosions();
 		drawExplosionDebris = props.getOptionsViewExplosionDebris();
 		allowScaleUp = props.getOptionsRenderingAllowScaleUp();
-		fpsGraph.setVisible(props.getOptionsMiscFPSMeter());
+		fpsMeter.setVisible(props.getOptionsMiscFPSMeter());
 
 		renderingHints = props.getRenderingHints();
 	}
@@ -872,7 +872,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			long delta = timeLastPaint == -1 ? 0 : now - timeLastPaint;
 			timeLastPaint = now;
 
-			fpsGraph.recordFrameDelta(delta);
+			fpsMeter.recordFrameDelta(delta);
 
 			double desiredTPS = battleManager.getEffectiveTPS();
 
@@ -917,12 +917,16 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			final ITurnSnapshot lastSnapshot = windowManager.getLastSnapshot();
 			final ITurnSnapshot lastLastSnapshot = windowManager.getLastLastSnapshot();
 			if (lastSnapshot != null) {
+				fpsMeter.setTurnId(lastSnapshot.getTurn());
+
 				update(lastSnapshot, lastLastSnapshot, g, Math.min(1., 1. * frameCount / mod));
 			} else {
+				fpsMeter.setTurnId(0);
+
 				paintRobocodeLogo(g);
 			}
 
-			fpsGraph.paint(g);
+			fpsMeter.paint(g);
 		}
 
 		private void update(ITurnSnapshot snapshot, ITurnSnapshot lastSnapshot, Graphics g, double t) {
