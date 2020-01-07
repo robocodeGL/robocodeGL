@@ -34,6 +34,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 /**
@@ -60,6 +61,7 @@ public final class AwtBattleAdaptor {
 	private volatile boolean frameSync = false;
 
 	private volatile boolean pauseInUI = false;
+	private final AtomicLong nextTurnCount = new AtomicLong(0);
 
 
 	private BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
@@ -391,6 +393,10 @@ public final class AwtBattleAdaptor {
 		snapshot.drainTo(pendingTurns);
 	}
 
+	public void signalNextTurn() {
+		nextTurnCount.incrementAndGet();
+	}
+
 	public void signalStopBattle() {
 		frameSync = false;
 		snapshot.clear();
@@ -408,15 +414,27 @@ public final class AwtBattleAdaptor {
 					ArrayList<Turn> c = new ArrayList<Turn>();
 					pendingTurns.drainTo(c);
 
-					for (Turn t : c) {
-						if (this.pauseInUI) {
-							pauseInUI = true;
-						}
+					boolean shouldNextTurn = takeShouldNextTurn();
+					if (this.pauseInUI) {
+						pauseInUI = true;
+					}
+					if (shouldNextTurn) {
+						pauseInUI = false;
+					}
 
+					for (Turn t : c) {
 						if (pauseInUI) {
 							pendingTurns.put(t);
 						} else {
 							pausablePut(t);
+						}
+
+						shouldNextTurn = takeShouldNextTurn();
+						if (this.pauseInUI) {
+							pauseInUI = true;
+						}
+						if (shouldNextTurn) {
+							pauseInUI = false;
 						}
 					}
 
@@ -442,6 +460,17 @@ public final class AwtBattleAdaptor {
 
 			snapshot.offer(turn);
 		}
+	}
+
+	private boolean takeShouldNextTurn() throws InterruptedException {
+		long nextTurn = nextTurnCount.get();
+		while (nextTurn > 0 && !nextTurnCount.compareAndSet(nextTurn, nextTurn - 1)) {
+			synchronized (nextTurnCount) {
+				nextTurnCount.wait();
+				nextTurn = nextTurnCount.get();
+			}
+		}
+		return nextTurn > 0;
 	}
 
 	private void pausablePut(final Turn turn) throws InterruptedException {
