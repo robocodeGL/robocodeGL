@@ -537,6 +537,11 @@ public class WindowManager implements IWindowManagerExt {
 		awtAdaptor.signalPauseBattle();
 	}
 
+	@Override
+	public void signalNextTurn() {
+		awtAdaptor.signalNextTurn();
+	}
+
 	private void importRobots(List<File> files) {
 		// for (File file : files) {
 		// 	tryImportRobot(file);

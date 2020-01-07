@@ -390,11 +390,18 @@ public final class AwtBattleAdaptor {
 
 	public void signalPauseBattle() {
 		pauseInUI = true;
-		snapshot.drainTo(pendingTurns);
+		ArrayList<Turn> c = new ArrayList<Turn>();
+		snapshot.drainTo(c);
+		for (Turn turn : c) {
+			pendingTurns.offer(turn);
+		}
 	}
 
 	public void signalNextTurn() {
-		nextTurnCount.incrementAndGet();
+		synchronized (nextTurnCount) {
+			nextTurnCount.incrementAndGet();
+			nextTurnCount.notify();
+		}
 	}
 
 	public void signalStopBattle() {
@@ -424,7 +431,7 @@ public final class AwtBattleAdaptor {
 
 					for (Turn t : c) {
 						if (pauseInUI) {
-							pendingTurns.put(t);
+							pendingTurns.offer(t);
 						} else {
 							pausablePut(t);
 						}
@@ -439,14 +446,14 @@ public final class AwtBattleAdaptor {
 					}
 
 					if (pauseInUI) {
-						pendingTurns.put(turn);
+						pendingTurns.offer(turn);
 					} else {
 						pausablePut(turn);
 					}
 					// snapshot.put(new Turn(last, turnSnapshot));
 					// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 				} else {
-					pendingTurns.put(turn);
+					pendingTurns.offer(turn);
 				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
@@ -480,7 +487,7 @@ public final class AwtBattleAdaptor {
 				return pauseInUI ? null : turn;
 			}
 		})) {
-			pendingTurns.put(turn);
+			pendingTurns.offer(turn);
 		}
 	}
 }
