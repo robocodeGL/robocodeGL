@@ -420,7 +420,11 @@ public final class AwtBattleAdaptor {
 						}
 					}
 
-					pausablePut(turn);
+					if (pauseInUI) {
+						pendingTurns.put(turn);
+					} else {
+						pausablePut(turn);
+					}
 					// snapshot.put(new Turn(last, turnSnapshot));
 					// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 				} else {
