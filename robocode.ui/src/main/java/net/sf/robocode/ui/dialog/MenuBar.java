@@ -334,7 +334,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	}
 
 	private void battleNextTurnActionPerformed() {
-		robocodeFrame.nextTurn();
+		robocodeFrame.pauseOrNextTurn();
 	}
 
 	private void battleOpenRecordActionPerformed() {

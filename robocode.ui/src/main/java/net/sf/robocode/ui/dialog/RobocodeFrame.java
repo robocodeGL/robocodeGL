@@ -631,7 +631,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
 					if (spacePressedTime == -1) {
-						nextTurn();
+						pauseOrNextTurn();
 						battleManager.setSlowMoMode(true);
 						spacePressedTime = System.nanoTime();
 						longPressTimer.start();
@@ -870,14 +870,18 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		}
 	}
 
-	public void nextTurn() {
+	public void pauseOrNextTurn() {
 		if (!battleManager.isPaused()) {
 			battleManager.pauseBattle();
 			windowManager.signalPauseBattle();
 		} else {
-			battleManager.nextTurn();
-			windowManager.signalNextTurn();
+			nextTurn();
 		}
+	}
+
+	private void nextTurn() {
+		battleManager.nextTurn();
+		windowManager.signalNextTurn();
 	}
 
 	private class EventHandler implements ComponentListener, ActionListener, ContainerListener, WindowListener,
@@ -893,7 +897,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			} else if (source == getRestartButton()) {
 				restartBattleAsync();
 			} else if (source == getNextTurnButton()) {
-				battleManager.nextTurn();
+				nextTurn();
 			} else if (source == getReplayButton()) {
 				battleManager.replay();
 			}
