@@ -106,6 +106,30 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 		}
 	}
 
+	/**
+	 * @param supplier supply a value to be put when notFull. supply null to cancel.
+	 */
+	public boolean putWithSupplier(MySupplier<E> supplier) throws InterruptedException {
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			while (count == items.length) {
+				notFull.await();
+			}
+
+			E e = supplier.get();
+
+			if (e != null) {
+				enqueueImpl(e);
+				return true;
+			} else {
+				return false;
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	@Override
 	public E peek() {
 		final ReentrantLock lock = this.lock;
@@ -169,7 +193,7 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 		lock.lock();
 		try {
 			int k = count;
-			count= 0;
+			count = 0;
 
 			clearCircular(items, takeIndex, k);
 

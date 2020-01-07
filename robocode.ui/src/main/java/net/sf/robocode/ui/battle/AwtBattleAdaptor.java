@@ -29,9 +29,9 @@ import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -46,7 +46,7 @@ public final class AwtBattleAdaptor {
 	private final BattleEventDispatcher battleEventDispatcher = new BattleEventDispatcher();
 	private final BattleObserver observer;
 
-	private final BlockingQueue<Turn> snapshot;
+	private final MyBlockingQueue<Turn> snapshot = new MyBlockingQueue<Turn>(1);
 	private final AtomicBoolean isRunning;
 	private final AtomicBoolean isPaused;
 	private final AtomicInteger majorEvent;
@@ -59,10 +59,12 @@ public final class AwtBattleAdaptor {
 
 	private volatile boolean frameSync = false;
 
+	private volatile boolean pauseInUI = false;
+	private BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
+
 	public AwtBattleAdaptor(IBattleManager battleManager, ISettingsManager properties, int maxFps, boolean skipSameFrames) {
 		this.battleManager = battleManager;
 		this.properties = properties;
-		snapshot = new ArrayBlockingQueue<Turn>(1);
 
 		this.skipSameFrames = skipSameFrames;
 		isRunning = new AtomicBoolean(false);
@@ -350,6 +352,7 @@ public final class AwtBattleAdaptor {
 
 		@Override
 		public void onBattleResumed(final BattleResumedEvent event) {
+			pauseInUI = false;
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					battleEventDispatcher.onBattleResumed(event);
@@ -380,24 +383,52 @@ public final class AwtBattleAdaptor {
 		}
 	}
 
+	public void signalPauseBattle() {
+		pauseInUI = true;
+	}
+
 	public void signalStopBattle() {
 		frameSync = false;
 		snapshot.clear();
 	}
 
-	private void putSnapshot(ITurnSnapshot turnSnapshot, boolean blocking) {
-		ITurnSnapshot last = this.last;
+	private void putSnapshot(final ITurnSnapshot turnSnapshot, boolean blocking) {
+		final ITurnSnapshot last = this.last;
 		this.last = turnSnapshot;
 
 		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
-				snapshot.put(new Turn(last, turnSnapshot));
+				ArrayList<Turn> c = new ArrayList<Turn>();
+				pendingTurns.drainTo(c);
+				for (Turn turn : c) {
+					pausablePut(turn);
+				}
+
+				pausablePut(new Turn(last, turnSnapshot));
+				// snapshot.put(new Turn(last, turnSnapshot));
 				// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		} else {
+			ArrayList<Turn> c = new ArrayList<Turn>();
+			pendingTurns.drainTo(c);
+			for (Turn turn : c) {
+				snapshot.offer(turn);
+			}
+
 			snapshot.offer(new Turn(last, turnSnapshot));
+		}
+	}
+
+	private void pausablePut(final Turn turn) throws InterruptedException {
+		if (!snapshot.putWithSupplier(new MySupplier<Turn>() {
+			@Override
+			public Turn get() {
+				return pauseInUI ? null : turn;
+			}
+		})) {
+			pendingTurns.put(turn);
 		}
 	}
 }
