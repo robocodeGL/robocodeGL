@@ -27,7 +27,7 @@ import java.util.Queue;
 
 import static java.lang.Math.abs;
 
-final class FPSGraph {
+final class FPSMeter {
 	private static final int MAX_HISTORY = 120;
 	private static final int SHORT_HISTORY = 3;
 	private static final float FPS_PADDING = 5f;
@@ -36,7 +36,7 @@ final class FPSGraph {
 	private static final Color MAIN_COLOR = new Color(0f, 1f, 0f, .7f);
 	private static final Color BACK_COLOR = new Color(0f, 0f, 0f, .7f);
 	private static final Font FONT = new Font("Arial", Font.PLAIN, 10);
-	public static final float STICK_MARGIN = 5f;
+	private static final float STICK_MARGIN = 5f;
 
 	private final Queue<Double> deltaHistory = new ArrayDeque<Double>(MAX_HISTORY);
 	private final Queue<Double> deltaHistoryShort = new ArrayDeque<Double>(SHORT_HISTORY);
@@ -55,6 +55,7 @@ final class FPSGraph {
 
 	private Component component;
 	private boolean visible;
+	private int turn;
 
 	public void init(Component c) {
 		this.component = c;
@@ -235,6 +236,8 @@ final class FPSGraph {
 			g.drawString(String.format("%.1f", mid - .5 * range), baseX, fpsY + FPS_PADDING + contentH);
 
 			drawRightAlign(g, String.format("%.1f", .1 * Math.round(avg * 10)), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + contentH, fm);
+
+			drawRightAlign(g, String.format("%d", turn), fpsX + FPS_PADDING + contentW, fpsY + FPS_PADDING + fontH, fm);
 		}
 
 		g.setTransform(at);
@@ -262,6 +265,10 @@ final class FPSGraph {
 
 	private Rectangle2D getFPSRect() {
 		return new Rectangle2D.Double(fpsX, fpsY, fpsW, fpsH);
+	}
+
+	public void setTurnId(int turn) {
+		this.turn = turn;
 	}
 
 	private static boolean isFinite(double d) {
