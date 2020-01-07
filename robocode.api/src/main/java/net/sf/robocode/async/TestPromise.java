@@ -14,6 +14,9 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * @author Xor
+ */
 public final class TestPromise extends JFrame {
 	private TestPromise() {
 		setPreferredSize(new Dimension(300, 300));
