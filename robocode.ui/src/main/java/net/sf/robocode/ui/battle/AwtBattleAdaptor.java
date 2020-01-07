@@ -60,6 +60,8 @@ public final class AwtBattleAdaptor {
 	private volatile boolean frameSync = false;
 
 	private volatile boolean pauseInUI = false;
+
+
 	private BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
 
 	public AwtBattleAdaptor(IBattleManager battleManager, ISettingsManager properties, int maxFps, boolean skipSameFrames) {
@@ -268,6 +270,7 @@ public final class AwtBattleAdaptor {
 		@Override
 		public void onBattleStarted(final BattleStartedEvent event) {
 			snapshot.clear();
+			pendingTurns.clear();
 			lastSnapshot = null;
 			lastLastSnapshot = null;
 			frameSync = true;
@@ -385,6 +388,7 @@ public final class AwtBattleAdaptor {
 
 	public void signalPauseBattle() {
 		pauseInUI = true;
+		snapshot.drainTo(pendingTurns);
 	}
 
 	public void signalStopBattle() {
@@ -396,37 +400,48 @@ public final class AwtBattleAdaptor {
 		final ITurnSnapshot last = this.last;
 		this.last = turnSnapshot;
 
+		Turn turn = new Turn(last, turnSnapshot);
 		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
+				boolean pauseInUI = this.pauseInUI;
 				if (!pauseInUI) {
 					ArrayList<Turn> c = new ArrayList<Turn>();
 					pendingTurns.drainTo(c);
-					for (Turn turn : c) {
-						pausablePut(turn);
-					}
-				}
 
-				pausablePut(new Turn(last, turnSnapshot));
-				// snapshot.put(new Turn(last, turnSnapshot));
-				// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
+					for (Turn t : c) {
+						if (this.pauseInUI) {
+							pauseInUI = true;
+						}
+
+						if (pauseInUI) {
+							pendingTurns.put(t);
+						} else {
+							pausablePut(t);
+						}
+					}
+
+					pausablePut(turn);
+					// snapshot.put(new Turn(last, turnSnapshot));
+					// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
+				} else {
+					pendingTurns.put(turn);
+				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		} else {
-			if (!pauseInUI) {
-				ArrayList<Turn> c = new ArrayList<Turn>();
-				pendingTurns.drainTo(c);
-				for (Turn turn : c) {
-					snapshot.offer(turn);
-				}
+			ArrayList<Turn> c = new ArrayList<Turn>();
+			pendingTurns.drainTo(c);
+			for (Turn t : c) {
+				snapshot.offer(t);
 			}
 
-			snapshot.offer(new Turn(last, turnSnapshot));
+			snapshot.offer(turn);
 		}
 	}
 
 	private void pausablePut(final Turn turn) throws InterruptedException {
-		if (pauseInUI || !snapshot.putWithSupplier(new MySupplier<Turn>() {
+		if (!snapshot.putWithSupplier(new MySupplier<Turn>() {
 			@Override
 			public Turn get() {
 				return pauseInUI ? null : turn;

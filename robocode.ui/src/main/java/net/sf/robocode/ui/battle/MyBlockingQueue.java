@@ -206,6 +206,28 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 		}
 	}
 
+	@Override
+	public int drainTo(Collection<? super E> c) {
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			int oldCount = count;
+			int k = oldCount;
+			count = 0;
+
+			drainCircular(items, takeIndex, k, c);
+
+			while (k > 0 && lock.hasWaiters(notFull)) {
+				--k;
+				notFull.signal();
+			}
+
+			return oldCount;
+		} finally {
+			lock.unlock();
+		}
+	}
+
 	private static void clearCircular(Object[] items, int takeIndex, int count) {
 		int cap = items.length;
 		int putIndex = takeIndex + count;
@@ -224,13 +246,29 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 		}
 	}
 
-	@Override
-	public Iterator<E> iterator() {
-		throw new UnsupportedOperationException();
+	private void drainCircular(Object[] items, int takeIndex, int count, Collection<? super E> c) {
+		int cap = items.length;
+		int putIndex = takeIndex + count;
+		if (putIndex > cap) {
+			for (int i = takeIndex; i < cap; ++i) {
+				c.add(itemAt(i));
+				items[i] = null;
+			}
+			putIndex -= cap;
+			for (int i = 0; i < putIndex; ++i) {
+				c.add(itemAt(i));
+				items[i] = null;
+			}
+		} else {
+			for (int i = takeIndex; i < putIndex; ++i) {
+				c.add(itemAt(i));
+				items[i] = null;
+			}
+		}
 	}
 
 	@Override
-	public int drainTo(Collection<? super E> c) {
+	public Iterator<E> iterator() {
 		throw new UnsupportedOperationException();
 	}
 
