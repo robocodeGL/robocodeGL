@@ -65,7 +65,10 @@ public interface IBattleManager extends IBattleManagerBase {
 
 	boolean isPaused();
 
-	void togglePauseResumeBattle();
+	/**
+	 * @return true if battle is paused after method call
+	 */
+	boolean togglePauseResumeBattle();
 
 	void resumeIfPausedBattle(); // TODO refactor, remove
 
