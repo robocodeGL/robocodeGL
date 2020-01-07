@@ -871,8 +871,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	public void nextTurn() {
 		if (!battleManager.isPaused()) {
 			battleManager.pauseBattle();
+		} else {
+			battleManager.nextTurn();
 		}
-		battleManager.nextTurn();
 	}
 
 	private class EventHandler implements ComponentListener, ActionListener, ContainerListener, WindowListener,
