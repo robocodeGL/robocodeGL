@@ -7,6 +7,9 @@
  */
 package net.sf.robocode.async;
 
+/**
+ * @author Xor
+ */
 public interface PromiseSupplier {
 	Promise get();
 }

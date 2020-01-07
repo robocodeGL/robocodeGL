@@ -10,6 +10,11 @@ package net.sf.robocode.async;
 import javax.swing.SwingUtilities;
 import java.util.concurrent.atomic.AtomicReference;
 
+/**
+ * A simplified version of JavaScript Promise counterpart for async programming of Swing programs
+ *
+ * @author Xor
+ */
 public final class Promise {
 	private static final Runnable RESOLVED = new Runnable() {
 		@Override
