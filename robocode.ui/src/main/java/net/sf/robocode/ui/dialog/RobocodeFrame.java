@@ -876,6 +876,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			windowManager.signalPauseBattle();
 		} else {
 			battleManager.nextTurn();
+			windowManager.signalNextTurn();
 		}
 	}
 
