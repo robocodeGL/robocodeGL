@@ -102,7 +102,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	private final static int MAX_TPS = 10000;
 	private final static int MAX_TPS_SLIDER_VALUE = 61;
 
-	private final static int UPDATE_TITLE_INTERVAL = 500; // milliseconds
+	private final static int UPDATE_TITLE_INTERVAL = 100; // 500; // milliseconds
 	private final static String INSTALL_URL = "https://robocode.sourceforge.io/installer";
 
 	private static final Cursor BUSY_CURSOR = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR);
@@ -1140,7 +1140,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			currentTurn = event.getTurnSnapshot().getTurn();
 
 			// Only update every half second to spare CPU cycles
-			if ((System.currentTimeMillis() - lastTitleUpdateTime) >= UPDATE_TITLE_INTERVAL) {
+			if (isBattlePaused || (System.currentTimeMillis() - lastTitleUpdateTime) >= UPDATE_TITLE_INTERVAL) {
 				updateTitle();
 			}
 		}
