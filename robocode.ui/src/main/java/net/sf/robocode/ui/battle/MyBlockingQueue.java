@@ -7,8 +7,6 @@
  */
 package net.sf.robocode.ui.battle;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 import java.util.AbstractQueue;
 import java.util.Collection;
 import java.util.Iterator;
@@ -30,18 +28,44 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 
 	private Object[] items;
 
-	private int pollIndex;
+	private int takeIndex;
 	private int count;
 
 	public MyBlockingQueue(int capacity) {
 		items = new Object[capacity];
-		pollIndex = 0;
+		takeIndex = 0;
 		count = 0;
 	}
 
 	@SuppressWarnings("unchecked")
 	private E itemAt(int i) {
 		return (E) items[i];
+	}
+
+	private E dequeueImpl() {
+		final Object[] items = this.items;
+		final E ret = itemAt(takeIndex);
+		items[takeIndex] = null;
+		++takeIndex;
+		--count;
+		if (takeIndex == items.length) {
+			takeIndex = 0;
+		}
+		notFull.signal();
+		return ret;
+	}
+
+	private void enqueueImpl(E e) {
+		final Object[] items = this.items;
+		final int cap = items.length;
+
+		int putIndex = takeIndex + count;
+		if (putIndex >= cap) {
+			putIndex -= cap;
+		}
+		items[putIndex] = e;
+		++count;
+		notEmpty.signal();
 	}
 
 	@Override
@@ -64,29 +88,22 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 		}
 	}
 
-	private E dequeueImpl() {
-		final Object[] items = this.items;
-		final E ret = itemAt(pollIndex);
-		++pollIndex;
-		--count;
-		if (pollIndex == items.length) {
-			pollIndex = 0;
-		}
-		notFull.signal();
-		return ret;
-	}
+	@Override
+	public void put(E e) throws InterruptedException {
+		if (e == null)
+			throw new NullPointerException();
 
-	private void enqueueImpl(E e) {
-		final Object[] items = this.items;
-		final int cap = items.length;
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			while (count == items.length) {
+				notFull.await();
+			}
 
-		int putIndex = pollIndex + count;
-		if (putIndex > cap) {
-			putIndex -= cap;
+			enqueueImpl(e);
+		} finally {
+			lock.unlock();
 		}
-		items[putIndex] = e;
-		++count;
-		notEmpty.signal();
 	}
 
 	@Override
@@ -94,7 +111,7 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 		final ReentrantLock lock = this.lock;
 		lock.lock();
 		try {
-			return itemAt(pollIndex);
+			return itemAt(takeIndex);
 		} finally {
 			lock.unlock();
 		}
@@ -116,8 +133,18 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 	}
 
 	@Override
-	public Iterator<E> iterator() {
-		throw new NotImplementedException();
+	public E take() throws InterruptedException {
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			while (count == 0) {
+				notEmpty.await();
+			}
+
+			return dequeueImpl();
+		} finally {
+			lock.unlock();
+		}
 	}
 
 	@Override
@@ -126,37 +153,75 @@ public final class MyBlockingQueue<E> extends AbstractQueue<E> implements Blocki
 	}
 
 	@Override
-	public void put(E e) throws InterruptedException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public E take() throws InterruptedException {
-		throw new NotImplementedException();
-	}
-
-	@Override
-	public E poll(long timeout, TimeUnit unit) throws InterruptedException {
-		throw new NotImplementedException();
-	}
-
-	@Override
 	public int remainingCapacity() {
-		throw new NotImplementedException();
+		final ReentrantLock lock = this.lock;
+		lock.lock(); // locking necessary to support live resize
+		try {
+			return items.length - count;
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	@Override
+	public void clear() {
+		final ReentrantLock lock = this.lock;
+		lock.lock();
+		try {
+			int k = count;
+			count= 0;
+
+			clearCircular(items, takeIndex, k);
+
+			while (k > 0 && lock.hasWaiters(notFull)) {
+				--k;
+				notFull.signal();
+			}
+		} finally {
+			lock.unlock();
+		}
+	}
+
+	private static void clearCircular(Object[] items, int takeIndex, int count) {
+		int cap = items.length;
+		int putIndex = takeIndex + count;
+		if (putIndex > cap) {
+			for (int i = takeIndex; i < cap; ++i) {
+				items[i] = null;
+			}
+			putIndex -= cap;
+			for (int i = 0; i < putIndex; ++i) {
+				items[i] = null;
+			}
+		} else {
+			for (int i = takeIndex; i < putIndex; ++i) {
+				items[i] = null;
+			}
+		}
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int drainTo(Collection<? super E> c) {
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public int drainTo(Collection<? super E> c, int maxElements) {
-		throw new NotImplementedException();
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public boolean offer(E e, long timeout, TimeUnit unit) throws InterruptedException {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public E poll(long timeout, TimeUnit unit) throws InterruptedException {
+		throw new UnsupportedOperationException();
 	}
 }
