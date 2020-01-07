@@ -391,7 +391,8 @@ public final class AwtBattleAdaptor {
 
 		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
-				snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
+				snapshot.put(new Turn(last, turnSnapshot));
+				// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
