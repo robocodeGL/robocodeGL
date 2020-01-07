@@ -696,6 +696,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		longPressTimer.stop();
 		battleManager.setSlowMoMode(false);
 		battleManager.pauseIfResumedBattle();
+		windowManager.signalPauseBattle();
 	}
 
 	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
