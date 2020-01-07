@@ -61,7 +61,7 @@ public final class AwtBattleAdaptor {
 	private volatile boolean frameSync = false;
 
 	private volatile boolean pauseInUI = false;
-	private final AtomicLong nextTurnCount = new AtomicLong(0);
+	private final AtomicLong nextTurnCount = new AtomicLong(0L);
 
 
 	private BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
@@ -131,7 +131,20 @@ public final class AwtBattleAdaptor {
 
 	public boolean pollFrame(boolean forceRepaint, boolean readoutText) {
 		try {
-			Turn turn = snapshot.poll();
+			if (pauseInUI) {
+				if (!takeShouldNextTurn()) {
+					return forceRepaint;
+				}
+			}
+
+			Turn tryTurn = pendingTurns.poll();
+
+			Turn turn;
+			if (tryTurn == null) {
+				turn = snapshot.poll();
+			} else {
+				turn = tryTurn;
+			}
 
 			if (turn == null) return forceRepaint;
 
@@ -358,6 +371,7 @@ public final class AwtBattleAdaptor {
 		@Override
 		public void onBattleResumed(final BattleResumedEvent event) {
 			pauseInUI = false;
+			nextTurnCount.set(0L);
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
 					battleEventDispatcher.onBattleResumed(event);
@@ -389,9 +403,11 @@ public final class AwtBattleAdaptor {
 	}
 
 	public void signalPauseBattle() {
-		pauseInUI = true;
 		ArrayList<Turn> c = new ArrayList<Turn>();
-		snapshot.drainTo(c);
+		synchronized (snapshot) {
+			pauseInUI = true;
+			snapshot.drainTo(c);
+		}
 		for (Turn turn : c) {
 			pendingTurns.offer(turn);
 		}
@@ -416,40 +432,8 @@ public final class AwtBattleAdaptor {
 		Turn turn = new Turn(last, turnSnapshot);
 		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
-				boolean pauseInUI = this.pauseInUI;
-				if (!pauseInUI) {
-					ArrayList<Turn> c = new ArrayList<Turn>();
-					pendingTurns.drainTo(c);
-
-					boolean shouldNextTurn = takeShouldNextTurn();
-					if (this.pauseInUI) {
-						pauseInUI = true;
-					}
-					if (shouldNextTurn) {
-						pauseInUI = false;
-					}
-
-					for (Turn t : c) {
-						if (pauseInUI) {
-							pendingTurns.offer(t);
-						} else {
-							pausablePut(t);
-						}
-
-						shouldNextTurn = takeShouldNextTurn();
-						if (this.pauseInUI) {
-							pauseInUI = true;
-						}
-						if (shouldNextTurn) {
-							pauseInUI = false;
-						}
-					}
-
-					if (pauseInUI) {
-						pendingTurns.offer(turn);
-					} else {
-						pausablePut(turn);
-					}
+				if (!pauseInUI) { // fast path, no need to lock
+					pausablePut(turn);
 					// snapshot.put(new Turn(last, turnSnapshot));
 					// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 				} else {
@@ -459,12 +443,6 @@ public final class AwtBattleAdaptor {
 				Thread.currentThread().interrupt();
 			}
 		} else {
-			ArrayList<Turn> c = new ArrayList<Turn>();
-			pendingTurns.drainTo(c);
-			for (Turn t : c) {
-				snapshot.offer(t);
-			}
-
 			snapshot.offer(turn);
 		}
 	}
