@@ -398,10 +398,12 @@ public final class AwtBattleAdaptor {
 
 		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
-				ArrayList<Turn> c = new ArrayList<Turn>();
-				pendingTurns.drainTo(c);
-				for (Turn turn : c) {
-					pausablePut(turn);
+				if (!pauseInUI) {
+					ArrayList<Turn> c = new ArrayList<Turn>();
+					pendingTurns.drainTo(c);
+					for (Turn turn : c) {
+						pausablePut(turn);
+					}
 				}
 
 				pausablePut(new Turn(last, turnSnapshot));
@@ -411,10 +413,12 @@ public final class AwtBattleAdaptor {
 				Thread.currentThread().interrupt();
 			}
 		} else {
-			ArrayList<Turn> c = new ArrayList<Turn>();
-			pendingTurns.drainTo(c);
-			for (Turn turn : c) {
-				snapshot.offer(turn);
+			if (!pauseInUI) {
+				ArrayList<Turn> c = new ArrayList<Turn>();
+				pendingTurns.drainTo(c);
+				for (Turn turn : c) {
+					snapshot.offer(turn);
+				}
 			}
 
 			snapshot.offer(new Turn(last, turnSnapshot));
@@ -422,7 +426,7 @@ public final class AwtBattleAdaptor {
 	}
 
 	private void pausablePut(final Turn turn) throws InterruptedException {
-		if (!snapshot.putWithSupplier(new MySupplier<Turn>() {
+		if (pauseInUI || !snapshot.putWithSupplier(new MySupplier<Turn>() {
 			@Override
 			public Turn get() {
 				return pauseInUI ? null : turn;

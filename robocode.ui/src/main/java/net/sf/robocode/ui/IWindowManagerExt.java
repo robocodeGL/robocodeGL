@@ -69,5 +69,7 @@ public interface IWindowManagerExt extends IWindowManager {
 
 	int getFPS();
 
+	void signalPauseBattle();
+
 	void signalStopBattle();
 }

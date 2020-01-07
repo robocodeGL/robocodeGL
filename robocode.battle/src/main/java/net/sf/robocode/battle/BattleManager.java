@@ -410,11 +410,13 @@ public class BattleManager implements IBattleManager {
 		return (pauseCount != 0);
 	}
 
-	public synchronized void togglePauseResumeBattle() {
+	public synchronized boolean togglePauseResumeBattle() {
 		if (isPaused()) {
 			resumeBattle();
+			return false;
 		} else {
 			pauseBattle();
+			return true;
 		}
 	}
 

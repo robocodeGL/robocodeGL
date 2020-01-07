@@ -865,12 +865,15 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 
 	public void togglePause() {
-		battleManager.togglePauseResumeBattle();
+		if (battleManager.togglePauseResumeBattle()) {
+			windowManager.signalPauseBattle();
+		}
 	}
 
 	public void nextTurn() {
 		if (!battleManager.isPaused()) {
 			battleManager.pauseBattle();
+			windowManager.signalPauseBattle();
 		} else {
 			battleManager.nextTurn();
 		}
