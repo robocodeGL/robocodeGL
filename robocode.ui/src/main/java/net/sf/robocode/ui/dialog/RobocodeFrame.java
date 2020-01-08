@@ -205,8 +205,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 
 	private void clearRobotButtons() {
-		menuBar.getBattleRobotListMenu().removeAll();
-		menuBar.getBattleRobotListMenu().add(menuBar.getBattleRobotListEmptyMenuItem());
+		// menuBar.getBattleRobotListMenu().removeAll();
+		// menuBar.getBattleRobotListMenu().add(menuBar.getBattleRobotListEmptyMenuItem());
 
 		for (RobotButton robotButton : robotButtons) {
 			robotButton.detach();
