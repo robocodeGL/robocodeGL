@@ -27,6 +27,11 @@ import java.util.Queue;
 
 import static java.lang.Math.abs;
 
+/**
+ * A simple widget displaying realtime FPS on battle view
+ *
+ * @author Xor
+ */
 final class FPSMeter {
 	private static final int MAX_HISTORY = 120;
 	private static final int SHORT_HISTORY = 3;

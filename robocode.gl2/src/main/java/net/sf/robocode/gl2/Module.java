@@ -12,7 +12,7 @@ import net.sf.robocode.core.Container;
 
 
 /**
- * @author Pavel Savara (original)
+ * @author Xor
  */
 public class Module {
 	static {

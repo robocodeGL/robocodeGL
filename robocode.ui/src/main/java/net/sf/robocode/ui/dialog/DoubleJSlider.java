@@ -9,6 +9,11 @@ package net.sf.robocode.ui.dialog;
 
 import javax.swing.JSlider;
 
+/**
+ * JSlider with higher adjusting precision
+ *
+ * @author Xor
+ */
 public final class DoubleJSlider extends JSlider {
 	private final int scale;
 

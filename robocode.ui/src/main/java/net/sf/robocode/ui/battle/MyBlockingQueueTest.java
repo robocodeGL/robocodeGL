@@ -1,5 +1,8 @@
 package net.sf.robocode.ui.battle;
 
+/**
+ * @author Xor
+ */
 public final class MyBlockingQueueTest {
 	private static final int CAP = 10;
 
