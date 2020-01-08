@@ -1017,8 +1017,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		menuBar.getBattleOpenMenuItem().setEnabled(true);
 		menuBar.getOptionsAdjustTPSMenuItem().setEnabled(true);
 		menuBar.getBattleTogglePauseMenuItem().setEnabled(true);
+		menuBar.getBattleNextTurnMenuItem().setEnabled(true);
 		setEnablePauseButton(true);
-		setEnableNextTurnButton(true, true);
+		// setEnableNextTurnButton(true, true);
 		tpsSlider.setEnabled(true);
 	}
 
