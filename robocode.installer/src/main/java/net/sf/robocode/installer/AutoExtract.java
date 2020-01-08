@@ -311,9 +311,9 @@ public class AutoExtract implements ActionListener {
 		if (argv.length == 1) {
 			suggestedDirName = argv[0];
 		} else if (isWindowsOS()) {
-			suggestedDirName = "C:\\robocode\\";
+			suggestedDirName = "C:\\robocodeGL\\";
 		} else {
-			suggestedDirName = System.getProperty("user.home") + File.separator + "robocode" + File.separator;
+			suggestedDirName = System.getProperty("user.home") + File.separator + "robocodeGL" + File.separator;
 		}
 
 		String message;
