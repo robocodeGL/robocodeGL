@@ -16,6 +16,9 @@ import javax.swing.UIManager;
 import java.awt.Dimension;
 import java.awt.Graphics;
 
+/**
+ * @author Xor
+ */
 public final class UIDemo extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {

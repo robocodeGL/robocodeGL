@@ -15,6 +15,11 @@ import java.util.List;
 
 import static java.awt.datatransfer.DataFlavor.javaFileListFlavor;
 
+/**
+ * FileDropHandler handles file drop to RobocodeFrame and imports them
+ *
+ * @author Xor
+ */
 public final class FileDropHandler extends TransferHandler {
 	private FileListConsumer consumer;
 

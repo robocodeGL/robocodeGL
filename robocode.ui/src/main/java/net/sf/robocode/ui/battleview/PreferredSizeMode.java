@@ -7,6 +7,9 @@
  */
 package net.sf.robocode.ui.battleview;
 
+/**
+ * @author Xor
+ */
 public enum PreferredSizeMode {
 	MINIMAL,
 	SHRINK_TO_FIT,

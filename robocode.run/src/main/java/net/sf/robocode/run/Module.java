@@ -12,10 +12,9 @@ import net.sf.robocode.core.Container;
 
 
 /**
- * @author Pavel Savara (original)
+ * @author Xor (original)
  */
 public class Module {
 	static {
-		// Container.cache.addComponent(IGL2.class, GL2.class);
 	}
 }

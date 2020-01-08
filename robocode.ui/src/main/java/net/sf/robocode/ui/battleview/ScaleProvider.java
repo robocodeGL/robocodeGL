@@ -7,6 +7,9 @@
  */
 package net.sf.robocode.ui.battleview;
 
+/**
+ * @author Xor
+ */
 public interface ScaleProvider {
 	double getScale();
 }
