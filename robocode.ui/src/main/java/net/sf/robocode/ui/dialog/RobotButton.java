@@ -77,7 +77,7 @@ public class RobotButton extends JButton implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		if (robotDialog == null) {
 			attach();
-			if (!robotDialog.isVisible() || robotDialog.getState() != Frame.NORMAL) {
+			if (!robotDialog.isVisible()) { //  || robotDialog.getState() != Frame.NORMAL) {
 				WindowUtil.packPlaceShow(robotDialog);
 			}
 		} else {

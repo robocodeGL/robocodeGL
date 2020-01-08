@@ -30,7 +30,7 @@ import java.util.Map;
  * @author Flemming N. Larsen (contributor)
  */
 @SuppressWarnings("serial")
-public class RobotDialog extends JFrame {
+public class RobotDialog extends JDialog {
 	private final Color grayGreen = new Color(0x0080C080);
 	private RobotButton robotButton;
 	private JTabbedPane tabbedPane;
@@ -67,6 +67,8 @@ public class RobotDialog extends JFrame {
 	}
 
 	private void initialize() {
+
+
 		robotIndex = robotButton.getRobotIndex();
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setContentPane(getRobotDialogContentPane());
