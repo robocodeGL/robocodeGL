@@ -371,6 +371,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			sidePanel.add(getRobotButtonsScrollPane(), BorderLayout.CENTER);
 			final BattleButton btn = net.sf.robocode.core.Container.getComponent(BattleButton.class);
 
+			menuBar.getBattleMainBattleMenuItem().addActionListener(btn);
+
 			btn.attach();
 			sidePanel.add(btn, BorderLayout.SOUTH);
 		}
