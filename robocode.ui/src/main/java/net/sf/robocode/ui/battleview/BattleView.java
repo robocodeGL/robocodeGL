@@ -921,6 +921,10 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 				update(lastSnapshot, lastLastSnapshot, g, Math.min(1., 1. * frameCount / mod));
 
+				if (lastLastSnapshot == null) {
+					frameCount = 0;
+				}
+
 			} else {
 				fpsMeter.setTurnId(0);
 
