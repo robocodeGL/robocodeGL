@@ -204,6 +204,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 		public void menuSelected(MenuEvent e) {
 			battleManager.pauseBattle();
+			windowManager.signalPauseBattle();
 		}
 
 		public void menuCanceled(MenuEvent e) {}
