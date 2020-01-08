@@ -750,7 +750,7 @@ public class SettingsManager implements ISettingsManager {
 		optionsViewExplosionDebris = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_EXPLOSION_DEBRIS, "true"));
 		optionsRenderingAllowScaleUp = Boolean.valueOf(props.getProperty(OPTIONS_RENDERING_ALLOW_SCALE_UP, "true"));
 		optionsMiscFPSMeter = Boolean.valueOf(props.getProperty(OPTIONS_MISC_FPS_METER, "false"));
-		optionsUiHideControls = Boolean.valueOf(props.getProperty(OPTIONS_UI_HIDE_CONTROLS, "false"));
+		optionsUiHideControls = Boolean.valueOf(props.getProperty(OPTIONS_UI_HIDE_CONTROLS, "true"));
 		optionsViewSentryBorder = Boolean.valueOf(props.getProperty(OPTIONS_VIEW_SENTRY_BORDER, "false"));
 		optionsViewPreventSpeedupWhenMinimized = Boolean.valueOf(
 				props.getProperty(OPTIONS_VIEW_PREVENT_SPEEDUP_WHEN_MINIMIZED, "false"));
