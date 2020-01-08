@@ -65,6 +65,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private JCheckBoxMenuItem battleTogglePauseMenuItem;
 	private JMenuItem battleNextTurnMenuItem;
 	private JMenuItem battleExitMenuItem;
+	private JMenu battleRobotListMenu;
 	private JMenuItem battleOpenRecordMenuItem;
 	private JMenuItem battleSaveRecordAsMenuItem;
 	private JMenuItem battleExportRecordMenuItem;
@@ -456,6 +457,16 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		return battleExitMenuItem;
 	}
 
+	public JMenu getBattleRobotListMenu() {
+		if (battleRobotListMenu == null) {
+			battleRobotListMenu = new JMenu();
+			battleRobotListMenu.setText("Robots");
+			battleRobotListMenu.setMnemonic('R');
+			battleRobotListMenu.addActionListener(eventHandler);
+		}
+		return battleRobotListMenu;
+	}
+
 	public JMenu getBattleMenu() {
 		if (battleMenu == null) {
 			battleMenu = new JMenu();
@@ -469,6 +480,8 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleTogglePauseMenuItem());
 			battleMenu.add(getBattleNextTurnMenuItem());
+			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleRobotListMenu());
 			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleSaveMenuItem());
 			battleMenu.add(getBattleSaveAsMenuItem());
