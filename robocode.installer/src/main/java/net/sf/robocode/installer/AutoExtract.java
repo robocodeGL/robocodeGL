@@ -484,11 +484,11 @@ public class AutoExtract implements ActionListener {
 		} else if (osName.toLowerCase().indexOf("mac") == 0) {
 			if (osVersion >= 10.1) {
 				JOptionPane.showMessageDialog(null,
-						message + "\n" + "To start Robocode, browse to " + installDir + " then double-click robocode.sh\n");
+						message + "\n" + "To start Robocode, browse to " + installDir + " then double-click robocode.command\n");
 			} else {
 				JOptionPane.showMessageDialog(null,
 						message + "\n" + "To start Robocode, enter the following at a command prompt:\n"
-						+ installDir.getAbsolutePath() + "/robocode.sh");
+						+ installDir.getAbsolutePath() + "/robocode.command");
 			}
 		} else {
 			JOptionPane.showMessageDialog(null,
