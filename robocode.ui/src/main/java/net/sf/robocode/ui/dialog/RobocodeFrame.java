@@ -188,7 +188,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 					return;
 				}
 				if (System.nanoTime() - spacePressedTime > SLOW_MO_WAIT_MS * 1000000) {
-					battleManager.resumeIfPausedBattle();
+					battleManager.resumeBattle();
 				}
 			}
 		});
@@ -723,8 +723,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		spacePressedTime = -1;
 		longPressTimer.stop();
 		battleManager.setSlowMoMode(false);
-		battleManager.pauseIfResumedBattle();
-		windowManager.signalPauseBattle();
+		windowManager.pauseBattle();
 	}
 
 	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
@@ -905,8 +904,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	public void pauseOrNextTurn() {
 		if (!battleManager.isPaused()) {
-			battleManager.pauseBattle();
-			windowManager.signalPauseBattle();
+			windowManager.pauseBattle();
 		} else {
 			nextTurn();
 		}
