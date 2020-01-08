@@ -34,7 +34,6 @@ import javax.swing.JSeparator;
 import javax.swing.KeyStroke;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
-import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -1084,24 +1083,21 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	}
 
 	private void optionsFitWindowActionPerformed() {
-		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
-
-		if (robocodeFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-			return;
-		}
-
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
-				robocodeFrame.clearPreferredSize();
-				robocodeFrame.setPreferredSizeMode(PreferredSizeMode.MINIMAL);
-				robocodeFrame.pack();
+				robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.MINIMAL);
 			}
 		});
 	}
 
 	private void optionsFitBattleFieldActionPerformed() {
-		robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.SHRINK_TO_FIT);
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.SHRINK_TO_FIT);
+			}
+		});
 	}
 
 	private void optionsHideControlsActionPerformed() {

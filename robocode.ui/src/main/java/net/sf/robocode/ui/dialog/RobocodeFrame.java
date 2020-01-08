@@ -859,19 +859,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 		clearPreferredSize();
 		setPreferredSizeMode(preferredSizeMode);
-		Dimension size = getPreferredSize();
-		setSize(size);
-
-		Promise.delayed(100).then(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					WindowUtil.fitWindow(RobocodeFrame.this);
-				} finally {
-					setPreferredSizeMode(PreferredSizeMode.MINIMAL);
-				}
-			}
-		});
+		pack();
 	}
 
 	public void onHideControlsChange() {
