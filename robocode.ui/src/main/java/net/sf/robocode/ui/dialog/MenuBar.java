@@ -24,7 +24,6 @@ import net.sf.robocode.ui.mac.MacMenuHelper;
 
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -1101,7 +1100,12 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	}
 
 	private void optionsHideControlsActionPerformed() {
-		properties.setOptionsUiHideControls(!properties.getOptionsUiHideControls());
+		Promise.delayed(100).then(new Runnable() {
+			@Override
+			public void run() {
+				properties.setOptionsUiHideControls(!properties.getOptionsUiHideControls());
+			}
+		});
 	}
 
 	private void optionsAdjustTPSActionPerformed() {

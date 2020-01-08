@@ -52,11 +52,13 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -346,6 +348,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	private JPanel getBattleViewPanel() {
 		if (battleViewPanel == null) {
 			battleViewPanel = new JPanel();
+			battleViewPanel.setBackground(Color.BLACK);
 			// battleViewPanel.setPreferredSize(new Dimension(800, 600));
 			// battleViewPanel.setLayout(null);
 			battleViewPanel.setLayout(new BorderLayout());
@@ -868,9 +871,25 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			return;
 		}
 
-		setPreferredSizeMode(PreferredSizeMode.KEEP_CURRENT);
+		clearPreferredSize();
+		getBattleViewPanel().setPreferredSize(battleView.getSize());
+
+		battleView.setVisible(false);
+
 		setControlsVisible(!hide);
-		resetRobocodeFrameSize(PreferredSizeMode.KEEP_CURRENT);
+
+		if (getExtendedState() != MAXIMIZED_BOTH) {
+			pack();
+		}
+
+		getBattleViewPanel().setPreferredSize(null);
+
+		SwingUtilities.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				battleView.setVisible(true);
+			}
+		});
 	}
 
 	@Override
