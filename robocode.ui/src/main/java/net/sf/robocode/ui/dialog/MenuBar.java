@@ -492,7 +492,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		return battleMenu;
 	}
 
-	private JMenuItem getBattleNewMenuItem() {
+	public JMenuItem getBattleNewMenuItem() {
 		if (battleNewMenuItem == null) {
 			battleNewMenuItem = new JMenuItem();
 			battleNewMenuItem.setText("New");
@@ -503,7 +503,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		return battleNewMenuItem;
 	}
 
-	private JMenuItem getBattleOpenMenuItem() {
+	public JMenuItem getBattleOpenMenuItem() {
 		if (battleOpenMenuItem == null) {
 			battleOpenMenuItem = new JMenuItem();
 			battleOpenMenuItem.setText("Open");
@@ -863,7 +863,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		return helpRoboRumbleMenuItem;
 	}
 
-	private JMenuItem getOptionsAdjustTPSMenuItem() {
+	public JMenuItem getOptionsAdjustTPSMenuItem() {
 		if (optionsAdjustTPSMenuItem == null) {
 			optionsAdjustTPSMenuItem = new JMenuItem();
 			optionsAdjustTPSMenuItem.setText("Set TPS");

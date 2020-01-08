@@ -17,7 +17,17 @@ import net.sf.robocode.io.FileUtil;
 import net.sf.robocode.repository.IRepositoryManager;
 import net.sf.robocode.settings.ISettingsManager;
 import net.sf.robocode.ui.battle.AwtBattleAdaptor;
-import net.sf.robocode.ui.dialog.*;
+import net.sf.robocode.ui.dialog.AboutBox;
+import net.sf.robocode.ui.dialog.FileDropHandler;
+import net.sf.robocode.ui.dialog.NewBattleDialog;
+import net.sf.robocode.ui.dialog.PreferencesDialog;
+import net.sf.robocode.ui.dialog.RankingDialog;
+import net.sf.robocode.ui.dialog.RcSplashScreen;
+import net.sf.robocode.ui.dialog.ResultsDialog;
+import net.sf.robocode.ui.dialog.RobocodeFrame;
+import net.sf.robocode.ui.dialog.RobotExtractor;
+import net.sf.robocode.ui.dialog.TeamCreator;
+import net.sf.robocode.ui.dialog.WindowUtil;
 import net.sf.robocode.ui.editor.IRobocodeEditor;
 import net.sf.robocode.ui.packager.RobotPackager;
 import net.sf.robocode.version.IVersionManager;
@@ -25,17 +35,27 @@ import robocode.control.events.BattleCompletedEvent;
 import robocode.control.events.IBattleListener;
 import robocode.control.snapshot.ITurnSnapshot;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.EventQueue;
+import java.awt.FileDialog;
+import java.awt.Frame;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.*;
 import java.util.AbstractMap.SimpleImmutableEntry;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map.Entry;
 
 
@@ -774,16 +794,28 @@ public class WindowManager implements IWindowManagerExt {
 			battleManager.setBattleFilename(intro.getPath());
 			battleManager.loadBattleProperties();
 
+
 			final boolean origShowResults = showResults; // save flag for showing the results
 
+			final int oldTPS = settingsManager.getOptionsBattleDesiredTPS();
+			settingsManager.setOptionsBattleDesiredTPS(30);
+			robocodeFrame.disableControlForIntro();
+
 			showResults = false;
-			try {
-				battleManager.startNewBattleAsync(battleManager.loadBattleProperties(), true, false);
-				battleManager.setDefaultBattleProperties();
-				robocodeFrame.afterIntroBattle();
-			} finally {
-				showResults = origShowResults; // always restore the original flag for showing the results
-			}
+			battleManager.startNewBattleAsync(battleManager.loadBattleProperties(), true, false)
+					.then(new Runnable() {
+						@Override
+						public void run() {
+							robocodeFrame.restoreControlForIntro();
+
+							battleManager.setDefaultBattleProperties();
+							robocodeFrame.afterIntroBattle();
+
+							showResults = origShowResults; // always restore the original flag for showing the results
+
+							settingsManager.setOptionsBattleDesiredTPS(oldTPS);
+						}
+					});
 		}
 	}
 
