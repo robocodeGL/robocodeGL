@@ -19,3 +19,4 @@ RemoteSystemsTempFiles
 tools/lib
 /config
 /robocode.samples/src/main/resources/*.jar
+/screenshots
