@@ -49,6 +49,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
 import javax.swing.Timer;
@@ -84,6 +85,8 @@ import java.util.Date;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+
+import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
 
 
 /**
@@ -214,6 +217,13 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	private void addRobotButton(RobotButton b) {
 		JMenuItem robotMenuItem = new JMenuItem(b.getText());
 		robotMenuItem.addActionListener(b);
+		int keyIndex = b.getRobotIndex();
+		if (keyIndex < 10) {
+			if (keyIndex == 9) {
+				keyIndex = -1;
+			}
+			robotMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_1 + keyIndex, MENU_SHORTCUT_KEY_MASK, false));
+		}
 		menuBar.getBattleRobotListMenu().add(robotMenuItem);
 
 		robotButtons.add(b);
