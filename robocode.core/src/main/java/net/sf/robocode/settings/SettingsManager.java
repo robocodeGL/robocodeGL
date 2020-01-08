@@ -45,7 +45,7 @@ public class SettingsManager implements ISettingsManager {
 			optionsViewRobotNames = true,
 			optionsViewScanArcs = false,
 			optionsViewExplosions = true,
-			optionsViewGround = true,
+			optionsViewGround = false,
 			optionsViewExplosionDebris = true,
 			optionsRenderingAllowScaleUp = true,
 			optionsViewSentryBorder = false;
@@ -73,7 +73,7 @@ public class SettingsManager implements ISettingsManager {
 
 	private boolean
 			optionsMiscFPSMeter = false,
-			optionsUiHideControls = false;
+			optionsUiHideControls = true;
 
 	// Sound Options (Sound Effects)
 	private boolean
