@@ -1249,7 +1249,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 
 	private void setPauseButtonSelected(boolean paused) {
-		menuBar.getBattleTogglePauseMenuItem().setState(paused);
+		// menuBar.getBattleTogglePauseMenuItem().setState(paused);
 		getPauseButton().setSelected(paused);
 	}
 
