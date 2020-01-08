@@ -30,7 +30,7 @@ public class BattleButton extends JButton implements ActionListener {
 
 	public void actionPerformed(ActionEvent e) {
 		attach();
-		if (!battleDialog.isVisible() || battleDialog.getState() != Frame.NORMAL) {
+		if (!battleDialog.isVisible()) { // || battleDialog.getState() != Frame.NORMAL) {
 			WindowUtil.packPlaceShow(battleDialog);
 		} else {
 			battleDialog.setVisible(true);

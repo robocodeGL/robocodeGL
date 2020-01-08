@@ -29,7 +29,7 @@ import java.io.StringWriter;
 /**
  * @author Pavel Savara (original)
  */
-public class BattleDialog extends JFrame {
+public class BattleDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private final BattleObserver battleObserver = new BattleObserver();
