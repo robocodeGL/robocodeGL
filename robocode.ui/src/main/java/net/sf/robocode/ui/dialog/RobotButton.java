@@ -64,6 +64,7 @@ public class RobotButton extends JButton implements ActionListener {
 		this.contestantIndex = contestantIndex;
 		this.lastEnergy = maxEnergy;
 		this.maxEnergy = maxEnergy;
+		this.teamIndex = teamIndex;
 		initialize();
 		if (attach) {
 			attach();
@@ -196,7 +197,7 @@ public class RobotButton extends JButton implements ActionListener {
 				maxScore = 1;
 			}
 
-			final int newScore = (int) scoreSnapshotList[teamIndex].getCurrentScore();
+			final int newScore = (int) scoreSnapshotList[teamIndex == -1 ? contestantIndex : teamIndex].getCurrentScore();
 			final int newEnergy = (int) robots[robotIndex].getEnergy();
 			boolean rep = (lastEnergy != newEnergy || lastScore != newScore);
 
