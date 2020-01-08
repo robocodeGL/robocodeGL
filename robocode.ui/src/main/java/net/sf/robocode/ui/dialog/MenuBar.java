@@ -1121,8 +1121,11 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 					"Failed to change TPS", JOptionPane.ERROR_MESSAGE);
 			}
 		}
+
+		battleManager.resumeBattle();
+
 		if (tps >= 0) {
-			robocodeFrame.setTPS(tps, true);
+			robocodeFrame.setTPS(tps, false);
 		}
 	}
 
