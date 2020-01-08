@@ -278,7 +278,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	private void battleOpenActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
 			String path = windowManager.showBattleOpenDialog(".battle", "Battles");
 			if (path != null) {
@@ -292,7 +292,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	private void battleSaveActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 			String path = battleManager.getBattleFilename();
 
 			if (path == null) {
@@ -309,7 +309,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	private void battleSaveAsActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
 			String path = windowManager.saveBattleDialog(battleManager.getBattlePath(), ".battle", "Battles");
 
@@ -340,7 +340,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	private void battleOpenRecordActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
 			final String path = windowManager.showBattleOpenDialog(".br", "Records");
 
@@ -371,7 +371,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	private void battleImportRecordActionPerformed() {
 		try {
-			battleManager.pauseBattle();
+			windowManager.pauseBattle();
 
 			final String path = windowManager.showBattleOpenDialog(".br.xml", "XML Records");
 
@@ -403,7 +403,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private void battleSaveRecordAsActionPerformed() {
 		if (recordManager.hasRecord()) {
 			try {
-				battleManager.pauseBattle();
+				windowManager.pauseBattle();
 
 				String path = windowManager.saveBattleDialog(battleManager.getBattlePath(), ".br", "Records");
 
@@ -424,7 +424,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private void battleExportRecordActionPerformed() {
 		if (recordManager.hasRecord()) {
 			try {
-				battleManager.pauseBattle();
+				windowManager.pauseBattle();
 
 				String path = windowManager.saveBattleDialog(battleManager.getBattlePath(), ".br.xml", "XML Records");
 
@@ -1109,7 +1109,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	}
 
 	private void optionsAdjustTPSActionPerformed() {
-		battleManager.pauseBattle();
+		windowManager.pauseBattle();
 
 		int tps = properties.getOptionsBattleDesiredTPS();
 		String res = JOptionPane.showInputDialog(this, "Input new TPS: ", tps);

@@ -400,7 +400,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	public void showOptionsPreferences() {
 		try {
-			battleManager.pauseBattle();
+			pauseBattle();
 
 			WindowUtil.packCenterShow(getRobocodeFrame(), Container.getComponent(PreferencesDialog.class));
 		} finally {
@@ -494,7 +494,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	public void showNewBattleDialog(BattleProperties battleProperties) {
 		try {
-			battleManager.pauseBattle();
+			pauseBattle();
 			final NewBattleDialog battleDialog = Container.createComponent(NewBattleDialog.class);
 
 			battleDialog.setup(settingsManager, battleProperties);
@@ -544,7 +544,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	@Override
 	public void pauseBattle() {
-		battleManager.pauseBattle();
+		pauseBattle();
 		signalPauseBattle();
 	}
 
