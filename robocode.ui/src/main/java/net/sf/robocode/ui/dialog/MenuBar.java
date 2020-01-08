@@ -1087,17 +1087,15 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		final RobocodeFrame robocodeFrame = (RobocodeFrame) windowManager.getRobocodeFrame();
 
 		if (robocodeFrame.getExtendedState() == JFrame.MAXIMIZED_BOTH) {
-			robocodeFrame.setExtendedState(JFrame.NORMAL);
+			return;
 		}
 
-		robocodeFrame.clearPreferredSize();
-		robocodeFrame.setPreferredSizeMode(PreferredSizeMode.MINIMAL);
-		Dimension size = robocodeFrame.getPreferredSize();
-		robocodeFrame.setSize(size);
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
-				WindowUtil.fitWindow(robocodeFrame);
+				robocodeFrame.clearPreferredSize();
+				robocodeFrame.setPreferredSizeMode(PreferredSizeMode.MINIMAL);
+				robocodeFrame.pack();
 			}
 		});
 	}
