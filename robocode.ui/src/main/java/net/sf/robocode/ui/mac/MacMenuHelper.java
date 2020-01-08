@@ -8,6 +8,11 @@ import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+/**
+ * Helper class for supporting mac builtin menus (about, preferences, quit) via reflection
+ *
+ * @author Xor
+ */
 public final class MacMenuHelper {
 	private MacMenuHelper() {
 	}
