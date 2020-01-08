@@ -941,7 +941,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			robotEditorMenuItem = new JMenuItem();
 			robotEditorMenuItem.setText("Source Editor");
 			robotEditorMenuItem.setMnemonic('E');
-			robotEditorMenuItem.setVisible(net.sf.robocode.core.Container.getComponent(IRobocodeEditor.class) != null);
+			robotEditorMenuItem.setEnabled(net.sf.robocode.core.Container.getComponent(IRobocodeEditor.class) != null);
 			robotEditorMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, MENU_SHORTCUT_KEY_MASK, false));
 			robotEditorMenuItem.addActionListener(eventHandler);
 		}
