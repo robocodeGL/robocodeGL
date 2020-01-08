@@ -92,10 +92,10 @@ public final class AwtBattleAdaptor {
 		if (this.isEnabled && !isEnabled) {
 			battleManager.removeListener(observer);
 			frameSync = false;
-			isEnabled = false;
+			this.isEnabled = false;
 		} else if (!this.isEnabled && isEnabled) {
 			battleManager.addListener(observer);
-			isEnabled = true;
+			this.isEnabled = true;
 		}
 	}
 
