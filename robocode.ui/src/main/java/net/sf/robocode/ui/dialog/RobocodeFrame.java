@@ -657,7 +657,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		battleViewComp.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
+				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiersEx() == 0) {
 					if (spacePressedTime == -1) {
 						pauseOrNextTurn();
 						battleManager.setSlowMoMode(true);
@@ -670,7 +670,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiers() == 0) {
+				if (e.getKeyCode() == KeyEvent.VK_SPACE && e.getModifiersEx() == 0) {
 					if (spacePressedTime != -1) {
 						stopSlowMoMode();
 					}
@@ -723,7 +723,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		spacePressedTime = -1;
 		longPressTimer.stop();
 		battleManager.setSlowMoMode(false);
-		windowManager.pauseBattle();
+		battleManager.pauseIfResumedBattle();
+		windowManager.signalPauseBattle();
 	}
 
 	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
