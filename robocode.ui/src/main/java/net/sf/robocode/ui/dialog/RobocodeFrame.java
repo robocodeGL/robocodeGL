@@ -8,7 +8,6 @@
 package net.sf.robocode.ui.dialog;
 
 
-import net.sf.robocode.async.Promise;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.recording.IRecordManager;
@@ -1065,6 +1064,10 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			isBattleRunning = true;
 			isBattleReplay = event.isReplay();
 
+			tps = 0;
+			currentRound = 0;
+			currentTurn = -1;
+
 			setEnableStopButton(true);
 			updateRestartButtonStatus();
 			getReplayButton().setEnabled(event.isReplay());
@@ -1190,7 +1193,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			if (isBattleRunning) {
 				title.append(": ");
 
-				if (currentTurn == 0) {
+				if (currentTurn == -1) {
+					title.append("Before start");
+				} else if (currentTurn == 0) {
 					title.append("Starting round");
 				} else {
 					if (isBattleReplay) {
