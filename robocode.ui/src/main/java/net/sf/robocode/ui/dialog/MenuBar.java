@@ -51,7 +51,7 @@ import static net.sf.robocode.ui.util.ShortcutUtil.MENU_SHORTCUT_KEY_MASK;
  * @author Matthew Reeder (contributor)
  * @author Luis Crespo (contributor)
  */
-@SuppressWarnings("serial")
+@SuppressWarnings({"serial", "InstanceVariableUsedBeforeInitialized"})
 public final class MenuBar extends JMenuBar implements ISettingsListener {
 
 	// Battle menu
@@ -66,6 +66,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private JMenuItem battleNextTurnMenuItem;
 	private JMenuItem battleExitMenuItem;
 	private JMenu battleRobotListMenu;
+	private JMenuItem battleRobotListEmptyMenuItem;
 	private JMenuItem battleMainBattleMenuItem;
 	private JMenuItem battleOpenRecordMenuItem;
 	private JMenuItem battleSaveRecordAsMenuItem;
@@ -593,8 +594,18 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleRobotListMenu.setText("Robots");
 			battleRobotListMenu.setMnemonic('R');
 			battleRobotListMenu.addActionListener(eventHandler);
+			battleRobotListMenu.add(getBattleRobotListEmptyMenuItem());
 		}
 		return battleRobotListMenu;
+	}
+
+	public JMenuItem getBattleRobotListEmptyMenuItem() {
+		if (battleRobotListEmptyMenuItem == null) {
+			battleRobotListEmptyMenuItem = new JMenuItem();
+			battleRobotListEmptyMenuItem.setText("(empty)");
+			battleRobotListEmptyMenuItem.setEnabled(false);
+		}
+		return battleRobotListEmptyMenuItem;
 	}
 
 	public JMenuItem getBattleMainBattleMenuItem() {
