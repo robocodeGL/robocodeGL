@@ -203,6 +203,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	private void clearRobotButtons() {
 		menuBar.getBattleRobotListMenu().removeAll();
+		menuBar.getBattleRobotListMenu().add(menuBar.getBattleRobotListEmptyMenuItem());
 
 		for (RobotButton robotButton : robotButtons) {
 			robotButton.detach();
@@ -1072,6 +1073,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		public void onRoundStarted(final RoundStartedEvent event) {
 			if (event.getRound() == 0) {
 				getRobotButtonsPanel().removeAll();
+				menuBar.getBattleRobotListMenu().removeAll();
 
 				final List<IRobotSnapshot> robots = Arrays.asList(event.getStartSnapshot().getRobots());
 
