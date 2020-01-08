@@ -43,6 +43,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -200,10 +201,21 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		setCursor(enabled ? BUSY_CURSOR : DEFAULT_CURSOR);
 	}
 
-	public void addRobotButton(JButton b) {
-		if (b instanceof RobotButton) {
-			robotButtons.add((RobotButton) b);
+	private void clearRobotButtons() {
+		menuBar.getBattleRobotListMenu().removeAll();
+
+		for (RobotButton robotButton : robotButtons) {
+			robotButton.detach();
 		}
+		robotButtons.clear();
+	}
+
+	private void addRobotButton(RobotButton b) {
+		JMenuItem robotMenuItem = new JMenuItem(b.getText());
+		robotMenuItem.addActionListener(b);
+		menuBar.getBattleRobotListMenu().add(robotMenuItem);
+
+		robotButtons.add(b);
 		getRobotButtonsPanel().add(b);
 		b.setVisible(true);
 		getRobotButtonsPanel().validate();
@@ -1090,10 +1102,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		public void onBattleFinished(BattleFinishedEvent event) {
 			isBattleRunning = false;
 
-			for (RobotButton robotButton : robotButtons) {
-				robotButton.detach();
-			}
-			robotButtons.clear();
+			clearRobotButtons();
 
 			final boolean canReplayRecord = recordManager.hasRecord();
 			final boolean enableSaveRecord = (properties.getOptionsCommonEnableReplayRecording() & canReplayRecord);
