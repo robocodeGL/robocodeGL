@@ -544,7 +544,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	@Override
 	public void pauseBattle() {
-		pauseBattle();
+		battleManager.pauseBattle();
 		signalPauseBattle();
 	}
 
