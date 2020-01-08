@@ -187,7 +187,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 					return;
 				}
 				if (System.nanoTime() - spacePressedTime > SLOW_MO_WAIT_MS * 1000000) {
-					battleManager.resumeBattle();
+					battleManager.resumeIfPausedBattle();
 				}
 			}
 		});
