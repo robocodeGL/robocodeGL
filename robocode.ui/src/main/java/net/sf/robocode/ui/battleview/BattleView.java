@@ -920,10 +920,13 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 				fpsMeter.setTurnId(lastSnapshot.getTurn());
 
 				update(lastSnapshot, lastLastSnapshot, g, Math.min(1., 1. * frameCount / mod));
+
 			} else {
 				fpsMeter.setTurnId(0);
 
 				paintRobocodeLogo(g);
+
+				frameCount = 0;
 			}
 
 			fpsMeter.paint(g);
