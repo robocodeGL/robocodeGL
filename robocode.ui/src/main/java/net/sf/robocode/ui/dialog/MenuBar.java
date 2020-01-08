@@ -62,7 +62,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private JMenuItem battleSaveAsMenuItem;
 	private JMenuItem battleRestartMenuItem;
 	private JMenuItem battleStopMenuItem;
-	private JCheckBoxMenuItem battleTogglePauseMenuItem;
+	private JMenuItem battleTogglePauseMenuItem;
 	private JMenuItem battleNextTurnMenuItem;
 	private JMenuItem battleExitMenuItem;
 	private JMenu battleRobotListMenu;
@@ -571,10 +571,10 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		return battleStopMenuItem;
 	}
 
-	public JCheckBoxMenuItem getBattleTogglePauseMenuItem() {
+	public JMenuItem getBattleTogglePauseMenuItem() {
 		if (battleTogglePauseMenuItem == null) {
-			battleTogglePauseMenuItem = new JCheckBoxMenuItem();
-			battleTogglePauseMenuItem.setText("Pause");
+			battleTogglePauseMenuItem = new JMenuItem();
+			battleTogglePauseMenuItem.setText("Pause / Resume");
 			battleTogglePauseMenuItem.setMnemonic('P');
 			battleTogglePauseMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0, false));
 			battleTogglePauseMenuItem.setEnabled(true);
@@ -586,7 +586,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	public JMenuItem getBattleNextTurnMenuItem() {
 		if (battleNextTurnMenuItem == null) {
 			battleNextTurnMenuItem = new JMenuItem();
-			battleNextTurnMenuItem.setText("Pause/Next Turn");
+			battleNextTurnMenuItem.setText("Pause / Next Turn");
 			battleNextTurnMenuItem.setMnemonic('T');
 			battleNextTurnMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_SPACE, 0, false));
 			battleNextTurnMenuItem.setEnabled(false);
