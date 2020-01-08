@@ -15,6 +15,11 @@ import java.io.InputStreamReader;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * Simple parser for partially supporting LibGDX texture packer format
+ *
+ * @author Xor
+ */
 public final class ImageAtlas {
 	public static final class Region {
 		private int sx;

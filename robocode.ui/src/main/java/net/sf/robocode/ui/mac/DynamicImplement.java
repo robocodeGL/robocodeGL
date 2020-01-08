@@ -6,6 +6,11 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 
+/**
+ * Utility for dynamically implementing interfaces
+ *
+ * @author Xor
+ */
 public final class DynamicImplement implements InvocationHandler {
   private Object wrapped;
 
@@ -66,8 +71,8 @@ public final class DynamicImplement implements InvocationHandler {
     }
   }
 
-  public static Object makeImplement(Class<?> superClass, Object toWrap) {
-    return makeImplement(new Class[]{superClass}, toWrap);
+  public static Object makeImplement(Class<?> anInterface, Object toWrap) {
+    return makeImplement(new Class[]{anInterface}, toWrap);
   }
 
   public static Object makeImplement(Class<?>[] interfaces, Object toWrap) {

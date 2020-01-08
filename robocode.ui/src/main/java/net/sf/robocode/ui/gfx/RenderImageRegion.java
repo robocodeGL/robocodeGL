@@ -19,6 +19,7 @@ import java.awt.geom.Area;
  * An image that can be rendered.
  *
  * @author Flemming N. Larsen (original)
+ * @author Xor (contributor)
  */
 public class RenderImageRegion extends RenderObject {
 
