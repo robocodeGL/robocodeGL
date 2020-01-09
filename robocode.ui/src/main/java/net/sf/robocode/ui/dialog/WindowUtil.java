@@ -51,6 +51,11 @@ public class WindowUtil {
 		if (size != null) {
 			w.setSize(size);
 		}
+
+		if (location == null && main == null) {
+			location = getCenterScreenLocation(null, w);
+		}
+
 		if (location != null) {
 			w.setLocation(location);
 		} else {
@@ -104,6 +109,17 @@ public class WindowUtil {
 	public static void packCenterScreenShowNoRemember(Window main, Window window) {
 		window.pack();
 
+		Point location = getCenterScreenLocation(main, window);
+
+		if (location != null) {
+			window.setLocation(location);
+		} else {
+			window.setLocationRelativeTo(null);
+		}
+		window.setVisible(true);
+	}
+
+	private static Point getCenterScreenLocation(Window main, Window window) {
 		Point location = null;
 
 		Point mainLocation;
@@ -139,13 +155,7 @@ public class WindowUtil {
 				}
 			}
 		}
-
-		if (location != null) {
-			window.setLocation(location);
-		} else {
-			window.setLocationRelativeTo(null);
-		}
-		window.setVisible(true);
+		return location;
 	}
 
 	public static void packPlaceShow(Window main, Window window) {
