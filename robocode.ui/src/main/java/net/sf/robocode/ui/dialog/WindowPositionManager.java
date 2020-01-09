@@ -89,7 +89,11 @@ public class WindowPositionManager implements ComponentListener {
 	public Rectangle getWindowRect(Window window) {
 		window.addComponentListener(this);
 
-		String rString = (String) getWindowPositions().get(window.getClass().getName());
+		return getWindowRect(window.getClass().getName());
+	}
+
+	public Rectangle getWindowRect(String name) {
+		String rString = (String) getWindowPositions().get(name);
 
 		if (rString == null) {
 			return null;
@@ -142,14 +146,15 @@ public class WindowPositionManager implements ComponentListener {
 		return new Rectangle(x, y, windowBounds.width, windowBounds.height);
 	}
 
-	public static GraphicsDevice findDeviceContainingLocation(Point location) {
+	public static GraphicsConfiguration findDeviceContainingLocation(Point location) {
 		final GraphicsEnvironment gfxEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final GraphicsDevice[] screenDevices = gfxEnv.getScreenDevices();
 
 		for (int i = screenDevices.length - 1; i >= 0; i--) {
 			GraphicsDevice screenDevice = screenDevices[i];
-			if (screenDevice.getDefaultConfiguration().getBounds().contains(location)) {
-				return screenDevice;
+			GraphicsConfiguration gc = screenDevice.getDefaultConfiguration();
+			if (gc.getBounds().contains(location)) {
+				return gc;
 			}
 
 			// GraphicsConfiguration[] gfxCfg = screenDevice.getConfigurations();
