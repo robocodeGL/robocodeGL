@@ -19,6 +19,7 @@ import com.jogamp.common.os.Platform;
 import com.jogamp.opengl.GL;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
+import com.jogamp.opengl.GLOffscreenAutoDrawable;
 import com.jogamp.opengl.awt.GLCanvas;
 import jogamp.common.os.PlatformPropsImpl;
 
@@ -155,7 +156,7 @@ public class GLG2DSimpleEventListener implements GLEventListener {
 
       logicWidth = canvas.getWidth();
       logicHeight = canvas.getHeight();
-    } else {
+    } else if (!(drawable instanceof GLOffscreenAutoDrawable)) {
       System.err.println(drawable.getClass().getName() + " not recognized. ");
     }
   }
