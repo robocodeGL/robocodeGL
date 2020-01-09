@@ -11,6 +11,7 @@ package net.sf.robocode.battle.snapshot;
 import net.sf.robocode.battle.Battle;
 import net.sf.robocode.battle.peer.BulletPeer;
 import net.sf.robocode.battle.peer.RobotPeer;
+import net.sf.robocode.io.Logger;
 import net.sf.robocode.serialization.IXmlSerializable;
 import net.sf.robocode.serialization.XmlReader;
 import net.sf.robocode.serialization.SerializableOptions;
@@ -156,7 +157,9 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 					? robot.getScoreSnapshot()
 					: new ScoreSnapshot(robot.getTeamName(), snapshot, robot.getScoreSnapshot());
 
-			results.set(contestantIndex, score);
+			if (results.set(contestantIndex, score) != null) {
+				Logger.logWarning("contestantIndex " + contestantIndex + " is duplicated!");
+			}
 		}
 
 		return results.toArray(new IScoreSnapshot[0]);
