@@ -32,65 +32,21 @@ public class WindowUtil {
 	}
 
 	public static void center(Window main, Window w) {
-		w.setLocationRelativeTo(main);
-		// WindowUtil.center(main, w, true);
-	}
-
-	public static void center(Window main, Window w, boolean move) {
 		Point location = null;
 		Dimension size = null;
 
 		Rectangle windowRect = windowPositionManager.getWindowRect(w);
-
 		if (windowRect != null) {
 			location = new Point(windowRect.x, windowRect.y);
 			size = new Dimension(windowRect.width, windowRect.height);
 		}
-		if (!move) {
-			size = null;
+		if (size != null) {
+			w.setSize(size);
 		}
-		if (location == null || size == null) {
-			// Center a window
-			Dimension screenSize;
-
-			if (main != null) {
-				screenSize = main.getSize();
-			} else {
-				screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-			}
-			size = w.getSize();
-			if (size.height > screenSize.height - 20 || size.width > screenSize.width - 20) {
-				// Keep aspect ratio for the robocode frame.
-				if (w.getName().equals("RobocodeFrame")) {
-					int shrink = size.width - screenSize.width + 20;
-
-					if (size.height - screenSize.height + 20 > shrink) {
-						shrink = size.height - screenSize.height + 20;
-					}
-
-					size.width -= shrink;
-					size.height -= shrink;
-				} else {
-					if (size.height > screenSize.height - 20) {
-						size.height = screenSize.height - 20;
-					}
-					if (size.width > screenSize.width - 20) {
-						size.width = screenSize.width - 20;
-					}
-				}
-			}
-			if (main != null) {
-				location = main.getLocation();
-				location.x += (screenSize.width - size.width) / 2;
-				location.y += (screenSize.height - size.height) / 2;
-			} else {
-				location = new Point((screenSize.width - size.width) / 2, (screenSize.height - size.height) / 2);
-			}
-		}
-
-		w.setSize(size);
-		if (move) {
+		if (location != null) {
 			w.setLocation(location);
+		} else {
+			w.setLocationRelativeTo(main);
 		}
 	}
 
@@ -118,7 +74,7 @@ public class WindowUtil {
 		// w.removeComponentListener(windowPositionManager);
 		w.pack();
 
-		center(null, w, false);
+		// center(null, w, false);
 	}
 
 	public static void packCenterShow(Window window) {
