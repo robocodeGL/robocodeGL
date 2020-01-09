@@ -32,7 +32,8 @@ public class WindowUtil {
 	}
 
 	public static void center(Window main, Window w) {
-		WindowUtil.center(main, w, true);
+		w.setLocationRelativeTo(main);
+		// WindowUtil.center(main, w, true);
 	}
 
 	public static void center(Window main, Window w, boolean move) {
