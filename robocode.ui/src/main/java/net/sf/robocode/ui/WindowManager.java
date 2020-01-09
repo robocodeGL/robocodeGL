@@ -719,12 +719,8 @@ public class WindowManager implements IWindowManagerExt {
 	 * @param center {@code true} if the window must be centered; {@code false} otherwise
 	 */
 	private void packCenterShow(Window window, boolean center) {
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-
 		window.pack();
-		if (center) {
-			window.setLocation((screenSize.width - window.getWidth()) / 2, (screenSize.height - window.getHeight()) / 2);
-		}
+		window.setLocationRelativeTo(null);
 		window.setVisible(true);
 	}
 
