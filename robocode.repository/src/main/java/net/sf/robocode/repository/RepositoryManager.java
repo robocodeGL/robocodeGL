@@ -118,7 +118,7 @@ public class RepositoryManager implements IRepositoryManager { // NO_UCD (use de
 			RootHandler.closeHandlers();
 		}
 
-		Logger.logMessage((force ? "force " : "") + "update takes " + ((System.nanoTime() - t0) / 1000000000.0) + "s");
+		Logger.logMessage("Robot database " + (force ? "force " : "") + "update takes " + ((System.nanoTime() - t0) / 1000000000.0) + "s");
 
 		return prev != repository.getItems().size();
 	}
