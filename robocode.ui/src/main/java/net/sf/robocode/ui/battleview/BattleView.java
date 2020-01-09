@@ -74,6 +74,7 @@ import static java.lang.Math.sqrt;
  */
 @SuppressWarnings("serial")
 public class BattleView extends GLG2DCanvas implements ScaleProvider {
+	private static final boolean ENABLE_INTERPOLATION = true;
 
 	private static final String ROBOCODE_SLOGAN = "Build the best, destroy the rest!";
 
@@ -892,8 +893,8 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			if (lastDesiredTPS != desiredTPS) {
 				if (lastDesiredTPS != 0) {
-					int mod0 = (int) Math.floor(60 / lastDesiredTPS + 0.001);
-					int mod1 = (int) Math.floor(60 / desiredTPS + 0.001);
+					int mod0 = lastDesiredTPS >= 59.9 ? 1 : (int) Math.floor(60 / lastDesiredTPS + 0.001);
+					int mod1 = desiredTPS >= 59.9 ? 1 : (int) Math.floor(60 / desiredTPS + 0.001);
 
 					frameCount = Math.round((double) frameCount / mod0 * mod1);
 				}
@@ -933,12 +934,24 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			if (lastSnapshot != null) {
 				fpsMeter.setTurnId(lastSnapshot.getTurn());
 
-				update(lastSnapshot, lastLastSnapshot, g, Math.min(1., 1. * frameCount / mod));
-
-				if (lastLastSnapshot == null) {
-					frameCount = 0;
+				double t = 1.;
+				if (ENABLE_INTERPOLATION) {
+					if (lastLastSnapshot != null) {
+						if (lastLastSnapshot.getRound() == lastSnapshot.getRound()) {
+							if (lastLastSnapshot.getTurn() + 1 == lastSnapshot.getTurn()) {
+								t = max(0., min(1., 1. * frameCount / mod));
+							}
+						}
+					}
 				}
 
+				update(lastSnapshot, lastLastSnapshot, g, t);
+
+				if (lastLastSnapshot == null) {
+					if (ENABLE_INTERPOLATION) {
+						frameCount = 0;
+					}
+				}
 			} else {
 				fpsMeter.setTurnId(0);
 
