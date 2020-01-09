@@ -8,6 +8,8 @@
 package net.sf.robocode.ui.dialog;
 
 
+import net.sf.robocode.ui.IWindowManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -21,9 +23,11 @@ public class BattleButton extends JButton implements ActionListener {
 	private static final long serialVersionUID = 1L;
 
 	private final BattleDialog battleDialog;
+	private IWindowManager windowManager;
 
-	public BattleButton(BattleDialog battleDialog) {
+	public BattleButton(BattleDialog battleDialog, IWindowManager windowManager) {
 		this.battleDialog = battleDialog;
+		this.windowManager = windowManager;
 
 		initialize();
 	}
@@ -31,7 +35,7 @@ public class BattleButton extends JButton implements ActionListener {
 	public void actionPerformed(ActionEvent e) {
 		attach();
 		if (!battleDialog.isVisible()) { // || battleDialog.getState() != Frame.NORMAL) {
-			WindowUtil.packPlaceShow(battleDialog);
+			WindowUtil.packPlaceShow(windowManager.getRobocodeFrame(), battleDialog);
 		} else {
 			battleDialog.setVisible(true);
 		}
