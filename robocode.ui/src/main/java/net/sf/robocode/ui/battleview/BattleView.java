@@ -48,6 +48,7 @@ import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Shape;
+import java.awt.Toolkit;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.geom.AffineTransform;
@@ -85,7 +86,6 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private static final int ROBOT_TEXT_Y_OFFSET = 24;
 
-	private static final Font SMALL_FONT = new Font("Dialog", Font.PLAIN, 10);
 	private static final BasicStroke DEFAULT_STROKE = new BasicStroke();
 
 	private BattleRules battleRules;
@@ -116,6 +116,8 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	private RenderingHints renderingHints;
 
 	// Fonts and the like
+	private Font smallFontBase;
+
 	private Font smallFont;
 	private FontMetrics smallFontMetrics;
 
@@ -272,8 +274,21 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			scale = 1;
 		}
 
+		try {
+			smallFontBase = null;
+			smallFontBase = (Font) Toolkit.getDefaultToolkit().getDesktopProperty("win.icon.font");
+			if (smallFontBase != null) {
+				smallFontBase = smallFontBase.deriveFont((float) 11);
+			}
+		} catch (Exception ignore) {
+		}
+		if (smallFontBase == null) {
+			smallFontBase = new Font("Dialog", Font.PLAIN, 10);
+		}
+		System.out.println(smallFontBase);
+
 		// Scale font
-		smallFont = SMALL_FONT.deriveFont((float) (SMALL_FONT.getSize2D() / Math.min(1., scale)));
+		smallFont = smallFontBase.deriveFont((float) (smallFontBase.getSize2D() / Math.min(1., scale)));
 		smallFontMetrics = getGraphics().getFontMetrics(smallFont);
 
 		// Initialize ground image
@@ -615,7 +630,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			g.setBackground(Color.WHITE);
 			g.setColor(Color.BLACK);
-			g.setFont(SMALL_FONT);
+			g.setFont(smallFontBase);
 			g.setStroke(DEFAULT_STROKE);
 
 			g.setClip(null);

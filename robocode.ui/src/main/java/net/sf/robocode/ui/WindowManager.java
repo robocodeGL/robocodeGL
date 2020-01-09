@@ -43,6 +43,7 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
+import java.awt.Font;
 import java.awt.Frame;
 import java.awt.Toolkit;
 import java.awt.Window;
@@ -760,6 +761,8 @@ public class WindowManager implements IWindowManagerExt {
 	 * If this also fails, the LAF will not be changed.
 	 */
 	private void setLookAndFeel() {
+		ensureDefaultGUIFontSize();
+
 		if (System.getProperty("apple.laf.useScreenMenuBar") == null) {
 			System.setProperty("apple.laf.useScreenMenuBar", "true");
 		}
@@ -848,6 +851,32 @@ public class WindowManager implements IWindowManagerExt {
 				extension = name.substring(idx);
 			}
 			return extension.equalsIgnoreCase(".jar") || extension.equalsIgnoreCase(".zip");
+		}
+	}
+
+	private static void ensureDefaultGUIFontSize() {
+		Toolkit toolkit = Toolkit.getDefaultToolkit();
+		Font guiFont = (Font) toolkit.getDesktopProperty("win.defaultGUI.font");
+		if (guiFont == null) return;
+		Font iconFont = (Font) toolkit.getDesktopProperty("win.icon.font");
+		if (guiFont.getSize() < iconFont.getSize()) {
+			invokeDeclaredMethod("setDesktopProperty", Toolkit.class,
+				toolkit, "win.defaultGUI.font", iconFont);
+		}
+	}
+
+	private static void invokeDeclaredMethod(String methodName,
+	                                         Class<?> clazz, Object instance, String propertyName,
+	                                         Object propertyValue) {
+		try {
+			Method method = clazz.getDeclaredMethod(methodName, String.class, Object.class);
+			method.setAccessible(true);
+			method.invoke(instance, propertyName, propertyValue);
+		} catch (NoSuchMethodException ignore) {
+		} catch (SecurityException ignore) {
+		} catch (IllegalAccessException ignore) {
+		} catch (IllegalArgumentException ignore) {
+		} catch (InvocationTargetException ignore) {
 		}
 	}
 }
