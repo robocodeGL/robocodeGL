@@ -130,17 +130,17 @@ public final class Battle extends BaseBattle {
 				teamMembers.get(teamName).add(nameIndexed);
 			}
 		}
-		
+
 		for (RobotSpecification specification : battlingRobotsList) {
 			final String teamName = HiddenAccess.getRobotTeamName(specification);
 			TeamPeer team = null;
 			if (teamName != null) {
 				if (!teamPeers.containsKey(teamName)) {
 					String teamNameIndexed = teamName.substring(0, teamName.length() - 6) + " (" + (teamNames.indexOf(teamName) + 1) + ')';
-	
+
 					int teamIndex = teamNames.indexOf(teamName);
 					team = new TeamPeer(teamNameIndexed, teamMembers.get(teamName), teamIndex);
-	
+
 					teamPeers.put(teamName, team);
 					contestants.add(team);
 				} else {

@@ -157,9 +157,7 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 					? robot.getScoreSnapshot()
 					: new ScoreSnapshot(robot.getTeamName(), snapshot, robot.getScoreSnapshot());
 
-			if (results.set(contestantIndex, score) != null) {
-				Logger.logWarning("contestantIndex " + contestantIndex + " is duplicated!");
-			}
+			results.set(contestantIndex, score);
 		}
 
 		return results.toArray(new IScoreSnapshot[0]);
