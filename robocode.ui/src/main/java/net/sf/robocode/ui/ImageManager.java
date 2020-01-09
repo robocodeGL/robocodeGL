@@ -108,9 +108,9 @@ public class ImageManager implements IImageManager {
 						throw new IOException("Invalid: " + name);
 					} else {
 						img = ImageIO.read(url);
-						System.out.println("before Parse");
+						// System.out.println("before Parse");
 						atlas = ImageAtlas.parse("/net/sf/robocode/ui/images/gl2/explosions.atlas");
-						System.out.println("after Parse");
+						// System.out.println("after Parse");
 					}
 				} catch (IOException e) {
 					throw new RuntimeException(e);
