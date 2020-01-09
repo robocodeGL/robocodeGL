@@ -40,7 +40,6 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.FileDialog;
 import java.awt.Font;
@@ -218,7 +217,7 @@ public class WindowManager implements IWindowManagerExt {
 	}
 
 	public void showAboutBox() {
-		packCenterShow(Container.getComponent(AboutBox.class), true);
+		packCenterShow(Container.getComponent(AboutBox.class));
 	}
 
 	public String showBattleOpenDialog(final String defExt, final String name) {
@@ -433,7 +432,7 @@ public class WindowManager implements IWindowManagerExt {
 		final ResultsDialog dialog = Container.getComponent(ResultsDialog.class);
 
 		dialog.setup(event.getSortedResults(), event.getBattleRules().getNumRounds());
-		packCenterShow(dialog, true);
+		packCenterShow(dialog);
 	}
 
 	public void showRankingDialog(boolean visible) {
@@ -455,7 +454,7 @@ public class WindowManager implements IWindowManagerExt {
 		RankingDialog rankingDialog = Container.getComponent(RankingDialog.class);
 
 		if (visible) {
-			packCenterShow(rankingDialog, centerRankings);
+			packCenterShow(rankingDialog);
 			centerRankings = false; // only center the first time Rankings are shown
 		} else {
 			rankingDialog.dispose();
@@ -498,7 +497,7 @@ public class WindowManager implements IWindowManagerExt {
 	public void showSplashScreen() {
 		RcSplashScreen splashScreen = Container.getComponent(RcSplashScreen.class);
 
-		packCenterShow(splashScreen, true);
+		packCenterShow(splashScreen);
 
 		WindowUtil.setStatusLabel(splashScreen.getSplashLabel());
 
@@ -716,12 +715,9 @@ public class WindowManager implements IWindowManagerExt {
 	 * Packs, centers, and shows the specified window on the screen.
 	 *
 	 * @param window the window to pack, center, and show
-	 * @param center {@code true} if the window must be centered; {@code false} otherwise
 	 */
-	private void packCenterShow(Window window, boolean center) {
-		window.pack();
-		window.setLocationRelativeTo(null);
-		window.setVisible(true);
+	private void packCenterShow(Window window) {
+		WindowUtil.packCenterShowNoRemember(null, window);
 	}
 
 	public void cleanup() {

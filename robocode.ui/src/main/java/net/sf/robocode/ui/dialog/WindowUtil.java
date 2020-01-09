@@ -13,7 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.Dimension;
-import java.awt.GraphicsDevice;
+import java.awt.GraphicsConfiguration;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -101,6 +101,53 @@ public class WindowUtil {
 		window.setVisible(true);
 	}
 
+	public static void packCenterShowNoRemember(Window main, Window window) {
+		window.pack();
+
+		Point location = null;
+
+		Point mainLocation;
+		if (main != null) {
+			mainLocation = main.getLocation();
+		} else {
+			Rectangle rect = windowPositionManager.getWindowRect(RobocodeFrame.class.getName());
+			mainLocation = rect == null ? null : rect.getLocation();
+		}
+
+		if (mainLocation != null) {
+			GraphicsConfiguration screen = WindowPositionManager.findDeviceContainingLocation(mainLocation);
+			if (screen != null) {
+				Rectangle screenBounds = screen.getBounds();
+
+				Dimension size = window.getSize();
+
+				location = new Point((int) screenBounds.getCenterX(), (int) screenBounds.getCenterY());
+				location.x -= size.width / 2;
+				location.y -= size.height / 2;
+
+				if (location.y + size.height > screenBounds.y + screenBounds.height) {
+					location.y = screenBounds.y + screenBounds.height - size.height;
+				}
+				if (location.y < screenBounds.y) {
+					location.y = screenBounds.y;
+				}
+				if (location.x + size.width > screenBounds.x + screenBounds.width) {
+					location.x = screenBounds.x + screenBounds.width - size.width;
+				}
+				if (location.x < screenBounds.x) {
+					location.x = screenBounds.x;
+				}
+			}
+		}
+
+		if (location != null) {
+			window.setLocation(location);
+		} else {
+			window.setLocationRelativeTo(null);
+		}
+		window.setVisible(true);
+	}
+
 	public static void packPlaceShow(Window main, Window window) {
 		window.pack();
 		WindowUtil.place(main, window);
@@ -113,9 +160,9 @@ public class WindowUtil {
 		Point screenOrigin = null;
 		Dimension screenSize = null;
 		if (main != null) {
-			GraphicsDevice screen = WindowPositionManager.findDeviceContainingLocation(main.getLocation());
+			GraphicsConfiguration screen = WindowPositionManager.findDeviceContainingLocation(main.getLocation());
 			if (screen != null) {
-				Rectangle bounds = screen.getDefaultConfiguration().getBounds();
+				Rectangle bounds = screen.getBounds();
 				screenOrigin = bounds.getLocation();
 				screenSize = new Dimension(bounds.width, bounds.height);
 			}
