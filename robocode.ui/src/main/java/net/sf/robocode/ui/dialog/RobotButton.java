@@ -189,8 +189,10 @@ public class RobotButton extends JButton implements ActionListener {
 
 			maxScore = 0;
 			for (IScoreSnapshot team : scoreSnapshotList) {
-				if (maxScore < team.getCurrentScore()) {
-					maxScore = (int) team.getCurrentScore();
+				if (team != null) {
+					if (maxScore < team.getCurrentScore()) {
+						maxScore = (int) team.getCurrentScore();
+					}
 				}
 			}
 			if (maxScore == 0) {

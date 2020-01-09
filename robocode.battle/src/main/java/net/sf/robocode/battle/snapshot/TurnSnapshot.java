@@ -124,11 +124,16 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 	 * {@inheritDoc}
 	 */
 	public IScoreSnapshot[] getSortedTeamScores() {
-		List<IScoreSnapshot> copy = new ArrayList<IScoreSnapshot>(Arrays.asList(getIndexedTeamScores()));
+		List<IScoreSnapshot> copy = new ArrayList<IScoreSnapshot>();
+		for (IScoreSnapshot score : getIndexedTeamScores()) {
+			if (score != null) {
+				copy.add(score);
+			}
+		}
 
 		Collections.sort(copy);
 		Collections.reverse(copy);
-		return copy.toArray(new IScoreSnapshot[copy.size()]);
+		return copy.toArray(new IScoreSnapshot[0]);
 	}
 
 	/**
@@ -153,15 +158,8 @@ public final class TurnSnapshot implements java.io.Serializable, IXmlSerializabl
 
 			results.set(contestantIndex, score);
 		}
-		List<IScoreSnapshot> scores = new ArrayList<IScoreSnapshot>();
 
-		for (IScoreSnapshot scoreSnapshot : results) {
-			if (scoreSnapshot != null) {
-				scores.add(scoreSnapshot);
-			}
-		}
-
-		return scores.toArray(new IScoreSnapshot[scores.size()]);
+		return results.toArray(new IScoreSnapshot[0]);
 	}
 
 	public void stripDetails(SerializableOptions options) {
