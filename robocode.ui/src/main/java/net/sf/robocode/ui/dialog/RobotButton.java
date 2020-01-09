@@ -45,7 +45,6 @@ public class RobotButton extends JButton implements ActionListener {
 	private String name;
 	private int robotIndex;
 	private int contestantIndex;
-	private int teamIndex;
 	private int maxEnergy = 1;
 	private int maxScore = 1;
 	private int lastEnergy;
@@ -58,13 +57,12 @@ public class RobotButton extends JButton implements ActionListener {
 		this.dialogManager = dialogManager;
 	}
 
-	public void setup(String name, int maxEnergy, int robotIndex,int contestantIndex, int teamIndex, boolean attach) {
+	public void setup(String name, int maxEnergy, int robotIndex, int contestantIndex, boolean attach) {
 		this.name = name;
 		this.robotIndex = robotIndex;
 		this.contestantIndex = contestantIndex;
 		this.lastEnergy = maxEnergy;
 		this.maxEnergy = maxEnergy;
-		this.teamIndex = teamIndex;
 		initialize();
 		if (attach) {
 			attach();
@@ -189,15 +187,17 @@ public class RobotButton extends JButton implements ActionListener {
 
 			maxScore = 0;
 			for (IScoreSnapshot team : scoreSnapshotList) {
-				if (maxScore < team.getCurrentScore()) {
-					maxScore = (int) team.getCurrentScore();
+				if (team != null) {
+					if (maxScore < team.getCurrentScore()) {
+						maxScore = (int) team.getCurrentScore();
+					}
 				}
 			}
 			if (maxScore == 0) {
 				maxScore = 1;
 			}
 
-			final int newScore = (int) scoreSnapshotList[teamIndex == -1 ? contestantIndex : teamIndex].getCurrentScore();
+			final int newScore = (int) scoreSnapshotList[contestantIndex].getCurrentScore();
 			final int newEnergy = (int) robots[robotIndex].getEnergy();
 			boolean rep = (lastEnergy != newEnergy || lastScore != newScore);
 
@@ -221,7 +221,7 @@ public class RobotButton extends JButton implements ActionListener {
 			lastScore = event.getIndexedResults()[contestantIndex].getScore();
 			repaint();
 		}
-		
+
 		public void onBattleFinished(final BattleFinishedEvent event) {
 			lastEnergy = 0;
 			repaint();
