@@ -78,7 +78,6 @@ public final class ImageAtlas {
 						skip = 5;
 					} else if (skip > 0) {
 						--skip;
-						// System.out.println("skipped: " + line);
 					} else {
 						if (line.startsWith("  ")) {
 							String[] split = line.trim().split(":");
@@ -86,8 +85,6 @@ public final class ImageAtlas {
 							if (split.length == 2) {
 								String key = split[0].trim();
 								String value = split[1].trim();
-
-								// System.out.println("property: " + key + ": " + value);
 
 								Region region = last;
 								if (region == null) throw new IllegalStateException();
@@ -102,11 +99,9 @@ public final class ImageAtlas {
 									region.h = pair[1];
 								}
 							} else {
-								System.out.println("unknown: " + line);
+								System.err.println("unknown: " + line);
 							}
 						} else {
-							// System.out.println("region: " + line);
-
 							map.put(line.trim(), last = new Region());
 						}
 					}
