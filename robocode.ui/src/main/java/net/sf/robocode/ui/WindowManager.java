@@ -717,7 +717,7 @@ public class WindowManager implements IWindowManagerExt {
 	 * @param window the window to pack, center, and show
 	 */
 	private void packCenterShow(Window window) {
-		WindowUtil.packCenterShowNoRemember(null, window);
+		WindowUtil.packCenterScreenShowNoRemember(null, window);
 	}
 
 	public void cleanup() {

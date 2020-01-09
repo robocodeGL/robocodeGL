@@ -101,7 +101,7 @@ public class WindowUtil {
 		window.setVisible(true);
 	}
 
-	public static void packCenterShowNoRemember(Window main, Window window) {
+	public static void packCenterScreenShowNoRemember(Window main, Window window) {
 		window.pack();
 
 		Point location = null;
