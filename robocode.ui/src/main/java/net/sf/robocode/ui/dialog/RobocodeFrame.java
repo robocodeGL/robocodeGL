@@ -193,6 +193,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 				}
 			}
 		});
+
+		dialogManager.setRobocodeFrame(this);
 	}
 
 	protected void finalize() throws Throwable {

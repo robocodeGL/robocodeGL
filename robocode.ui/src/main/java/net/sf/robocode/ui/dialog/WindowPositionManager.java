@@ -142,7 +142,7 @@ public class WindowPositionManager implements ComponentListener {
 		return new Rectangle(x, y, windowBounds.width, windowBounds.height);
 	}
 
-	private GraphicsDevice findDeviceContainingLocation(Point location) {
+	public static GraphicsDevice findDeviceContainingLocation(Point location) {
 		final GraphicsEnvironment gfxEnv = GraphicsEnvironment.getLocalGraphicsEnvironment();
 		final GraphicsDevice[] screenDevices = gfxEnv.getScreenDevices();
 

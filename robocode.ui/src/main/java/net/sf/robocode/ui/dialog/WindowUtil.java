@@ -8,8 +8,16 @@
 package net.sf.robocode.ui.dialog;
 
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Toolkit;
+import java.awt.Window;
 import java.io.PrintWriter;
 
 
@@ -21,7 +29,7 @@ import java.io.PrintWriter;
  */
 public class WindowUtil {
 
-	private static final Point origin = new Point(0, 0);
+	private static final Point origin = new Point(40, 40);
 	private static final WindowPositionManager windowPositionManager = new WindowPositionManager();
 	private static JLabel statusLabel;
 	private static PrintWriter statusWriter;
@@ -93,15 +101,29 @@ public class WindowUtil {
 		window.setVisible(true);
 	}
 
-	public static void packPlaceShow(Window window) {
+	public static void packPlaceShow(Window main, Window window) {
 		window.pack();
-		WindowUtil.place(window);
+		WindowUtil.place(main, window);
 		window.setVisible(true);
 	}
 
-	public static void place(Window w) {
-		// Center a window
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+	public static void place(Window main, Window w) {
+		// place windows as a stack
+
+		Point screenOrigin = null;
+		Dimension screenSize = null;
+		if (main != null) {
+			GraphicsDevice screen = WindowPositionManager.findDeviceContainingLocation(main.getLocation());
+			if (screen != null) {
+				Rectangle bounds = screen.getDefaultConfiguration().getBounds();
+				screenOrigin = bounds.getLocation();
+				screenSize = new Dimension(bounds.width, bounds.height);
+			}
+		}
+		if (screenSize == null) {
+			screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+		}
+
 		Dimension size = w.getSize();
 
 		if (size.height > screenSize.height) {
@@ -111,15 +133,23 @@ public class WindowUtil {
 			size.width = screenSize.width;
 		}
 
-		w.setLocation(origin);
-		origin.y += 150;
 		if (origin.y + size.height > screenSize.height) {
-			origin.y = 0;
+			origin.y = 40;
 			origin.x += 40;
 		}
 		if (origin.x + size.width > screenSize.width) {
-			origin.x = 0;
+			origin.x = 40;
 		}
+
+		Point location = new Point(origin);
+		if (screenOrigin != null) {
+			location.x += screenOrigin.x;
+			location.y += screenOrigin.y;
+		}
+
+		w.setLocation(location);
+
+		origin.y += 150;
 	}
 
 	public static void saveWindowPositions() {

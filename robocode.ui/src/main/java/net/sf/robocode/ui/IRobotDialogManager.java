@@ -10,6 +10,7 @@ package net.sf.robocode.ui;
 
 import net.sf.robocode.ui.dialog.BattleButton;
 import net.sf.robocode.ui.dialog.BattleDialog;
+import net.sf.robocode.ui.dialog.RobocodeFrame;
 import net.sf.robocode.ui.dialog.RobotButton;
 import net.sf.robocode.ui.dialog.RobotDialog;
 import robocode.control.snapshot.IRobotSnapshot;
@@ -27,4 +28,6 @@ public interface IRobotDialogManager {
 
 	RobotDialog getRobotDialog(RobotButton robotButton, String name, boolean create);
 	BattleDialog getBattleDialog(BattleButton battleButton, boolean create);
+
+	void setRobocodeFrame(RobocodeFrame robocodeFrame);
 }

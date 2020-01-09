@@ -740,7 +740,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	public IRobotDialogManager getRobotDialogManager() {
 		if (robotDialogManager == null) {
-			robotDialogManager = new RobotDialogManager();
+			robotDialogManager = Container.getComponent(IRobotDialogManager.class);
 		}
 		return robotDialogManager;
 	}
