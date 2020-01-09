@@ -187,14 +187,14 @@ public final class Battle extends BaseBattle {
 
 			String teamFullName = HiddenAccess.getRobotTeamName(specification);
 
-			// The team index and robot index depends on current sizes of the contestant list and robot list
-			int teamIndex = contestants.size();
 			int robotIndex = robots.size();
 
 			if (teamFullName != null) {
 				if (!namedTeams.containsKey(teamFullName)) {
 					String newTeamName = teamDuplicates.get(teams.indexOf(teamFullName));
 
+					// use robotIndex of first robot as teamIndex
+					int teamIndex = robotIndex;
 					team = new TeamPeer(newTeamName, teamMembers.get(teamFullName), teamIndex);
 
 					namedTeams.put(teamFullName, team);
@@ -202,9 +202,6 @@ public final class Battle extends BaseBattle {
 
 				} else {
 					team = namedTeams.get(teamFullName);
-					if (team != null) {
-						teamIndex = team.getTeamIndex();
-					}
 				}
 			}
 			Integer duplicate = robotDuplicates.get(i);
