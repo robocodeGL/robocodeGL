@@ -64,7 +64,7 @@ public final class AwtBattleAdaptor {
 	private final AtomicLong nextTurnCount = new AtomicLong(0L);
 
 
-	private BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
+	private final BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
 
 	public AwtBattleAdaptor(IBattleManager battleManager, ISettingsManager properties, int maxFps, boolean skipSameFrames) {
 		this.battleManager = battleManager;
@@ -266,9 +266,6 @@ public final class AwtBattleAdaptor {
 		@Override
 		public void onRoundStarted(final RoundStartedEvent event) {
 			last = null;
-			lastSnapshot = null;
-			lastLastSnapshot = null;
-			snapshot.clear();
 			putSnapshot(event.getStartSnapshot(), true);
 			// if (lastMajorEvent.get() == majorEvent.get()) {
 			// }
@@ -404,12 +401,13 @@ public final class AwtBattleAdaptor {
 
 	public void signalPauseBattle() {
 		ArrayList<Turn> c = new ArrayList<Turn>();
-		synchronized (snapshot) {
-			pauseInUI = true;
-			snapshot.drainTo(c);
-		}
-		for (Turn turn : c) {
-			pendingTurns.offer(turn);
+
+		synchronized (pendingTurns) {
+			synchronized (snapshot) {
+				pauseInUI = true;
+				snapshot.drainTo(c);
+			}
+			pendingTurns.addAll(c);
 		}
 	}
 
@@ -437,13 +435,21 @@ public final class AwtBattleAdaptor {
 					// snapshot.put(new Turn(last, turnSnapshot));
 					// snapshot.offer(new Turn(last, turnSnapshot), 1500, TimeUnit.MILLISECONDS);
 				} else {
-					pendingTurns.offer(turn);
+					synchronized (pendingTurns) {
+						pendingTurns.offer(turn);
+					}
 				}
 			} catch (InterruptedException e) {
 				Thread.currentThread().interrupt();
 			}
 		} else {
-			snapshot.offer(turn);
+			if (pauseInUI) {
+				synchronized (pendingTurns) {
+					pendingTurns.offer(turn);
+				}
+			} else {
+				snapshot.offer(turn);
+			}
 		}
 	}
 
@@ -465,7 +471,9 @@ public final class AwtBattleAdaptor {
 				return pauseInUI ? null : turn;
 			}
 		})) {
-			pendingTurns.offer(turn);
+			synchronized (pendingTurns) {
+				pendingTurns.offer(turn);
+			}
 		}
 	}
 }
