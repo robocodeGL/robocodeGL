@@ -137,7 +137,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 	private final FPSMeter fpsMeter = new FPSMeter();
 
-	private PreferredSizeMode preferredSizeMode = PreferredSizeMode.MINIMAL;
+	private PreferredSizeMode preferredSizeMode = PreferredSizeMode.SCALED;
 	private Dimension lastSize;
 
 	public BattleView(ISettingsManager properties, IWindowManager windowManager, IImageManager imageManager, IBattleManager battleManager) {
@@ -178,8 +178,10 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			return lastSize == null ? getSize() : lastSize;
 		} else if (allowScaleUp && preferredSizeMode == PreferredSizeMode.SHRINK_TO_FIT) {
 			return getPreferredSizeShrinkToFit();
+		} else if (preferredSizeMode == PreferredSizeMode.SCALED) {
+			return getPreferredSizeMinimal(1.5f);
 		} else {
-			return getPreferredSizeMinimal();
+			return getPreferredSizeMinimal(1f);
 		}
 	}
 
@@ -200,14 +202,14 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		return new Dimension((int) Math.ceil(battleField.getWidth() * scale), (int) Math.ceil(battleField.getHeight() * scale));
 	}
 
-	private Dimension getPreferredSizeMinimal() {
-		int w = battleField.getWidth();
-		int h = battleField.getHeight();
+	private Dimension getPreferredSizeMinimal(float scale) {
+		int w = (int) (battleField.getWidth() * scale);
+		int h = (int) (battleField.getHeight() * scale);
 
 		if (w > 1000 || h > 1000) {
-			float scale = Math.min(1000f / w, 1000f / h);
-			w *= scale;
-			h *= scale;
+			float s = Math.min(1000f / w, 1000f / h);
+			w *= s;
+			h *= s;
 		}
 		return new Dimension(w, h);
 	}
