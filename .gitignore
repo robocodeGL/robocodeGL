@@ -21,3 +21,4 @@ tools/lib
 /robocode.samples/src/main/resources/*.jar
 /screenshots
 /battles
+/robots
