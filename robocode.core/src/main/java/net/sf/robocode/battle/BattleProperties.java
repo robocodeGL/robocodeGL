@@ -42,7 +42,7 @@ public class BattleProperties implements Serializable {
 
 	private int battlefieldWidth = 800;
 	private int battlefieldHeight = 600;
-	private int numRounds = 10;
+	private int numRounds = 35;
 	private double gunCoolingRate = 0.1;
 	private long inactivityTime = 450;
 	private boolean hideEnemyNames = false;
@@ -339,7 +339,7 @@ public class BattleProperties implements Serializable {
 		gunCoolingRate = Double.parseDouble(props.getProperty(BATTLE_GUNCOOLINGRATE, "0.1"));
 		inactivityTime = Long.parseLong(props.getProperty(BATTLE_RULES_INACTIVITYTIME, "450"));
 		hideEnemyNames = Boolean.parseBoolean(props.getProperty(BATTLE_HIDE_ENEMY_NAMES, "false"));
-		numRounds = Integer.parseInt(props.getProperty(BATTLE_NUMROUNDS, "10"));
+		numRounds = Integer.parseInt(props.getProperty(BATTLE_NUMROUNDS, "35"));
 		selectedRobots = props.getProperty(BATTLE_SELECTEDROBOTS, "");
 		initialPositions = props.getProperty(BATTLE_INITIAL_POSITIONS, "");
 		sentryBorderSize = Integer.parseInt(props.getProperty(BATTLE_SENTRY_BORDER_SIZE, "100"));
