@@ -31,7 +31,7 @@ public class EditorThemeProperties implements IEditorThemeProperties {
 
 	private static final String DEFAULT_THEME_NAME = EditorPropertiesManager.getEditorProperties().getThemeName();
 
-	private static final String DEFAULT_FONT_NAME = "Consolas"; // ""Monospaced";
+	private static final String DEFAULT_FONT_NAME = "Monospaced";
 	private static final int DEFAULT_FONT_SIZE = 14;
 
 	private static final Color DEFAULT_BACKGROUND_COLOR = Color.WHITE;
@@ -164,20 +164,10 @@ public class EditorThemeProperties implements IEditorThemeProperties {
 		EditorThemePropertiesManager.notifyThemeNameChanged(newName);
 	}
 
-	@SuppressWarnings("MagicConstant")
 	public Font getFont() {
-		String fontName = getFontName();
-		int style = getNormalTextStyle().getFontStyleFlags();
-		int fontSize = getFontSize();
-
-		Font font = Font.getFont(fontName);
-		if (font == null) {
-			return new Font("Monospaced", style, fontSize);
-		}
-
-		return font.deriveFont(style, (float) fontSize);
+		return new Font(getFontName(), getNormalTextStyle().getFontStyleFlags(), getFontSize());
 	}
-
+	
 	public void setFontName(String newName) {
 		this.fontName = newName;
 		EditorThemePropertiesManager.notifyFontNameChanged(newName);
