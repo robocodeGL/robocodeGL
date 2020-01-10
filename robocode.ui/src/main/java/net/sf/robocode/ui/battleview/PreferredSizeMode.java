@@ -12,6 +12,7 @@ package net.sf.robocode.ui.battleview;
  */
 public enum PreferredSizeMode {
 	MINIMAL,
+	SCALED,
 	SHRINK_TO_FIT,
 	KEEP_CURRENT,
 }

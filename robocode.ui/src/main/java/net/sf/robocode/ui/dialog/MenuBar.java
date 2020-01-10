@@ -1085,7 +1085,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		Promise.delayed(100).then(new Runnable() {
 			@Override
 			public void run() {
-				robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.MINIMAL);
+				robocodeFrame.resetRobocodeFrameSize(PreferredSizeMode.SCALED);
 			}
 		});
 	}
