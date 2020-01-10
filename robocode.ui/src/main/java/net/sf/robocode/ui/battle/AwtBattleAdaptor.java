@@ -235,24 +235,24 @@ public final class AwtBattleAdaptor {
 			// putSnapshot(event.getTurnSnapshot());
 			// }
 
-			final IRobotSnapshot[] robots = event.getTurnSnapshot().getRobots();
-
-			for (int i = 0; i < robots.length; i++) {
-				RobotSnapshot robot = (RobotSnapshot) robots[i];
-				final int r = i;
-				final String text = robot.getOutputStreamSnapshot();
-
-				if (text != null && text.length() != 0) {
-					robot.setOutputStreamSnapshot(null);
-					EventQueue.invokeLater(new Runnable() {
-						public void run() {
-							synchronized (snapshot) {
-								outCache[r].append(text);
-							}
-						}
-					});
-				}
-			}
+			// final IRobotSnapshot[] robots = event.getTurnSnapshot().getRobots();
+			//
+			// for (int i = 0; i < robots.length; i++) {
+			// 	RobotSnapshot robot = (RobotSnapshot) robots[i];
+			// 	final int r = i;
+			// 	final String text = robot.getOutputStreamSnapshot();
+			//
+			// 	if (text != null && text.length() != 0) {
+			// 		robot.setOutputStreamSnapshot(null);
+			// 		EventQueue.invokeLater(new Runnable() {
+			// 			public void run() {
+			// 				synchronized (snapshot) {
+			// 					outCache[r].append(text);
+			// 				}
+			// 			}
+			// 		});
+			// 	}
+			// }
 
 			// EventQueue.invokeLater(new Runnable() {
 			// 	public void run() {
