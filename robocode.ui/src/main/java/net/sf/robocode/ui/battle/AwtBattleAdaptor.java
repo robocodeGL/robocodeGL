@@ -54,7 +54,7 @@ public final class AwtBattleAdaptor {
 	private final AtomicInteger lastMajorEvent;
 	private ITurnSnapshot lastSnapshot;
 	private ITurnSnapshot lastLastSnapshot;
-	private StringBuilder[] outCache;
+	// private StringBuilder[] outCache;
 
 	private ITurnSnapshot last;
 
@@ -160,32 +160,32 @@ public final class AwtBattleAdaptor {
 					lastSnapshot = current;
 					lastLastSnapshot = turn.last;
 
-					IRobotSnapshot[] robots = null;
+					// IRobotSnapshot[] robots = null;
 
-					if (readoutText) {
-						synchronized (snapshot) {
-							robots = lastSnapshot.getRobots();
-
-							for (int i = 0; i < robots.length; i++) {
-								RobotSnapshot robot = (RobotSnapshot) robots[i];
-
-								final StringBuilder cache = outCache[i];
-
-								if (cache.length() > 0) {
-									robot.setOutputStreamSnapshot(cache.toString());
-									outCache[i].setLength(0);
-								}
-							}
-						}
-					}
+					// if (readoutText) {
+					// 	synchronized (snapshot) {
+					// 		robots = lastSnapshot.getRobots();
+					//
+					// 		for (int i = 0; i < robots.length; i++) {
+					// 			RobotSnapshot robot = (RobotSnapshot) robots[i];
+					//
+					// 			final StringBuilder cache = outCache[i];
+					//
+					// 			if (cache.length() > 0) {
+					// 				robot.setOutputStreamSnapshot(cache.toString());
+					// 				outCache[i].setLength(0);
+					// 			}
+					// 		}
+					// 	}
+					// }
 
 					battleEventDispatcher.onTurnEnded(new TurnEndedEvent(lastSnapshot));
 
-					if (readoutText) {
-						for (IRobotSnapshot robot : robots) {
-							((RobotSnapshot) robot).setOutputStreamSnapshot(null);
-						}
-					}
+					// if (readoutText) {
+					// 	for (IRobotSnapshot robot : robots) {
+					// 		((RobotSnapshot) robot).setOutputStreamSnapshot(null);
+					// 	}
+					// }
 
 					calculateFPS();
 
@@ -292,12 +292,12 @@ public final class AwtBattleAdaptor {
 			majorEvent.incrementAndGet();
 			EventQueue.invokeLater(new Runnable() {
 				public void run() {
-					synchronized (snapshot) {
-						outCache = new StringBuilder[event.getRobotsCount()];
-						for (int i = 0; i < event.getRobotsCount(); i++) {
-							outCache[i] = new StringBuilder(1024);
-						}
-					}
+					// synchronized (snapshot) {
+					// 	outCache = new StringBuilder[event.getRobotsCount()];
+					// 	for (int i = 0; i < event.getRobotsCount(); i++) {
+					// 		outCache[i] = new StringBuilder(1024);
+					// 	}
+					// }
 
 					battleEventDispatcher.onBattleStarted(event);
 					lastMajorEvent.incrementAndGet();
