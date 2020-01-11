@@ -239,7 +239,7 @@ public class ImageManager implements IImageManager {
 		if (img == null) {
 			if (USE_GL2_IMAGE) {
 				img = new RenderImageRegion(getColoredGl2RobotImage(color),
-					125, 88, 197, 214, GL2_ROBOT_SCALE);
+					2, 100, 205, 230, GL2_ROBOT_SCALE);
 			} else {
 				img = new RenderImage(ImageUtil.createColouredRobotImage(getBodyImage(), new Color(color, true)));
 			}
@@ -254,7 +254,7 @@ public class ImageManager implements IImageManager {
 		if (img == null) {
 			if (USE_GL2_IMAGE) {
 				img = new RenderImageRegion(getColoredGl2RobotImage(color),
-					2, 2, 121, 300, GL2_ROBOT_SCALE);
+					209, 30, 121, 300, GL2_ROBOT_SCALE);
 			} else {
 				img = new RenderImage(ImageUtil.createColouredRobotImage(getGunImage(), new Color(color, true)));
 			}
@@ -269,7 +269,7 @@ public class ImageManager implements IImageManager {
 		if (img == null) {
 			if (USE_GL2_IMAGE) {
 				img = new RenderImageRegion(getColoredGl2RobotImage(color),
-					324, 206, 151, 96, GL2_ROBOT_SCALE);
+					2, 2, 151, 96, GL2_ROBOT_SCALE);
 			} else {
 				img = new RenderImage(ImageUtil.createColouredRobotImage(getRadarImage(), new Color(color, true)));
 			}
