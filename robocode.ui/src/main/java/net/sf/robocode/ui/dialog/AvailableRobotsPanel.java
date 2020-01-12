@@ -66,15 +66,18 @@ public class AvailableRobotsPanel extends JPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), title));
 		setLayout(new BorderLayout());
 
 		JPanel top = new JPanel();
 
+		top.setOpaque(false);
 		top.setLayout(new GridLayout(1, 2));
 
 		JPanel a = new JPanel();
 
+		a.setOpaque(false);
 		a.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Packages"));
 		a.setLayout(new BorderLayout());
 		a.add(getAvailablePackagesScrollPane());
@@ -83,6 +86,7 @@ public class AvailableRobotsPanel extends JPanel {
 
 		JPanel b = new JPanel();
 
+		b.setOpaque(false);
 		b.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEmptyBorder(), "Robots"));
 		b.setLayout(new BorderLayout());
 		b.add(getAvailableRobotsScrollPane());
@@ -93,6 +97,7 @@ public class AvailableRobotsPanel extends JPanel {
 
 		JLabel refreshLabel = new JLabel("Press " + ShortcutUtil.getModifierKeyText() + "+R to refresh");
 
+		refreshLabel.setOpaque(false);
 		refreshLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		add(refreshLabel, BorderLayout.SOUTH);
 	}

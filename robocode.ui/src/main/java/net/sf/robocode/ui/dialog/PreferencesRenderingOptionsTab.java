@@ -53,6 +53,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		eventHandler = new EventHandler();
 
 		setLayout(new GridLayout(1, 3));

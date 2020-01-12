@@ -65,6 +65,7 @@ public class RobotDescriptionPanel extends JPanel {
 	private JLabel getFilePathLabel() {
 		if (filePathLabel == null) {
 			filePathLabel = new JLabel();
+			filePathLabel.setOpaque(false);
 			filePathLabel.setText(" ");
 		}
 		return filePathLabel;
@@ -73,6 +74,7 @@ public class RobotDescriptionPanel extends JPanel {
 	private JLabel getDescriptionLabel(int index) {
 		if (descriptionLabel[index] == null) {
 			descriptionLabel[index] = new JLabel();
+			descriptionLabel[index].setOpaque(false);
 			descriptionLabel[index].setFont(new Font("Monospaced", Font.PLAIN, 12));
 			descriptionLabel[index].setHorizontalAlignment(SwingConstants.LEFT);
 			descriptionLabel[index].setText(BLANK_STRING);
@@ -83,6 +85,7 @@ public class RobotDescriptionPanel extends JPanel {
 	private JPanel getDescriptionPanel() {
 		if (descriptionPanel == null) {
 			descriptionPanel = new JPanel();
+			descriptionPanel.setOpaque(false);
 			descriptionPanel.setAlignmentY(Component.CENTER_ALIGNMENT);
 			descriptionPanel.setLayout(new BoxLayout(descriptionPanel, BoxLayout.Y_AXIS));
 			descriptionPanel.setBorder(BorderFactory.createEtchedBorder());
@@ -107,6 +110,7 @@ public class RobotDescriptionPanel extends JPanel {
 	private JLabel getRobocodeVersionLabel() {
 		if (robocodeVersionLabel == null) {
 			robocodeVersionLabel = new JLabel();
+			robocodeVersionLabel.setOpaque(false);
 		}
 		return robocodeVersionLabel;
 	}
@@ -114,6 +118,7 @@ public class RobotDescriptionPanel extends JPanel {
 	private JLabel getRobotNameLabel() {
 		if (robotNameLabel == null) {
 			robotNameLabel = new JLabel();
+			robotNameLabel.setOpaque(false);
 			robotNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
 			robotNameLabel.setText(" ");
 		}
@@ -121,35 +126,42 @@ public class RobotDescriptionPanel extends JPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
 
 		JPanel p = new JPanel();
 
+		p.setOpaque(false);
 		p.setLayout(new BorderLayout());
 		p.add(getRobotNameLabel(), BorderLayout.CENTER);
 
 		JPanel q = new JPanel();
 
+		q.setOpaque(false);
 		q.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		q.add(getRobocodeVersionLabel());
 		p.add(q, BorderLayout.EAST);
 
 		q = new JPanel();
+		q.setOpaque(false);
 		q.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		p.add(q, BorderLayout.WEST);
 		add(p);
 
 		p = new JPanel();
+		p.setOpaque(false);
 		p.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		p.add(getDescriptionPanel());
 		add(p);
 
 		p = new JPanel();
+		p.setOpaque(false);
 		p.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		p.add(getWebpageButton());
 		add(p);
 
 		p = new JPanel();
+		p.setOpaque(false);
 		p.setLayout(new FlowLayout(FlowLayout.CENTER, 1, 1));
 		p.add(getFilePathLabel());
 		add(p);
