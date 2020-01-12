@@ -29,6 +29,7 @@ import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
 
 import java.awt.EventQueue;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -410,15 +411,17 @@ public final class AwtBattleAdaptor {
 		}
 	}
 
-	public void signalPauseBattle() {
-		ArrayList<Turn> c = new ArrayList<Turn>();
+	public void signalPauseBattle(boolean fastPause) {
+		if (fastPause && isSyncFrame()) {
+			ArrayList<Turn> c = new ArrayList<Turn>();
 
-		synchronized (pendingTurns) {
-			synchronized (snapshot) {
-				pauseInUI = true;
-				snapshot.drainTo(c);
+			synchronized (pendingTurns) {
+				synchronized (snapshot) {
+					pauseInUI = true;
+					snapshot.drainTo(c);
+				}
+				pendingTurns.addAll(c);
 			}
-			pendingTurns.addAll(c);
 		}
 	}
 
@@ -439,7 +442,9 @@ public final class AwtBattleAdaptor {
 		this.last = turnSnapshot;
 
 		final Turn turn = new Turn(last, turnSnapshot);
-		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
+		if (blocking && isSyncFrame()) {
+			readTextFromCache(turn);
+
 			try {
 				if (!pauseInUI) { // fast path, no need to lock
 					pausablePut(turn);
@@ -462,20 +467,7 @@ public final class AwtBattleAdaptor {
 				// noinspection SynchronizationOnLocalVariableOrMethodParameter
 				synchronized (turn) {
 					if (snapshot.offer(turn)) {
-						final IRobotSnapshot[] robots = turn.current.getRobots();
-
-						for (int i = 0; i < robots.length; i++) {
-							RobotSnapshot robot = (RobotSnapshot) robots[i];
-
-							synchronized (outCacheLock) { // lock unnecessary since only called from battle thread
-								final StringBuilder cache = outCache[i];
-
-								if (cache.length() > 0) {
-									robot.setOutputStreamSnapshot(cache.toString());
-									outCache[i].setLength(0);
-								}
-							}
-						}
+						readTextFromCache(turn);
 					} else {
 						final IRobotSnapshot[] robots = turn.current.getRobots();
 
@@ -492,6 +484,31 @@ public final class AwtBattleAdaptor {
 							}
 						}
 					}
+				}
+			}
+		}
+	}
+
+	private boolean isSyncFrame() {
+		return frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1;
+	}
+
+	private void readTextFromCache(Turn turn) {
+		final IRobotSnapshot[] robots = turn.current.getRobots();
+
+		for (int i = 0; i < robots.length; i++) {
+			RobotSnapshot robot = (RobotSnapshot) robots[i];
+
+			synchronized (outCacheLock) { // lock unnecessary since only called from battle thread
+				final StringBuilder cache = outCache[i];
+
+				if (cache.length() > 0) {
+					final String text = robot.getOutputStreamSnapshot();
+					if (text != null && text.length() != 0) {
+						outCache[i].append(text);
+					}
+					robot.setOutputStreamSnapshot(cache.toString());
+					outCache[i].setLength(0);
 				}
 			}
 		}
