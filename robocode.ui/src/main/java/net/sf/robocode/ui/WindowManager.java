@@ -553,8 +553,8 @@ public class WindowManager implements IWindowManagerExt {
 	}
 
 	@Override
-	public void signalPauseBattle() {
-		awtAdaptor.signalPauseBattle();
+	public void signalPauseBattle(boolean fastPause) {
+		awtAdaptor.signalPauseBattle(fastPause);
 	}
 
 	@Override
@@ -564,8 +564,9 @@ public class WindowManager implements IWindowManagerExt {
 
 	@Override
 	public void pauseBattle() {
+		boolean fastPause = battleManager.getEffectiveTPS() < 60.1;
 		battleManager.pauseBattle();
-		signalPauseBattle();
+		signalPauseBattle(fastPause);
 	}
 
 	private void importRobots(List<File> files) {

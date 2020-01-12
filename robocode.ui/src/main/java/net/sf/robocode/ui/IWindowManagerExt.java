@@ -73,7 +73,7 @@ public interface IWindowManagerExt extends IWindowManager {
 
 	void signalStopBattle();
 
-	void signalPauseBattle();
+	void signalPauseBattle(boolean fastPause);
 
 	void signalNextTurn();
 }

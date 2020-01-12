@@ -731,7 +731,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		longPressTimer.stop();
 		battleManager.setSlowMoMode(false);
 		battleManager.pauseIfResumedBattle();
-		windowManager.signalPauseBattle();
+		windowManager.signalPauseBattle(true);
 	}
 
 	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
@@ -906,8 +906,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 
 	public void togglePause() {
+		boolean fastPause = battleManager.getEffectiveTPS() < 60.1;
 		if (battleManager.togglePauseResumeBattle()) {
-			windowManager.signalPauseBattle();
+			windowManager.signalPauseBattle(fastPause);
 		}
 	}
 
