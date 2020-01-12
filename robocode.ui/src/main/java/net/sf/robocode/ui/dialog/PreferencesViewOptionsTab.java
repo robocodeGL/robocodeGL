@@ -267,6 +267,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JPanel getTpsOptionsPanel() {
 		if (tpsOptionsPanel == null) {
 			tpsOptionsPanel = new JPanel();
+			tpsOptionsPanel.setOpaque(false);
 			tpsOptionsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Turns Per Second (TPS)"));
 			tpsOptionsPanel.setLayout(new GridBagLayout());
@@ -316,6 +317,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JPanel getVisibleOptionsPanel() {
 		if (visibleOptionsPanel == null) {
 			visibleOptionsPanel = new JPanel();
+			visibleOptionsPanel.setOpaque(false);
 			visibleOptionsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Arena"));
 			visibleOptionsPanel.setLayout(new GridBagLayout());
 
