@@ -408,6 +408,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		setLayout(new GridLayout(1, 2));
 		add(getVisibleOptionsPanel());
 		add(getTpsOptionsPanel());

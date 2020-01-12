@@ -54,6 +54,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	}
 
 	private void initialize() {
+		setOpaque(false);
 		setLayout(new GridLayout(1, 2));
 
 		add(getSoundOptionsPanel());
