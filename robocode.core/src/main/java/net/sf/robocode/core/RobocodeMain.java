@@ -255,6 +255,8 @@ public final class RobocodeMain extends RobocodeMainBase {
 			} else if (currentArg.equals("-?") || currentArg.equalsIgnoreCase("-help")) {
 				printUsage();
 				System.exit(0);
+			} else if (currentArg.startsWith("-NS")) {
+				i++;
 			} else {
 				Logger.logError("Not understood: " + currentArg);
 				printUsage();
