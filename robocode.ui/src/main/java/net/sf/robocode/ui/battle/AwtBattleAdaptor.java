@@ -30,8 +30,8 @@ import robocode.control.snapshot.ITurnSnapshot;
 
 import java.awt.EventQueue;
 import java.util.ArrayList;
-import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
@@ -54,7 +54,9 @@ public final class AwtBattleAdaptor {
 	private final AtomicInteger lastMajorEvent;
 	private ITurnSnapshot lastSnapshot;
 	private ITurnSnapshot lastLastSnapshot;
-	// private StringBuilder[] outCache;
+	private StringBuilder[] outCache;
+
+	private final Object outCacheLock = new Object();
 
 	private ITurnSnapshot last;
 
@@ -64,7 +66,7 @@ public final class AwtBattleAdaptor {
 	private final AtomicLong nextTurnCount = new AtomicLong(0L);
 
 
-	private final BlockingQueue<Turn> pendingTurns = new ArrayBlockingQueue<Turn>(16);
+	private final BlockingQueue<Turn> pendingTurns = new LinkedBlockingDeque<Turn>();
 
 	public AwtBattleAdaptor(IBattleManager battleManager, ISettingsManager properties, int maxFps, boolean skipSameFrames) {
 		this.battleManager = battleManager;
@@ -148,48 +150,51 @@ public final class AwtBattleAdaptor {
 
 			if (turn == null) return forceRepaint;
 
-			ITurnSnapshot current = turn.current;
+			// noinspection SynchronizationOnLocalVariableOrMethodParameter
+			synchronized (turn) {
+				ITurnSnapshot current = turn.current;
 
-			if (current == null) { // !isRunning.get() ||
-				// paint logo
-				lastSnapshot = null;
-				lastLastSnapshot = null;
-				battleEventDispatcher.onTurnEnded(new TurnEndedEvent(null));
-			} else {
-				if (lastSnapshot != current || !skipSameFrames || forceRepaint) {
-					lastSnapshot = current;
-					lastLastSnapshot = turn.last;
+				if (current == null) { // !isRunning.get() ||
+					// paint logo
+					lastSnapshot = null;
+					lastLastSnapshot = null;
+					battleEventDispatcher.onTurnEnded(new TurnEndedEvent(null));
+				} else {
+					if (lastSnapshot != current || !skipSameFrames || forceRepaint) {
+						lastSnapshot = current;
+						lastLastSnapshot = turn.last;
 
-					// IRobotSnapshot[] robots = null;
+						// IRobotSnapshot[] robots = null;
 
-					// if (readoutText) {
-					// 	synchronized (snapshot) {
-					// 		robots = lastSnapshot.getRobots();
-					//
-					// 		for (int i = 0; i < robots.length; i++) {
-					// 			RobotSnapshot robot = (RobotSnapshot) robots[i];
-					//
-					// 			final StringBuilder cache = outCache[i];
-					//
-					// 			if (cache.length() > 0) {
-					// 				robot.setOutputStreamSnapshot(cache.toString());
-					// 				outCache[i].setLength(0);
-					// 			}
-					// 		}
-					// 	}
-					// }
+						// if (readoutText) {
+						// 	synchronized (snapshot) {
+						// 		robots = lastSnapshot.getRobots();
+						//
+						// 		for (int i = 0; i < robots.length; i++) {
+						// 			RobotSnapshot robot = (RobotSnapshot) robots[i];
+						//
+						// 			final StringBuilder cache = outCache[i];
+						//
+						// 			if (cache.length() > 0) {
+						// 				robot.setOutputStreamSnapshot(cache.toString());
+						// 				outCache[i].setLength(0);
+						// 			}
+						// 		}
+						// 	}
+						// }
 
-					battleEventDispatcher.onTurnEnded(new TurnEndedEvent(lastSnapshot));
+						battleEventDispatcher.onTurnEnded(new TurnEndedEvent(lastSnapshot));
 
-					// if (readoutText) {
-					// 	for (IRobotSnapshot robot : robots) {
-					// 		((RobotSnapshot) robot).setOutputStreamSnapshot(null);
-					// 	}
-					// }
+						// if (readoutText) {
+						// 	for (IRobotSnapshot robot : robots) {
+						// 		((RobotSnapshot) robot).setOutputStreamSnapshot(null);
+						// 	}
+						// }
 
-					calculateFPS();
+						calculateFPS();
 
-					return true;
+						return true;
+					}
 				}
 			}
 		} catch (Throwable t) {
@@ -281,6 +286,13 @@ public final class AwtBattleAdaptor {
 
 		@Override
 		public void onBattleStarted(final BattleStartedEvent event) {
+			synchronized (outCacheLock) {
+				outCache = new StringBuilder[event.getRobotsCount()];
+				for (int i = 0; i < event.getRobotsCount(); i++) {
+					outCache[i] = new StringBuilder(1024);
+				}
+			}
+
 			snapshot.clear();
 			pendingTurns.clear();
 			lastSnapshot = null;
@@ -427,7 +439,7 @@ public final class AwtBattleAdaptor {
 		final ITurnSnapshot last = this.last;
 		this.last = turnSnapshot;
 
-		Turn turn = new Turn(last, turnSnapshot);
+		final Turn turn = new Turn(last, turnSnapshot);
 		if (blocking && frameSync && battleManager.isManagedTPS() && battleManager.getEffectiveTPS() < 60.1) {
 			try {
 				if (!pauseInUI) { // fast path, no need to lock
@@ -448,7 +460,40 @@ public final class AwtBattleAdaptor {
 					pendingTurns.offer(turn);
 				}
 			} else {
-				snapshot.offer(turn);
+				// noinspection SynchronizationOnLocalVariableOrMethodParameter
+				synchronized (turn) {
+					if (snapshot.offer(turn)) {
+						final IRobotSnapshot[] robots = turn.current.getRobots();
+
+						for (int i = 0; i < robots.length; i++) {
+							RobotSnapshot robot = (RobotSnapshot) robots[i];
+
+							synchronized (outCacheLock) { // lock unnecessary since only called from battle thread
+								final StringBuilder cache = outCache[i];
+
+								if (cache.length() > 0) {
+									robot.setOutputStreamSnapshot(cache.toString());
+									outCache[i].setLength(0);
+								}
+							}
+						}
+					} else {
+						final IRobotSnapshot[] robots = turn.current.getRobots();
+
+						for (int i = 0; i < robots.length; i++) {
+							RobotSnapshot robot = (RobotSnapshot) robots[i];
+							final int r = i;
+							final String text = robot.getOutputStreamSnapshot();
+
+							if (text != null && text.length() != 0) {
+								synchronized (outCacheLock) { // lock unnecessary since only called from battle thread
+									robot.setOutputStreamSnapshot(null);
+									outCache[r].append(text);
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	}
