@@ -33,6 +33,9 @@ public final class ConsoleScrollPane extends JScrollPane {
 
 	public ConsoleScrollPane() {
 		super();
+
+		setBorder(BorderFactory.createEmptyBorder());
+
 		setViewportView(getTextPane());
 	}
 
