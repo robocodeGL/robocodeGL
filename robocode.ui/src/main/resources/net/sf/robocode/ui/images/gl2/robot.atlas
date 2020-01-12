@@ -18,7 +18,7 @@ radar11
   orig: 151, 96
   offset: 0, 0
   index: -1
-turret9
+turret10
   rotate: false
   xy: 209, 30
   size: 121, 300
