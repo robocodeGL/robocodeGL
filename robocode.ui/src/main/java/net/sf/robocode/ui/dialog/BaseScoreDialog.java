@@ -147,13 +147,11 @@ public abstract class BaseScoreDialog extends JDialog {
 		int maxScoreColWidth = 0;
 
 		for (int x = 0; x < getTableModel().getColumnCount(); x++) {
-			if (x != 1) {
-				getTable().getColumnModel().getColumn(x).setCellRenderer(new ResultsTableCellRenderer(false));
-			}
+			getTable().getColumnModel().getColumn(x).setCellRenderer(new ResultsTableCellRenderer(false, x != 1));
 			TableColumn column = getTable().getColumnModel().getColumn(x);
 			Component comp;
 
-			column.setHeaderRenderer(new ResultsTableCellRenderer(true));
+			column.setHeaderRenderer(new ResultsTableCellRenderer(true, true));
 			comp = column.getHeaderRenderer().getTableCellRendererComponent(null, column.getHeaderValue(), false, false,
 					0, 0);
 			int width = comp.getPreferredSize().width;
