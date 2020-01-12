@@ -68,7 +68,10 @@ public final class ConsoleScrollPane extends JScrollPane {
 			table.setBackground(Color.DARK_GRAY);
 			table.setGridColor(Color.DARK_GRAY);
 			table.setShowGrid(false);
+			table.setIntercellSpacing(new Dimension(0, 0));
 			table.setForeground(Color.WHITE);
+
+			table.getColumnModel().getColumn(0).setCellRenderer(new ConsoleTableCellRenderer());
 
 			table.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
 		}
