@@ -66,6 +66,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JPanel getSoundOptionsPanel() {
 		if (soundOptionsPanel == null) {
 			soundOptionsPanel = new JPanel();
+			soundOptionsPanel.setOpaque(false);
 			soundOptionsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Sound Effects"));
 
@@ -178,6 +179,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JPanel getMixerOptionsPanel() {
 		if (mixerOptionsPanel == null) {
 			mixerOptionsPanel = new JPanel();
+			mixerOptionsPanel.setOpaque(false);
 			mixerOptionsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Mixer"));
 
 			mixerOptionsPanel.setLayout(new GridBagLayout());

@@ -67,6 +67,7 @@ public class PreferencesDevelopmentOptionsTab extends WizardPanel {
 	private JPanel getOptionsPanel() {
 		if (optionsPanel == null) {
 			optionsPanel = new JPanel();
+			optionsPanel.setOpaque(false);
 			optionsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Development"));
 
 			GridBagLayout layout = new GridBagLayout();

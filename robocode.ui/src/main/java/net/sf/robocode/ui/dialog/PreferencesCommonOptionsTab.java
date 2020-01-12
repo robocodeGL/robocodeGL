@@ -49,6 +49,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 	private JPanel getOptionsPanel() {
 		if (optionsPanel == null) {
 			optionsPanel = new JPanel();
+			optionsPanel.setOpaque(false);
 			optionsPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Common"));
 			optionsPanel.setLayout(new BoxLayout(optionsPanel, BoxLayout.Y_AXIS));
 			optionsPanel.add(getNotifyAboutBetaVersionsCheckBox());

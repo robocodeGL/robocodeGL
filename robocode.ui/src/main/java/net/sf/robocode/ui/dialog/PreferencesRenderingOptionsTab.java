@@ -68,6 +68,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JPanel getSpecificSettingsPanel() {
 		if (specificSettingsPanel == null) {
 			specificSettingsPanel = new JPanel();
+			specificSettingsPanel.setOpaque(false);
 			specificSettingsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Specific settings"));
 			specificSettingsPanel.setLayout(new GridBagLayout());
@@ -121,6 +122,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JPanel getPredefinedSettingsPanel() {
 		if (predefinedSettingsPanel == null) {
 			predefinedSettingsPanel = new JPanel();
+			predefinedSettingsPanel.setOpaque(false);
 			predefinedSettingsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Predefined settings"));
 			predefinedSettingsPanel.setLayout(new GridBagLayout());
@@ -151,6 +153,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JPanel getOtherSettingsPanel() {
 		if (otherSettingsPanel == null) {
 			otherSettingsPanel = new JPanel();
+			otherSettingsPanel.setOpaque(false);
 			otherSettingsPanel.setBorder(
 					BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Other settings"));
 			otherSettingsPanel.setLayout(new BoxLayout(otherSettingsPanel, BoxLayout.Y_AXIS));
