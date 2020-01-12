@@ -29,7 +29,6 @@ import robocode.control.snapshot.IRobotSnapshot;
 import robocode.control.snapshot.ITurnSnapshot;
 
 import java.awt.EventQueue;
-import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -154,48 +153,48 @@ public final class AwtBattleAdaptor {
 			synchronized (turn) {
 				ITurnSnapshot current = turn.current;
 
-				if (current == null) { // !isRunning.get() ||
-					// paint logo
-					lastSnapshot = null;
-					lastLastSnapshot = null;
-					battleEventDispatcher.onTurnEnded(new TurnEndedEvent(null));
-				} else {
-					if (lastSnapshot != current || !skipSameFrames || forceRepaint) {
-						lastSnapshot = current;
-						lastLastSnapshot = turn.last;
+				// if (current == null) { // !isRunning.get() ||
+				// 	// paint logo
+				// 	lastSnapshot = null;
+				// 	lastLastSnapshot = null;
+				// 	battleEventDispatcher.onTurnEnded(new TurnEndedEvent(null));
+				// } else {
+				if (lastSnapshot != current) {
+					lastSnapshot = current;
+					lastLastSnapshot = turn.last;
 
-						// IRobotSnapshot[] robots = null;
+					// IRobotSnapshot[] robots = null;
 
-						// if (readoutText) {
-						// 	synchronized (snapshot) {
-						// 		robots = lastSnapshot.getRobots();
-						//
-						// 		for (int i = 0; i < robots.length; i++) {
-						// 			RobotSnapshot robot = (RobotSnapshot) robots[i];
-						//
-						// 			final StringBuilder cache = outCache[i];
-						//
-						// 			if (cache.length() > 0) {
-						// 				robot.setOutputStreamSnapshot(cache.toString());
-						// 				outCache[i].setLength(0);
-						// 			}
-						// 		}
-						// 	}
-						// }
+					// if (readoutText) {
+					// 	synchronized (snapshot) {
+					// 		robots = lastSnapshot.getRobots();
+					//
+					// 		for (int i = 0; i < robots.length; i++) {
+					// 			RobotSnapshot robot = (RobotSnapshot) robots[i];
+					//
+					// 			final StringBuilder cache = outCache[i];
+					//
+					// 			if (cache.length() > 0) {
+					// 				robot.setOutputStreamSnapshot(cache.toString());
+					// 				outCache[i].setLength(0);
+					// 			}
+					// 		}
+					// 	}
+					// }
 
-						battleEventDispatcher.onTurnEnded(new TurnEndedEvent(lastSnapshot));
+					battleEventDispatcher.onTurnEnded(new TurnEndedEvent(current));
 
-						// if (readoutText) {
-						// 	for (IRobotSnapshot robot : robots) {
-						// 		((RobotSnapshot) robot).setOutputStreamSnapshot(null);
-						// 	}
-						// }
+					// if (readoutText) {
+					// 	for (IRobotSnapshot robot : robots) {
+					// 		((RobotSnapshot) robot).setOutputStreamSnapshot(null);
+					// 	}
+					// }
 
-						calculateFPS();
+					calculateFPS();
 
-						return true;
-					}
+					return true;
 				}
+				// }
 			}
 		} catch (Throwable t) {
 			Logger.logError(t);
