@@ -8,6 +8,9 @@
 package net.sf.robocode.ui.dialog;
 
 
+import net.sf.robocode.core.Container;
+import net.sf.robocode.ui.font.IFontManager;
+
 import javax.swing.BorderFactory;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -29,7 +32,8 @@ public final class ConsoleTableCellRenderer extends DefaultTableCellRenderer {
 		super();
 		setLayout(new FlowLayout(FlowLayout.CENTER, 0, 0));
 		setBorder(BorderFactory.createEmptyBorder());
-		setFont(new Font("Consolas", Font.PLAIN, 13));
+		IFontManager fontManager = Container.getComponent(IFontManager.class);
+		setFont(new Font(fontManager == null ? Font.MONOSPACED : fontManager.getMonospacedFont(), Font.PLAIN, 13));
 	}
 
 	@Override
