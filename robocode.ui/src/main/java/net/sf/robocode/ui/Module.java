@@ -13,6 +13,8 @@ import net.sf.robocode.core.Container;
 import net.sf.robocode.ui.battleview.BattleView;
 import net.sf.robocode.ui.battleview.InteractiveHandler;
 import net.sf.robocode.ui.dialog.*;
+import net.sf.robocode.ui.font.FontManager;
+import net.sf.robocode.ui.font.IFontManager;
 import net.sf.robocode.ui.packager.RobotPackager;
 
 
@@ -28,6 +30,7 @@ public class Module extends BaseModule {
 		Container.cache.addComponent(IImageManager.class, ImageManager.class);
 		Container.cache.addComponent(IRobotDialogManager.class, RobotDialogManager.class);
 		Container.cache.addComponent(IWindowManagerExt.class, WindowManager.class);
+		Container.cache.addComponent(IFontManager.class, FontManager.class);
 		Container.cache.addComponent(InteractiveHandler.class);
 		Container.cache.addComponent(PreferencesDialog.class);
 		Container.cache.addComponent(RankingDialog.class);
