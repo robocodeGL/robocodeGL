@@ -724,6 +724,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		setControlsVisible(!properties.getOptionsUiHideControls());
 
 		properties.addPropertyListener(this);
+
+		setBackground(Color.black);
 	}
 
 	private void stopSlowMoMode() {
