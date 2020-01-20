@@ -211,6 +211,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		if (displayFpsCheckBox == null) {
 			displayFpsCheckBox = new JCheckBox("Display FPS in titlebar");
 			displayFpsCheckBox.setMnemonic('P');
+			displayFpsCheckBox.setOpaque(false);
 			displayFpsCheckBox.setDisplayedMnemonicIndex(9);
 		}
 		return displayFpsCheckBox;
@@ -220,6 +221,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 		if (displayTpsCheckBox == null) {
 			displayTpsCheckBox = new JCheckBox("Display TPS in titlebar");
 			displayTpsCheckBox.setMnemonic('T');
+			displayTpsCheckBox.setOpaque(false);
 			displayTpsCheckBox.setDisplayedMnemonicIndex(8);
 		}
 		return displayTpsCheckBox;
@@ -260,6 +262,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getPreventSpeedupWhenMinimizedCheckBox() {
 		if (preventSpeedupWhenMinimizedCheckBox == null) {
 			preventSpeedupWhenMinimizedCheckBox = new JCheckBox("Prevent speedup when minimized");
+			preventSpeedupWhenMinimizedCheckBox.setOpaque(false);
 		}
 		return preventSpeedupWhenMinimizedCheckBox;
 	}
@@ -282,6 +285,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 			tpsOptionsPanel.add(getDisplayFpsCheckBox(), c);
 
 			JPanel tpsPanel = new JPanel();
+			tpsPanel.setOpaque(false);
 
 			tpsPanel.add(getDesiredTpsLabel());
 			tpsPanel.add(getDesiredTpsTextField());
@@ -350,6 +354,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleRobotEnergyCheckBox() {
 		if (visibleRobotEnergyCheckBox == null) {
 			visibleRobotEnergyCheckBox = new JCheckBox("Visible Robot Energy");
+			visibleRobotEnergyCheckBox.setOpaque(false);
 			visibleRobotEnergyCheckBox.setMnemonic('y');
 			visibleRobotEnergyCheckBox.setDisplayedMnemonicIndex(19);
 		}
@@ -359,6 +364,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleRobotNameCheckBox() {
 		if (visibleRobotNameCheckBox == null) {
 			visibleRobotNameCheckBox = new JCheckBox("Visible Robot Name");
+			visibleRobotNameCheckBox.setOpaque(false);
 			visibleRobotNameCheckBox.setMnemonic('V');
 		}
 		return visibleRobotNameCheckBox;
@@ -367,6 +373,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleScanArcsCheckBox() {
 		if (visibleScanArcsCheckBox == null) {
 			visibleScanArcsCheckBox = new JCheckBox("Visible Scan Arcs");
+			visibleScanArcsCheckBox.setOpaque(false);
 			visibleScanArcsCheckBox.setMnemonic('b');
 			visibleScanArcsCheckBox.setDisplayedMnemonicIndex(4);
 		}
@@ -376,6 +383,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleExplosionsCheckBox() {
 		if (visibleExplosionsCheckBox == null) {
 			visibleExplosionsCheckBox = new JCheckBox("Visible Explosions");
+			visibleExplosionsCheckBox.setOpaque(false);
 			visibleExplosionsCheckBox.setMnemonic('x');
 			visibleExplosionsCheckBox.setDisplayedMnemonicIndex(9);
 		}
@@ -385,6 +393,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleGroundCheckBox() {
 		if (visibleGroundCheckBox == null) {
 			visibleGroundCheckBox = new JCheckBox("Visible Ground");
+			visibleGroundCheckBox.setOpaque(false);
 			visibleGroundCheckBox.setMnemonic('G');
 			visibleGroundCheckBox.setDisplayedMnemonicIndex(8);
 		}
@@ -394,6 +403,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleExplosionDebrisCheckBox() {
 		if (visibleExplosionDebrisCheckBox == null) {
 			visibleExplosionDebrisCheckBox = new JCheckBox("Visible Explosion Debris");
+			visibleExplosionDebrisCheckBox.setOpaque(false);
 			visibleExplosionDebrisCheckBox.setMnemonic('E');
 			visibleExplosionDebrisCheckBox.setDisplayedMnemonicIndex(8);
 		}
@@ -403,6 +413,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JCheckBox getVisibleSentryBorderCheckBox() {
 		if (visibleSentryBorderCheckBox == null) {
 			visibleSentryBorderCheckBox = new JCheckBox("Visible Sentry Border");
+			visibleSentryBorderCheckBox.setOpaque(false);
 			visibleSentryBorderCheckBox.setMnemonic('l');
 			visibleSentryBorderCheckBox.setDisplayedMnemonicIndex(5);
 		}
