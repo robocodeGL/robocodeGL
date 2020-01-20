@@ -120,6 +120,7 @@ public class PreferencesDevelopmentOptionsTab extends WizardPanel {
 	private JButton getAddButton() {
 		if (addButton == null) {
 			addButton = new JButton("Add");
+			addButton.setOpaque(false);
 			addButton.setDisplayedMnemonicIndex(2);
 			addButton.addActionListener(eventHandler);
 		}
@@ -129,6 +130,7 @@ public class PreferencesDevelopmentOptionsTab extends WizardPanel {
 	private JButton getRemoveButton() {
 		if (removeButton == null) {
 			removeButton = new JButton("Remove");
+			removeButton.setOpaque(false);
 			removeButton.setDisplayedMnemonicIndex(3);
 			removeButton.addActionListener(eventHandler);
 		}
