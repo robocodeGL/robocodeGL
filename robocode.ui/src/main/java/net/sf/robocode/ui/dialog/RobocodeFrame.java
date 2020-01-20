@@ -924,7 +924,9 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 	public void speedUp() {
 		int tps = properties.getOptionsBattleDesiredTPS() * 2;
-		if (12 <= tps && tps <= 16) {
+		if (tps == 8) {
+			tps = 7;
+		} else if (12 <= tps && tps <= 16) {
 			tps = 15;
 		} else if (tps > 1000) {
 			tps = 10000;
@@ -941,10 +943,12 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		int tps = tps0 / 2;
 		if (tps0 > 1000) {
 			tps = 960;
+		} else if (tps0 == 15) {
+			tps = 7;
+		} else if (tps0 == 7) {
+			tps = 4;
 		} else if (tps0 == 1) {
 			tps = 1;
-		} else if (tps0 == 15) {
-			tps = 8;
 		}
 		setTPS(tps, false);
 	}
