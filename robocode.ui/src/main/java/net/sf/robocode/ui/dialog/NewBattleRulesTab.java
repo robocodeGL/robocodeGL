@@ -69,6 +69,9 @@ public class NewBattleRulesTab extends JPanel {
 	}
 
 	public void setup(ISettingsManager settingsManager, BattleProperties battleProperties) {
+		setOpaque(false);
+		hideEnemyNamesCheckBox.setOpaque(false);
+
 		this.settingsManager = settingsManager;
 		this.battleProperties = battleProperties;
 
@@ -103,6 +106,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JPanel createBattlefieldSizePanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 		panel.addAncestorListener(eventHandler);
 		
 		Border border = BorderFactory.createCompoundBorder(
@@ -123,6 +127,7 @@ public class NewBattleRulesTab extends JPanel {
 	
 	private JPanel createBattlefieldSlidersPanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 
 		GroupLayout layout = new GroupLayout(panel);
 		panel.setLayout(layout);
@@ -157,6 +162,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JPanel createPredefinedSizesPanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 
 		Border border = BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 20, 0, 0),
 				BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), "Predefined Sizes"));
@@ -172,6 +178,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JPanel createRulesPanel() {
 		JPanel panel = new JPanel();
+		panel.setOpaque(false);
 
 		panel.addAncestorListener(new EventHandler());
 		panel.setBorder(BorderFactory.createEtchedBorder());
@@ -343,6 +350,7 @@ public class NewBattleRulesTab extends JPanel {
 
 	private JSlider createBattlefieldSizeSlider() {
 		JSlider slider = new JSlider();
+		slider.setOpaque(false);
 		slider.setMinimum(MIN_BATTLEFIELD_SIZE);
 		slider.setMaximum(MAX_BATTLEFIELD_SIZE);
 		slider.setMajorTickSpacing(BATTLEFIELD_STEP_SIZE);

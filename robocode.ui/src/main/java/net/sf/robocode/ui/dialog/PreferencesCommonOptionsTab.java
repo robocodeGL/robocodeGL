@@ -67,6 +67,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 	private JCheckBox getNotifyAboutBetaVersionsCheckBox() {
 		if (notifyAboutBetaVersionsCheckBox == null) {
 			notifyAboutBetaVersionsCheckBox = new JCheckBox("Notify about new Beta versions of Robocode");
+			notifyAboutBetaVersionsCheckBox.setOpaque(false);
 			notifyAboutBetaVersionsCheckBox.setMnemonic('B');
 			notifyAboutBetaVersionsCheckBox.setDisplayedMnemonicIndex(17);
 		}
@@ -76,6 +77,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 	private JCheckBox getShowResultsCheckBox() {
 		if (showResultsCheckBox == null) {
 			showResultsCheckBox = new JCheckBox("Show results when battle(s) ends");
+			showResultsCheckBox.setOpaque(false);
 			showResultsCheckBox.setMnemonic('h');
 			showResultsCheckBox.setDisplayedMnemonicIndex(1);
 		}
@@ -85,6 +87,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 	private JCheckBox getDontHideRankingsCheckBox() {
 		if (dontHideRankingsCheckBox == null) {
 			dontHideRankingsCheckBox = new JCheckBox("Don't hide current rankings when main window is minimized");
+			dontHideRankingsCheckBox.setOpaque(false);
 			dontHideRankingsCheckBox.setMnemonic('t');
 			dontHideRankingsCheckBox.setDisplayedMnemonicIndex(4);
 		}
@@ -94,6 +97,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 	private JCheckBox getAppendWhenSavingResultsCheckBox() {
 		if (appendWhenSavingResultsCheckBox == null) {
 			appendWhenSavingResultsCheckBox = new JCheckBox("Append when saving results");
+			appendWhenSavingResultsCheckBox.setOpaque(false);
 			appendWhenSavingResultsCheckBox.setMnemonic('A');
 		}
 		return appendWhenSavingResultsCheckBox;
@@ -102,6 +106,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 	private JCheckBox getEnableReplayRecordingCheckBox() {
 		if (enableReplayRecordingCheckBox == null) {
 			enableReplayRecordingCheckBox = new JCheckBox("Enable replay recording (uses memory and disk space)");
+			enableReplayRecordingCheckBox.setOpaque(false);
 			enableReplayRecordingCheckBox.setMnemonic('E');
 		}
 		return enableReplayRecordingCheckBox;
@@ -111,6 +116,7 @@ public class PreferencesCommonOptionsTab extends WizardPanel {
 		if (enableAutoRecordingCheckBox == null) {
 			enableAutoRecordingCheckBox = new JCheckBox(
 					"Enable auto recording (every finished battle is automatically saved into battles folder)");
+			enableAutoRecordingCheckBox.setOpaque(false);
 			enableAutoRecordingCheckBox.setMnemonic('u');
 			enableAutoRecordingCheckBox.setDisplayedMnemonicIndex(8);
 

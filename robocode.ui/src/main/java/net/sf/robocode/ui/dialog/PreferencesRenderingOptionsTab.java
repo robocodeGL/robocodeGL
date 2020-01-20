@@ -230,6 +230,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox getOptionsRenderingBufferImagesCheckBox() {
 		if (optionsRenderingBufferImagesCheckBox == null) {
 			optionsRenderingBufferImagesCheckBox = new JCheckBox("Buffer images (uses memory)");
+			optionsRenderingBufferImagesCheckBox.setOpaque(false);
 			optionsRenderingBufferImagesCheckBox.setMnemonic('i');
 			optionsRenderingBufferImagesCheckBox.setDisplayedMnemonicIndex(7);
 			optionsRenderingBufferImagesCheckBox.addActionListener(eventHandler);
@@ -240,6 +241,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox getOptionsRenderingForceBulletColorCheckBox() {
 		if (optionsRenderingForceBulletColorCheckBox == null) {
 			optionsRenderingForceBulletColorCheckBox = new JCheckBox("Make all bullets white");
+			optionsRenderingForceBulletColorCheckBox.setOpaque(false);
 			optionsRenderingForceBulletColorCheckBox.setMnemonic('M');
 			optionsRenderingForceBulletColorCheckBox.addActionListener(eventHandler);
 		}
@@ -249,6 +251,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox getOptionsRenderingAllowScaleUpCheckBox() {
 		if (optionsRenderingAllowScaleUpCheckBox == null) {
 			optionsRenderingAllowScaleUpCheckBox = new JCheckBox("Allow scaling battle view up");
+			optionsRenderingAllowScaleUpCheckBox.setOpaque(false);
 			optionsRenderingAllowScaleUpCheckBox.setMnemonic('S');
 			optionsRenderingAllowScaleUpCheckBox.addActionListener(eventHandler);
 		}
@@ -258,6 +261,7 @@ public class PreferencesRenderingOptionsTab extends WizardPanel {
 	private JCheckBox getOptionsMiscFpsMeterCheckBox() {
 		if (displayFpsMeterCheckBox == null) {
 			displayFpsMeterCheckBox = new JCheckBox("Display FPS Meter");
+			displayFpsMeterCheckBox.setOpaque(false);
 			displayFpsMeterCheckBox.setMnemonic('P');
 			displayFpsMeterCheckBox.setDisplayedMnemonicIndex(9);
 		}
