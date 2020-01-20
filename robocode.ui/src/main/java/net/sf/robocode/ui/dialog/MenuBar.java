@@ -62,6 +62,9 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 	private JMenuItem battleStopMenuItem;
 	private JMenuItem battleTogglePauseMenuItem;
 	private JMenuItem battleNextTurnMenuItem;
+	private JMenuItem battleSpeedUpMenuItem;
+	private JMenuItem battleNormalSpeedMenuItem;
+	private JMenuItem battleSlowDownMenuItem;
 	private JMenuItem battleExitMenuItem;
 	private JMenu battleRobotListMenu;
 	private JMenuItem battleRobotListEmptyMenuItem;
@@ -127,6 +130,12 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 				battleTogglePauseActionPerformed();
 			} else if (source == mb.getBattleNextTurnMenuItem()) {
 				battleNextTurnActionPerformed();
+			} else if (source == mb.getBattleSpeedUpMenuItem()) {
+				battleSpeedUpActionPerformed();
+			} else if (source == mb.getBattleNormalSpeedMenuItem()) {
+				battleNormalSpeedActionPerformed();
+			} else if (source == mb.getBattleSlowDownMenuItem()) {
+				battleSlowDownActionPerformed();
 			} else if (source == mb.getBattleOpenRecordMenuItem()) {
 				battleOpenRecordActionPerformed();
 			} else if (source == mb.getBattleImportRecordMenuItem()) {
@@ -338,6 +347,18 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 		robocodeFrame.pauseOrNextTurn();
 	}
 
+	private void battleSpeedUpActionPerformed() {
+		robocodeFrame.speedUp();
+	}
+
+	private void battleNormalSpeedActionPerformed() {
+		robocodeFrame.normalSpeed();
+	}
+
+	private void battleSlowDownActionPerformed() {
+		robocodeFrame.slowDown();
+	}
+
 	private void battleOpenRecordActionPerformed() {
 		try {
 			windowManager.pauseBattle();
@@ -471,6 +492,10 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleMenu.add(getBattleTogglePauseMenuItem());
 			battleMenu.add(getBattleNextTurnMenuItem());
 			battleMenu.add(new JSeparator());
+			battleMenu.add(getBattleSpeedUpMenuItem());
+			battleMenu.add(getBattleNormalSpeedMenuItem());
+			battleMenu.add(getBattleSlowDownMenuItem());
+			battleMenu.add(new JSeparator());
 			battleMenu.add(getBattleRobotListMenu());
 			battleMenu.add(getBattleMainBattleMenuItem());
 			battleMenu.add(new JSeparator());
@@ -584,6 +609,39 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			battleNextTurnMenuItem.addActionListener(eventHandler);
 		}
 		return battleNextTurnMenuItem;
+	}
+
+	public JMenuItem getBattleSpeedUpMenuItem() {
+		if (battleSpeedUpMenuItem == null) {
+			battleSpeedUpMenuItem = new JMenuItem();
+			battleSpeedUpMenuItem.setText("Speed Up");
+			battleSpeedUpMenuItem.setMnemonic('F');
+			battleSpeedUpMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F, 0, false));
+			battleSpeedUpMenuItem.addActionListener(eventHandler);
+		}
+		return battleSpeedUpMenuItem;
+	}
+
+	public JMenuItem getBattleNormalSpeedMenuItem() {
+		if (battleNormalSpeedMenuItem == null) {
+			battleNormalSpeedMenuItem = new JMenuItem();
+			battleNormalSpeedMenuItem.setText("Normal Speed");
+			battleNormalSpeedMenuItem.setMnemonic('d');
+			battleNormalSpeedMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_D, 0, false));
+			battleNormalSpeedMenuItem.addActionListener(eventHandler);
+		}
+		return battleNormalSpeedMenuItem;
+	}
+
+	public JMenuItem getBattleSlowDownMenuItem() {
+		if (battleSlowDownMenuItem == null) {
+			battleSlowDownMenuItem = new JMenuItem();
+			battleSlowDownMenuItem.setText("Slow Down");
+			battleSlowDownMenuItem.setMnemonic('S');
+			battleSlowDownMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0, false));
+			battleSlowDownMenuItem.addActionListener(eventHandler);
+		}
+		return battleSlowDownMenuItem;
 	}
 
 	public JMenu getBattleRobotListMenu() {
