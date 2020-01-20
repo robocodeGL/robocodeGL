@@ -178,7 +178,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			return lastSize == null ? getSize() : lastSize;
 		} else if (allowScaleUp && preferredSizeMode == PreferredSizeMode.SHRINK_TO_FIT) {
 			return getPreferredSizeShrinkToFit();
-		} else if (preferredSizeMode == PreferredSizeMode.SCALED) {
+		} else if (allowScaleUp && preferredSizeMode == PreferredSizeMode.SCALED) {
 			return getPreferredSizeMinimal(1.5f);
 		} else {
 			return getPreferredSizeMinimal(1f);
