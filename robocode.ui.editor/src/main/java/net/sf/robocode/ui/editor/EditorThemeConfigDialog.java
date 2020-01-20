@@ -930,7 +930,7 @@ public class EditorThemeConfigDialog extends JDialog {
 						"File already exists:\n" + file.getName() + "\nDo you want to overwrite this file?", "Warning",
 						JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 				
-				if (option == JOptionPane.NO_OPTION) {
+				if (option != JOptionPane.YES_OPTION) {
 					return;
 				}
 			} else {
