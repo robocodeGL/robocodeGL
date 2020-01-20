@@ -182,7 +182,8 @@ public class NewBattleRulesTab extends JPanel {
 		panel.setOpaque(false);
 
 		panel.addAncestorListener(new EventHandler());
-		panel.setBorder(BorderFactory.createEtchedBorder());
+		// panel.setBorder(BorderFactory.createEtchedBorder());
+		panel.setBorder(BorderFactory.createEmptyBorder());
 
 		GroupLayout layout = new GroupLayout(panel);
 		layout.setAutoCreateContainerGaps(true);
