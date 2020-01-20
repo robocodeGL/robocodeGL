@@ -791,10 +791,10 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 	}
 	
 	private final double[] sliderValues = new double[]{
-		0, 30, 40, 45, 53,  54,  56,  57,  58,  59,  60.9, 60.9001, MAX_TPS_SLIDER_VALUE,
+		0, 30, 40, 45, 50, 55,  56,  57,  58,  59,  60,  60.5, 60.5001, MAX_TPS_SLIDER_VALUE,
 	};
 	private final double[] tpsValues = new double[]{
-		0, 30, 50, 65, 100, 110, 150, 200, 300, 500, 1000, MAX_TPS, MAX_TPS,
+		0, 30, 45, 60, 90, 120, 150, 200, 300, 500, 960, 960,  MAX_TPS, MAX_TPS,
 	};
 	
 	private double linearTicksMapping(double x, double[] xs, double[] ys) {
