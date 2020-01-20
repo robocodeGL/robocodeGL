@@ -165,6 +165,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JButton getEnableAllSoundsButton() {
 		if (enableAllSoundsButton == null) {
 			enableAllSoundsButton = new JButton("Enable all");
+			enableAllSoundsButton.setOpaque(false);
 			enableAllSoundsButton.setMnemonic('a');
 			enableAllSoundsButton.setDisplayedMnemonicIndex(7);
 			enableAllSoundsButton.addActionListener(eventHandler);
@@ -175,6 +176,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JButton getDisableAllSoundsButton() {
 		if (disableAllSoundsButton == null) {
 			disableAllSoundsButton = new JButton("Disable all");
+			disableAllSoundsButton.setOpaque(false);
 			disableAllSoundsButton.setMnemonic('i');
 			disableAllSoundsButton.setDisplayedMnemonicIndex(1);
 			disableAllSoundsButton.addActionListener(eventHandler);
@@ -249,6 +251,7 @@ public class PreferencesSoundOptionsTab extends WizardPanel {
 	private JButton getMixerDefaultButton() {
 		if (mixerDefaultButton == null) {
 			mixerDefaultButton = new JButton("Default");
+			mixerDefaultButton.setOpaque(false);
 			mixerDefaultButton.setMnemonic('u');
 			mixerDefaultButton.setDisplayedMnemonicIndex(4);
 			mixerDefaultButton.addActionListener(eventHandler);

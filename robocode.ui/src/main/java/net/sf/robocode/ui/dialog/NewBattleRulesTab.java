@@ -71,6 +71,7 @@ public class NewBattleRulesTab extends JPanel {
 	public void setup(ISettingsManager settingsManager, BattleProperties battleProperties) {
 		setOpaque(false);
 		hideEnemyNamesCheckBox.setOpaque(false);
+		restoreDefaultsButton.setOpaque(false);
 
 		this.settingsManager = settingsManager;
 		this.battleProperties = battleProperties;
@@ -374,6 +375,7 @@ public class NewBattleRulesTab extends JPanel {
 			this.width = width;
 			this.height = height;
 			addActionListener(eventHandler);
+			this.setOpaque(false);
 		}
 	}
 

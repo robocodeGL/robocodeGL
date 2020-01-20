@@ -150,6 +150,7 @@ public class RobotSelectionPanel extends WizardPanel {
 	private JButton getAddAllButton() {
 		if (addAllButton == null) {
 			addAllButton = new JButton();
+			addAllButton.setOpaque(false);
 			addAllButton.setText("Add All ->");
 			addAllButton.setMnemonic('l');
 			addAllButton.setDisplayedMnemonicIndex(5);
@@ -161,6 +162,7 @@ public class RobotSelectionPanel extends WizardPanel {
 	private JButton getAddButton() {
 		if (addButton == null) {
 			addButton = new JButton();
+			addButton.setOpaque(false);
 			addButton.setText("Add ->");
 			addButton.setMnemonic('A');
 			addButton.addActionListener(eventHandler);
@@ -194,6 +196,7 @@ public class RobotSelectionPanel extends WizardPanel {
 	private JButton getRemoveAllButton() {
 		if (removeAllButton == null) {
 			removeAllButton = new JButton();
+			removeAllButton.setOpaque(false);
 			removeAllButton.setText("<- Remove All");
 			removeAllButton.setMnemonic('v');
 			removeAllButton.setDisplayedMnemonicIndex(7);
@@ -205,6 +208,7 @@ public class RobotSelectionPanel extends WizardPanel {
 	private JButton getRemoveButton() {
 		if (removeButton == null) {
 			removeButton = new JButton();
+			removeButton.setOpaque(false);
 			removeButton.setText("<- Remove");
 			removeButton.setMnemonic('m');
 			removeButton.setDisplayedMnemonicIndex(5);

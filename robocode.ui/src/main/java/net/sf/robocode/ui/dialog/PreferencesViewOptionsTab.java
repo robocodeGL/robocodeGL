@@ -137,6 +137,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getDefaultViewOptionsButton() {
 		if (defaultViewOptionsButton == null) {
 			defaultViewOptionsButton = new JButton("Defaults");
+			defaultViewOptionsButton.setOpaque(false);
 			defaultViewOptionsButton.setMnemonic('u');
 			defaultViewOptionsButton.setDisplayedMnemonicIndex(4);
 			defaultViewOptionsButton.addActionListener(eventHandler);
@@ -147,6 +148,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getEnableAllViewOptionsButton() {
 		if (enableAllViewOptionsButton == null) {
 			enableAllViewOptionsButton = new JButton("Enable all");
+			enableAllViewOptionsButton.setOpaque(false);
 			enableAllViewOptionsButton.setMnemonic('a');
 			enableAllViewOptionsButton.setDisplayedMnemonicIndex(7);
 			enableAllViewOptionsButton.addActionListener(eventHandler);
@@ -157,6 +159,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getDisableAllViewOptionsButton() {
 		if (disableAllViewOptionsButton == null) {
 			disableAllViewOptionsButton = new JButton("Disable all");
+			disableAllViewOptionsButton.setOpaque(false);
 			disableAllViewOptionsButton.setMnemonic('i');
 			disableAllViewOptionsButton.setDisplayedMnemonicIndex(1);
 			disableAllViewOptionsButton.addActionListener(eventHandler);
@@ -230,6 +233,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getDefaultTpsButton() {
 		if (defaultTpsButton == null) {
 			defaultTpsButton = new JButton("Default");
+			defaultTpsButton.setOpaque(false);
 			defaultTpsButton.addActionListener(eventHandler);
 		}
 		return defaultTpsButton;
@@ -238,6 +242,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getMinTpsButton() {
 		if (minTpsButton == null) {
 			minTpsButton = new JButton("Minimum");
+			minTpsButton.setOpaque(false);
 			minTpsButton.addActionListener(eventHandler);
 		}
 		return minTpsButton;
@@ -246,6 +251,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getMaxTpsButton() {
 		if (maxTpsButton == null) {
 			maxTpsButton = new JButton("Max");
+			maxTpsButton.setOpaque(false);
 			maxTpsButton.addActionListener(eventHandler);
 		}
 		return maxTpsButton;
@@ -254,6 +260,7 @@ public class PreferencesViewOptionsTab extends WizardPanel {
 	private JButton getFastTpsButton() {
 		if (fastTpsButton == null) {
 			fastTpsButton = new JButton("Fast");
+			fastTpsButton.setOpaque(false);
 			fastTpsButton.addActionListener(eventHandler);
 		}
 		return fastTpsButton;
