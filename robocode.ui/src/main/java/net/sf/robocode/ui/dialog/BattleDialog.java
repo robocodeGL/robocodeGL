@@ -53,6 +53,7 @@ public class BattleDialog extends JDialog {
 	}
 
 	private void initialize() {
+		setAlwaysOnTop(true);
 		this.setTitle("Main battle log");
 		this.add(getBattleDialogContentPane());
 		pack();
