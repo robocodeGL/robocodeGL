@@ -454,7 +454,7 @@ public class NewBattleRulesTab extends JPanel {
 			} else if (event.getSource() == restoreDefaultsButton) {
 				battleProperties.setBattlefieldWidth(800);
 				battleProperties.setBattlefieldHeight(600);
-				battleProperties.setNumRounds(10);
+				battleProperties.setNumRounds(35);
 				battleProperties.setGunCoolingRate(0.1);
 				battleProperties.setInactivityTime(450);
 				battleProperties.setHideEnemyNames(false);
