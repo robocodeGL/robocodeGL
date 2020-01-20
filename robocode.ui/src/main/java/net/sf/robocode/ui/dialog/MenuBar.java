@@ -1022,6 +1022,7 @@ public final class MenuBar extends JMenuBar implements ISettingsListener {
 			optionsPreferencesMenuItem = new JMenuItem();
 			optionsPreferencesMenuItem.setText("Preferences");
 			optionsPreferencesMenuItem.setMnemonic('P');
+			optionsPreferencesMenuItem.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_COMMA, MENU_SHORTCUT_KEY_MASK, false));
 			optionsPreferencesMenuItem.addActionListener(eventHandler);
 		}
 		return optionsPreferencesMenuItem;
