@@ -604,7 +604,7 @@ public class WindowManager implements IWindowManagerExt {
 
 		if (!overwrite.isEmpty()) {
 			if (JOptionPane.showConfirmDialog(getRobocodeFrame(), to_overwrite + " already exists.  Overwrite?",
-				"Warning", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+				"Warning", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
 				skipped += overwrite.size();
 			} else {
 				exceptions.addAll(importRobotsImpl(overwrite));
