@@ -1002,6 +1002,10 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		}
 
 		public void windowClosing(WindowEvent e) {
+			if (JOptionPane.showConfirmDialog( RobocodeFrame.this, "Quit " + ROBOCODE_TITLE + "?", "Quit", JOptionPane.YES_NO_OPTION) != JOptionPane.YES_OPTION) {
+				return;
+			}
+
 			exitOnClose = true;
 			if (windowManager.isSlave()) {
 				WindowUtil.message("If you wish to exit Robocode, please exit the program controlling it.");
