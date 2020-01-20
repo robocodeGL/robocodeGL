@@ -922,6 +922,33 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		}
 	}
 
+	public void speedUp() {
+		int tps = properties.getOptionsBattleDesiredTPS() * 2;
+		if (12 <= tps && tps <= 16) {
+			tps = 15;
+		} else if (tps > 1000) {
+			tps = 10000;
+		}
+		setTPS(tps, false);
+	}
+
+	public void normalSpeed() {
+		setTPS(30, false);
+	}
+
+	public void slowDown() {
+		int tps0 = properties.getOptionsBattleDesiredTPS();
+		int tps = tps0 / 2;
+		if (tps0 > 1000) {
+			tps = 960;
+		} else if (tps0 == 1) {
+			tps = 1;
+		} else if (tps0 == 15) {
+			tps = 8;
+		}
+		setTPS(tps, false);
+	}
+
 	private void nextTurn() {
 		battleManager.nextTurn();
 		windowManager.signalNextTurn();
