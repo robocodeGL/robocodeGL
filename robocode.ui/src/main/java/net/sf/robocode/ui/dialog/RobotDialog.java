@@ -70,7 +70,7 @@ public class RobotDialog extends JDialog {
 
 
 		robotIndex = robotButton.getRobotIndex();
-		setAlwaysOnTop(true);
+		// setAlwaysOnTop(true);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		setContentPane(getRobotDialogContentPane());
 		if (windowManager.isSlave()) {
