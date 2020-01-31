@@ -58,6 +58,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.GeneralPath;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 
 import static java.lang.Math.abs;
@@ -388,10 +389,13 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 		if (snapShot != null) {
 			// Draw all bullets
-			drawBullets(g, snapShot, lastSnapshot, t);
+			drawExplosions(g, snapShot, lastSnapshot, t);
 
 			// Draw robot (debug) paintings
 			drawRobotPaint(g, snapShot);
+
+			// Draw all bullets
+			drawBullets(g, snapShot, lastSnapshot, t);
 
 			// Draw all text
 			drawText(g, snapShot, lastSnapshot, t);
@@ -693,54 +697,17 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 	}
 
 	private void drawBullets(Graphics2D g, ITurnSnapshot snapShot, ITurnSnapshot lastSnapshot, double t) {
-		HashMap<IntPair, IBulletSnapshot> last = null;
-		if (t != 1.) {
-			last = new HashMap<IntPair, IBulletSnapshot>();
-			if (lastSnapshot != null) {
-				for (IBulletSnapshot bullet : lastSnapshot.getBullets()) {
-					last.put(new IntPair(bullet.getOwnerIndex(), bullet.getBulletId()), bullet);
-				}
-			}
-		}
+		Map<IntPair, IBulletSnapshot> last = getBulletMap(lastSnapshot, t);
 
-		IntObjectHashMap robotMap = null;
+		IntObjectHashMap robotMap = getRobotMap(lastSnapshot);
 
 		final Shape savedClip = g.getClip();
 
 		g.setClip(null);
 
-		double x, y;
-
 		for (IBulletSnapshot bulletSnapshot : snapShot.getBullets()) {
-			double bx = bulletSnapshot.getPaintX();
-			double by = bulletSnapshot.getPaintY();
-
-			if (t != 1.) {
-				if (bulletSnapshot.getBulletId() == 0) {
-					if (robotMap == null) {
-						robotMap = getRobotMap(lastSnapshot);
-					}
-
-					IRobotSnapshot l = (IRobotSnapshot) robotMap.get(bulletSnapshot.getOwnerIndex());
-					if (l != null) {
-						bx = l.getX() * (1. - t) + bx * t;
-						by = l.getY() * (1. - t) + by * t;
-					}
-				} else {
-					IBulletSnapshot l = last.get(new IntPair(bulletSnapshot.getOwnerIndex(), bulletSnapshot.getBulletId()));
-					if (l != null) {
-						bx = l.getPaintX() * (1. - t) + bx * t;
-						by = l.getPaintY() * (1. - t) + by * t;
-					}
-				}
-			}
-
-			x = bx;
-			y = battleField.getHeight() - by;
-
-			AffineTransform at = AffineTransform.getTranslateInstance(x, y);
-
 			if (bulletSnapshot.getState().isActive()) {
+				AffineTransform at = getBulletTransform(bulletSnapshot, last, robotMap, t);
 
 				// radius = sqrt(x^2 / 0.1 * power), where x is the width of 1 pixel for a minimum 0.1 bullet
 				double scale = max(2 * sqrt(2.5 * bulletSnapshot.getPower()), 2 / this.scale);
@@ -758,23 +725,83 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 				g.setColor(bulletColor);
 				g.fill(bulletArea);
 
-			} else if (drawExplosions) {
-				int explosionIndex = bulletSnapshot.getExplosionImageIndex();
-				int frame = bulletSnapshot.getFrame();
+			}
+		}
+		g.setClip(savedClip);
+	}
 
-				// Sanity check to avoid bug-354 - Replaying an XML record can cause an ArrayIndexOutOfBoundsException
-				if (explosionIndex >= 0 && frame >= 0) {
-					if (!bulletSnapshot.isExplosion()) {
-						double scale = sqrt(1000 * bulletSnapshot.getPower()) / 128;
-						at.scale(scale, scale);
+	private void drawExplosions(Graphics2D g, ITurnSnapshot snapShot, ITurnSnapshot lastSnapshot, double t) {
+		Map<IntPair, IBulletSnapshot> last = getBulletMap(lastSnapshot, t);
+
+		IntObjectHashMap robotMap = getRobotMap(lastSnapshot);
+
+		final Shape savedClip = g.getClip();
+
+		g.setClip(null);
+
+		if (drawExplosions) {
+			for (IBulletSnapshot bulletSnapshot : snapShot.getBullets()) {
+				if (!bulletSnapshot.getState().isActive()) {
+					AffineTransform at = getBulletTransform(bulletSnapshot, last, robotMap, t);
+
+					int explosionIndex = bulletSnapshot.getExplosionImageIndex();
+					int frame = bulletSnapshot.getFrame();
+
+					// Sanity check to avoid bug-354 - Replaying an XML record can cause an ArrayIndexOutOfBoundsException
+					if (explosionIndex >= 0 && frame >= 0) {
+						if (!bulletSnapshot.isExplosion()) {
+							double scale = sqrt(1000 * bulletSnapshot.getPower()) / 128;
+							at.scale(scale, scale);
+						}
+						RenderObject explosionRenderImage = imageManager.getExplosionRenderImage(explosionIndex, frame);
+						explosionRenderImage.setTransform(at);
+						explosionRenderImage.paint(g);
 					}
-					RenderObject explosionRenderImage = imageManager.getExplosionRenderImage(explosionIndex, frame);
-					explosionRenderImage.setTransform(at);
-					explosionRenderImage.paint(g);
 				}
 			}
 		}
 		g.setClip(savedClip);
+	}
+
+	private Map<IntPair, IBulletSnapshot> getBulletMap(ITurnSnapshot lastSnapshot, double t) {
+		Map<IntPair, IBulletSnapshot> last = null;
+		if (t != 1.) {
+			last = new HashMap<IntPair, IBulletSnapshot>();
+			if (lastSnapshot != null) {
+				for (IBulletSnapshot bullet : lastSnapshot.getBullets()) {
+					last.put(new IntPair(bullet.getOwnerIndex(), bullet.getBulletId()), bullet);
+				}
+			}
+		}
+		return last;
+	}
+
+	private AffineTransform getBulletTransform(IBulletSnapshot bulletSnapshot, Map<IntPair, IBulletSnapshot> last, IntObjectHashMap robotMap, double t) {
+		double x;
+		double y;
+		double bx = bulletSnapshot.getPaintX();
+		double by = bulletSnapshot.getPaintY();
+
+		if (t != 1.) {
+			if (bulletSnapshot.getBulletId() == 0) {
+				IRobotSnapshot l = (IRobotSnapshot) robotMap.get(bulletSnapshot.getOwnerIndex());
+				if (l != null) {
+					bx = l.getX() * (1. - t) + bx * t;
+					by = l.getY() * (1. - t) + by * t;
+				}
+			} else {
+				IBulletSnapshot l = last.get(new IntPair(bulletSnapshot.getOwnerIndex(), bulletSnapshot.getBulletId()));
+				if (l != null) {
+					bx = l.getPaintX() * (1. - t) + bx * t;
+					by = l.getPaintY() * (1. - t) + by * t;
+				}
+			}
+		}
+
+		x = bx;
+		y = battleField.getHeight() - by;
+
+		return AffineTransform.getTranslateInstance(x, y);
 	}
 
 	private void centerString(Graphics2D g, String s, float x, float y, Font font, FontMetrics fm) {
