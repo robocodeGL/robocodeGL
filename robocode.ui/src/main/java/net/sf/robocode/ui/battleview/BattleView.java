@@ -381,9 +381,6 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 
 			// Draw robots
 			drawRobots(g, snapShot, lastSnapshot, t);
-
-			// Draw robot (debug) paintings
-			drawRobotPaint(g, snapShot);
 		}
 
 		// Draw the border of the battlefield
@@ -392,6 +389,9 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 		if (snapShot != null) {
 			// Draw all bullets
 			drawBullets(g, snapShot, lastSnapshot, t);
+
+			// Draw robot (debug) paintings
+			drawRobotPaint(g, snapShot);
 
 			// Draw all text
 			drawText(g, snapShot, lastSnapshot, t);
