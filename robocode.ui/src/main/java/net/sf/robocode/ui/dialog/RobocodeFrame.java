@@ -710,7 +710,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			menuBar.getRobotMenu().setEnabled(false);
 			setEnableStopButton(false);
 			setEnablePauseButton(false);
-			setEnableNextTurnButton(false, true);
+			setEnableNextTurnButton(false);
+			setEnableNextTurnMenuItem(false);
 			setEnableRestartButton(false);
 			getReplayButton().setEnabled(false);
 			exitOnClose = false;
@@ -736,11 +737,12 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		windowManager.signalPauseBattle(true);
 	}
 
-	private void setEnableNextTurnButton(boolean b, boolean setMenu) {
+	private void setEnableNextTurnButton(boolean b) {
 		getNextTurnButton().setEnabled(b);
-		if (setMenu) {
-			menuBar.getBattleNextTurnMenuItem().setEnabled(b);
-		}
+	}
+
+	private void setEnableNextTurnMenuItem(boolean b) {
+		menuBar.getBattleNextTurnMenuItem().setEnabled(b);
 	}
 
 	private void setEnablePauseButton(boolean b) {
@@ -1046,7 +1048,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		menuBar.getOptionsAdjustTPSMenuItem().setEnabled(false);
 		menuBar.getBattleTogglePauseMenuItem().setEnabled(false);
 		setEnablePauseButton(false);
-		setEnableNextTurnButton(false, true);
+		setEnableNextTurnButton(false);
+		setEnableNextTurnMenuItem(false);
 		tpsSlider.setEnabled(false);
 	}
 
@@ -1057,7 +1060,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 		menuBar.getBattleOpenMenuItem().setEnabled(true);
 		menuBar.getOptionsAdjustTPSMenuItem().setEnabled(true);
 		menuBar.getBattleTogglePauseMenuItem().setEnabled(true);
-		menuBar.getBattleNextTurnMenuItem().setEnabled(true);
+		setEnableNextTurnMenuItem(true);
 		setEnablePauseButton(true);
 		// setEnableNextTurnButton(true, true);
 		tpsSlider.setEnabled(true);
@@ -1147,6 +1150,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			menuBar.getBattleExportRecordMenuItem().setEnabled(false);
 			menuBar.getBattleSaveAsMenuItem().setEnabled(true);
 			menuBar.getBattleSaveMenuItem().setEnabled(true);
+			setEnableNextTurnMenuItem(true);
 
 			JCheckBoxMenuItem rankingCheckBoxMenuItem = menuBar.getOptionsShowRankingCheckBoxMenuItem();
 
@@ -1203,7 +1207,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 			setEnableStopButton(false);
 			getReplayButton().setEnabled(canReplayRecord);
-			setEnableNextTurnButton(false, true);
+			setEnableNextTurnButton(false);
+			setEnableNextTurnMenuItem(false);
 
 			menuBar.getBattleSaveRecordAsMenuItem().setEnabled(enableSaveRecord);
 			menuBar.getBattleExportRecordMenuItem().setEnabled(enableSaveRecord);
@@ -1218,7 +1223,8 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 
 			setPauseButtonSelected(true);
 			if (!isIntroBattle) {
-				setEnableNextTurnButton(true, true);
+				setEnableNextTurnButton(true);
+				setEnableNextTurnMenuItem(true);
 			}
 
 			updateTitle();
@@ -1229,7 +1235,7 @@ public class RobocodeFrame extends JFrame implements ISettingsListener {
 			isBattlePaused = false;
 
 			setPauseButtonSelected(false);
-			setEnableNextTurnButton(false, false);
+			setEnableNextTurnButton(false);
 
 			// TODO: Refactor?
 			if (getTpsFromSlider() == 0) {
