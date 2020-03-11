@@ -1597,7 +1597,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		switch (badBehavior) {
 		case CANNOT_START:
 			message.append("could not be started or loaded.");
-			disableInRepository = true; // Disable in repository when it cannot be started anyways
+			// disableInRepository = true; // Disable in repository when it cannot be started anyways
 			break;
 
 		case UNSTOPPABLE:
