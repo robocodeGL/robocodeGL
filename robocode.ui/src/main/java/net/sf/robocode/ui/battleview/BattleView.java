@@ -12,6 +12,7 @@ import com.jogamp.common.util.IntObjectHashMap;
 import com.jogamp.opengl.util.Animator;
 import net.sf.robocode.battle.IBattleManager;
 import net.sf.robocode.battle.snapshot.RobotSnapshot;
+import net.sf.robocode.robotpaint.BadPaintException;
 import net.sf.robocode.robotpaint.Graphics2DSerialized;
 import net.sf.robocode.robotpaint.IGraphicsProxy;
 import net.sf.robocode.settings.ISettingsListener;
@@ -633,27 +634,33 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 			GraphicsState gfxState = new GraphicsState();
 
 			gfxState.save(g);
+			try {
+				g.setBackground(Color.WHITE);
+				g.setColor(Color.BLACK);
+				g.setFont(smallFontBase);
+				g.setStroke(DEFAULT_STROKE);
 
-			g.setBackground(Color.WHITE);
-			g.setColor(Color.BLACK);
-			g.setFont(smallFontBase);
-			g.setStroke(DEFAULT_STROKE);
+				g.setClip(null);
+				g.setComposite(AlphaComposite.SrcAtop);
 
-			g.setClip(null);
-			g.setComposite(AlphaComposite.SrcAtop);
+				IGraphicsProxy gfxProxy = getRobotGraphics(robotIndex);
 
-			IGraphicsProxy gfxProxy = getRobotGraphics(robotIndex);
-
-			if (robotSnapshot.isSGPaintEnabled()) {
-				gfxProxy.processTo(g, graphicsCalls);
-			} else {
-				mirroredGraphics.bind(g, battleField.getHeight());
-				gfxProxy.processTo(mirroredGraphics, graphicsCalls);
-				mirroredGraphics.release();
+				if (robotSnapshot.isSGPaintEnabled()) {
+					gfxProxy.processTo(g, graphicsCalls);
+				} else {
+					mirroredGraphics.bind(g, battleField.getHeight());
+					try {
+						gfxProxy.processTo(mirroredGraphics, graphicsCalls);
+					} finally {
+						mirroredGraphics.release();
+					}
+				}
+			} catch (BadPaintException ex) {
+				ex.printStackTrace();
+			} finally {
+				// Restore the graphics state
+				gfxState.restore(g);
 			}
-
-			// Restore the graphics state
-			gfxState.restore(g);
 
 			robotIndex++;
 		}
