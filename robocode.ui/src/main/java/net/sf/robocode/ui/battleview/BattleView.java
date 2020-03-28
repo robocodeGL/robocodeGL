@@ -656,6 +656,7 @@ public class BattleView extends GLG2DCanvas implements ScaleProvider {
 					}
 				}
 			} catch (BadPaintException ex) {
+				((RobotSnapshot) robotSnapshot).setPaintEnabled(false);
 				ex.printStackTrace();
 			} finally {
 				// Restore the graphics state
