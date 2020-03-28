@@ -11,6 +11,9 @@ package net.sf.robocode.robotpaint;
 import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.RobocodeProperties;
 import net.sf.robocode.serialization.RbSerializer;
+import org.apache.commons.imaging.ImageFormats;
+import org.apache.commons.imaging.ImageWriteException;
+import org.apache.commons.imaging.Imaging;
 
 import javax.imageio.ImageIO;
 import javax.swing.UIManager;
@@ -47,7 +50,6 @@ import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;
@@ -1426,6 +1428,8 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		while (calls.remaining() > 0) {
 			try {
 				processQueuedCall(g);
+			} catch (BadPaintException e) {
+				throw e;
 			} catch (Exception e) {
 				e.printStackTrace();
 				// FOR-DEBUG } catch (Error e) {
@@ -2313,14 +2317,13 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			calls.put((byte) 0);
 		} else {
 			calls.put((byte) 1);
-			ByteArrayOutputStream bao = new ByteArrayOutputStream();
 			try {
-				ImageIO.write(img, "png", bao);
-				bao.flush();
+				calls.put(Imaging.writeImageToBytes((BufferedImage) img, ImageFormats.PNG, null));
 			} catch (IOException e) {
-				throw new RuntimeException(e);
+				throw new BadPaintException(e);
+			} catch (ImageWriteException e) {
+				e.printStackTrace();
 			}
-			calls.put(bao.toByteArray());
 		}
 	}
 
@@ -2336,8 +2339,10 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 						break;
 					}
 					return ImageIO.read(new ByteArrayInputStream(buf));
+				} catch (NegativeArraySizeException e) {
+					throw new BadPaintException(e);
 				} catch (IOException e) {
-					throw new RuntimeException(e);
+					throw new BadPaintException(e);
 				}
 		}
 		notSupported();
