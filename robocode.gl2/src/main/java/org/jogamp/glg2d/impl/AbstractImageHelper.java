@@ -241,7 +241,11 @@ public abstract class AbstractImageHelper implements GLG2DImageHelper {
 
   @Override
   public void drawImage(RenderedImage img, AffineTransform xform) {
-    notImplemented("drawImage(RenderedImage, AffineTransform)");
+    if (img instanceof BufferedImage) {
+      drawImage((BufferedImage) img, xform, null, null);
+    } else {
+      notImplemented("drawImage(RenderedImage, AffineTransform)");
+    }
   }
 
   @Override
