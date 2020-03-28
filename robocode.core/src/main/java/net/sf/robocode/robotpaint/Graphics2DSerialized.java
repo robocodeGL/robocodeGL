@@ -12,15 +12,43 @@ import net.sf.robocode.io.Logger;
 import net.sf.robocode.io.RobocodeProperties;
 import net.sf.robocode.serialization.RbSerializer;
 
-import java.awt.*;
+import javax.imageio.ImageIO;
+import javax.swing.UIManager;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
+import java.awt.Image;
+import java.awt.Paint;
+import java.awt.Polygon;
+import java.awt.Rectangle;
+import java.awt.RenderingHints;
+import java.awt.Shape;
+import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.font.GlyphVector;
-import java.awt.geom.*;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Arc2D;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.Line2D;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -28,8 +56,6 @@ import java.nio.ByteOrder;
 import java.text.AttributedCharacterIterator;
 import java.text.CharacterIterator;
 import java.util.Map;
-
-import javax.swing.UIManager;
 
 
 /**
@@ -897,7 +923,23 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	}
 
 	@Override
-	public void drawRenderedImage(RenderedImage img, AffineTransform xform) {}
+	public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
+		if (isPaintingEnabled) {
+			// notSupported();
+
+			((Buffer) calls).mark(); // Mark for rollback
+			try {
+				put(Method.DRAW_RENDERED_IMAGE);
+				put(img);
+				put(xform);
+			} catch (BufferOverflowException e) {
+				if (recoverFromBufferOverflow()) {
+					drawRenderedImage(img, xform); // Retry this method after reallocation
+					return; // Make sure we leave
+				}
+			}
+		}
+	}
 
 	@Override
 	public void drawRenderableImage(RenderableImage img, AffineTransform xform) {
@@ -1307,7 +1349,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 
 		if (hints == null) {
 			return new FontRenderContext(null, false, false);
-		} else {		
+		} else {
 			boolean isAntiAliased = RenderingHints.VALUE_FRACTIONALMETRICS_ON.equals(
 					hints.get(RenderingHints.KEY_TEXT_ANTIALIASING));
 			boolean usesFractionalMetrics = RenderingHints.VALUE_FRACTIONALMETRICS_ON.equals(
@@ -1587,6 +1629,10 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			processClip(g);
 			break;
 
+ 		case DRAW_RENDERED_IMAGE:
+ 			processDrawRenderedImage(g);
+			break;
+
 		case DRAW_GLYPH_VECTOR:
 		case DRAW_IMAGE_1:
 		case DRAW_IMAGE_2:
@@ -1596,7 +1642,6 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		case DRAW_IMAGE_6:
 		case DRAW_IMAGE_7:
 		case DRAW_IMAGE_8:
-		case DRAW_RENDERED_IMAGE:
 		case DRAW_RENDERABLE_IMAGE:
 		case SET_RENDERING_HINT:
 		case SET_RENDERING_HINTS:
@@ -1630,7 +1675,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private void processSetFont(Graphics2D g) {
 		Font font = calls.get() == 0
 				? null
-				: new Font(serializer.deserializeString(calls), calls.getInt(), calls.getInt()); 
+				: new Font(serializer.deserializeString(calls), calls.getInt(), calls.getInt());
 
 		// setFont(Font)
 		g.setFont(font);
@@ -1833,6 +1878,11 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		g.clip(readShape());
 	}
 
+	private void processDrawRenderedImage(Graphics2D g) {
+		// drawImage(Image, AffineTransform, ImageObserver)
+		g.drawRenderedImage(readRenderedImage(), readAffineTransform());
+	}
+
 	private Shape readShape() {
 		switch (calls.get()) {
 		case 0:
@@ -1881,7 +1931,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	 *
 	 * @return {@code true} if the buffer was reallocated;
 	 *         {@code false} if the max. capacity has been reached meaning that the reallocation
-	 *         was not performed. 
+	 *         was not performed.
 	 */
 	private boolean reallocBuffer() {
 		int bufferSize;
@@ -1895,7 +1945,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		}
 
 		// Check if the max. buffer size has been reached
-		if (RobocodeProperties.isDebuggingOff() && bufferSize > MAX_BUFFER_SIZE) {			
+		if (RobocodeProperties.isDebuggingOff() && bufferSize > MAX_BUFFER_SIZE) {
 			return false; // not reallocated!
 		}
 
@@ -1915,7 +1965,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 
 		// Switch to the new buffer
 		calls = newBuffer;
-		
+
 		return true; // buffer was reallocated
 	}
 
@@ -1924,7 +1974,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private boolean recoverFromBufferOverflow() {
 		((Buffer) calls).reset(); // Rollback buffer
 
-		boolean recovered = reallocBuffer(); 
+		boolean recovered = reallocBuffer();
 
 		if (!recovered) {
 			if (unrecoveredBufferOverflowCount++ == 1) { // Prevent spamming 
@@ -2139,7 +2189,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			return new AffineTransform(serializer.deserializeDoubles(calls));
 		}
 		notSupported();
-		return null;		
+		return null;
 	}
 
 	private void put(AffineTransform tx) {
@@ -2182,7 +2232,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			put((String) null);
 		} else {
 			StringBuilder sb = new StringBuilder();
-	
+
 			for (char c = iterator.first(); c != CharacterIterator.DONE; c = iterator.next()) {
 				sb.append(c);
 			}
@@ -2237,7 +2287,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private Color readColor() {
 		return calls.get() == 0 ? null : new Color(calls.getInt(), true);
 	}
-	
+
 	private void put(Color value) {
 		if (value == null) {
 			calls.put((byte) 0);
@@ -2251,11 +2301,47 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		if (font == null) {
 			calls.put((byte) 0);
 		} else {
-			calls.put((byte) 1);		
+			calls.put((byte) 1);
 			serializer.serialize(calls, font.getFontName());
 			calls.putInt(font.getStyle());
 			calls.putInt(font.getSize());
 		}
+	}
+
+	private void put(RenderedImage img) {
+		if (img == null) {
+			calls.put((byte) 0);
+		} else {
+			calls.put((byte) 1);
+			ByteArrayOutputStream bao = new ByteArrayOutputStream();
+			try {
+				ImageIO.write(img, "png", bao);
+				bao.flush();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+			calls.put(bao.toByteArray());
+		}
+	}
+
+	private RenderedImage readRenderedImage() {
+		switch (calls.get()) {
+			case 0:
+				return null;
+
+			case 1:
+				try {
+					byte[] buf = serializer.deserializeBytes(calls);
+					if (buf == null) {
+						break;
+					}
+					return ImageIO.read(new ByteArrayInputStream(buf));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+		}
+		notSupported();
+		return null;
 	}
 
 	// --------------------------------------------------------------------------
