@@ -53,6 +53,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;
+import java.nio.BufferUnderflowException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.text.AttributedCharacterIterator;
@@ -1430,6 +1431,8 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 				processQueuedCall(g);
 			} catch (BadPaintException e) {
 				throw e;
+			} catch (BufferUnderflowException e) {
+				throw new BadPaintException(e);
 			} catch (Exception e) {
 				e.printStackTrace();
 				// FOR-DEBUG } catch (Error e) {
