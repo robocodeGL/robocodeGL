@@ -2318,7 +2318,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		} else {
 			calls.put((byte) 1);
 			try {
-				calls.put(Imaging.writeImageToBytes((BufferedImage) img, ImageFormats.PNG, null));
+				put(Imaging.writeImageToBytes((BufferedImage) img, ImageFormats.PNG, null));
 			} catch (IOException e) {
 				throw new BadPaintException(e);
 			} catch (ImageWriteException e) {
