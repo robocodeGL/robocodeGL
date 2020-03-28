@@ -2339,9 +2339,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 						break;
 					}
 					return ImageIO.read(new ByteArrayInputStream(buf));
-				} catch (NegativeArraySizeException e) {
-					throw new BadPaintException(e);
-				} catch (IOException e) {
+				} catch (Exception e) {
 					throw new BadPaintException(e);
 				}
 		}
