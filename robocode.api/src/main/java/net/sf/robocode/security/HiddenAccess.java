@@ -175,6 +175,9 @@ public class HiddenAccess {
 				if (name.contains("kotlin-stdlib")) { // Kotlin standard library
 					urls.add(url);
 				}
+				if (name.contains("pngj")) { // PNGJ
+					urls.add(url);
+				}
 				if (name.contains("jogl") ||
 					name.contains("jogamp") ||
 					name.contains("gluegen")) { // JOGL
