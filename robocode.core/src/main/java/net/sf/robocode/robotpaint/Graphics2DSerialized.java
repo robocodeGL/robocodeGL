@@ -2327,7 +2327,6 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 			byte[] bytes = null;
 			try {
 				bytes = Imaging.writeImageToBytes(img, ImageFormats.PNG, null);
-				System.out.println("bytes.length=" + bytes.length);
 			} catch (IOException e) {
 				throw new BadPaintException(e);
 			} catch (ImageWriteException e) {
@@ -2349,9 +2348,6 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 					if (buf == null) {
 						throw new BadPaintException(new RuntimeException("buf == null"));
 					}
-
-					System.out.println("bytes.length=" + buf.length);
-
 					return Imaging.getBufferedImage(buf);
 				} catch (Exception e) {
 					throw new BadPaintException(e);
