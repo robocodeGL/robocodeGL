@@ -15,7 +15,6 @@ import org.apache.commons.imaging.ImageFormats;
 import org.apache.commons.imaging.ImageWriteException;
 import org.apache.commons.imaging.Imaging;
 
-import javax.imageio.ImageIO;
 import javax.swing.UIManager;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
@@ -49,7 +48,6 @@ import java.awt.image.BufferedImageOp;
 import java.awt.image.ImageObserver;
 import java.awt.image.RenderedImage;
 import java.awt.image.renderable.RenderableImage;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.Buffer;
 import java.nio.BufferOverflowException;
@@ -929,12 +927,14 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	@Override
 	public void drawRenderedImage(RenderedImage img, AffineTransform xform) {
 		if (isPaintingEnabled) {
-			// notSupported();
+			if (!(img instanceof BufferedImage)) {
+				notSupported();
+			}
 
 			((Buffer) calls).mark(); // Mark for rollback
 			try {
 				put(Method.DRAW_RENDERED_IMAGE);
-				put(img);
+				put((BufferedImage) img);
 				put(xform);
 			} catch (BufferOverflowException e) {
 				if (recoverFromBufferOverflow()) {
@@ -1460,6 +1460,8 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private void processQueuedCall(Graphics2D g) {
 		Method m = readMethod();
 
+		System.out.println(m);
+
 		switch (m) {
 		case NIL:
 			throw new BadPaintException(new RuntimeException("NIL encountered"));
@@ -1890,7 +1892,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	}
 
 	private void processDrawRenderedImage(Graphics2D g) {
-		// drawImage(Image, AffineTransform, ImageObserver)
+		// drawRenderedImage(RenderedImage, AffineTransform)
 		g.drawRenderedImage(readRenderedImage(), readAffineTransform());
 	}
 
@@ -2319,17 +2321,21 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		}
 	}
 
-	private void put(RenderedImage img) {
+	private void put(BufferedImage img) {
 		if (img == null) {
 			calls.put((byte) 0);
 		} else {
 			calls.put((byte) 1);
+			byte[] bytes = null;
 			try {
-				put(Imaging.writeImageToBytes((BufferedImage) img, ImageFormats.PNG, null));
+				bytes = Imaging.writeImageToBytes(img, ImageFormats.PNG, null);
+				System.out.println("bytes.length=" + bytes.length);
 			} catch (IOException e) {
 				throw new BadPaintException(e);
 			} catch (ImageWriteException e) {
-				e.printStackTrace();
+				throw new BadPaintException(e);
+			} finally {
+				put(bytes);
 			}
 		}
 	}
@@ -2343,9 +2349,12 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 				try {
 					byte[] buf = serializer.deserializeBytes(calls);
 					if (buf == null) {
-						break;
+						throw new BadPaintException(new RuntimeException("buf == null"));
 					}
-					return ImageIO.read(new ByteArrayInputStream(buf));
+
+					System.out.println("bytes.length=" + buf.length);
+
+					return Imaging.getBufferedImage(buf);
 				} catch (Exception e) {
 					throw new BadPaintException(e);
 				}
