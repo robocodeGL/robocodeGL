@@ -2215,7 +2215,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 
 			put((byte) 1);
 			put(m);
-			put(tx.getType());
+			// put(tx.getType());
 		}
 	}
 
