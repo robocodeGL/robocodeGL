@@ -1460,8 +1460,6 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private void processQueuedCall(Graphics2D g) {
 		Method m = readMethod();
 
-		System.out.println(m);
-
 		switch (m) {
 		case NIL:
 			throw new BadPaintException(new RuntimeException("NIL encountered"));
