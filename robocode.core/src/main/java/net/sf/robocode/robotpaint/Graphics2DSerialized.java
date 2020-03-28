@@ -73,6 +73,7 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 	private final Method[] methods = Method.class.getEnumConstants();
 
 	private enum Method {
+		NIL, // throws
 		TRANSLATE_INT, // translate(int, int)
 		SET_COLOR, // setColor(Color)
 		SET_PAINT_MODE, // setPaintMode()
@@ -1460,6 +1461,9 @@ public class Graphics2DSerialized extends Graphics2D implements IGraphicsProxy {
 		Method m = readMethod();
 
 		switch (m) {
+		case NIL:
+			throw new BadPaintException(new RuntimeException("NIL encountered"));
+
 		case TRANSLATE_INT:
 			processTranslate_int(g);
 			break;
