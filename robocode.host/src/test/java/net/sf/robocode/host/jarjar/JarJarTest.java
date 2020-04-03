@@ -30,7 +30,7 @@ public class JarJarTest {
 		JarJarURLConnection.register();
 	}
 
-	@Test
+	// @Test
 	public void run() throws IOException {
 
 		String clas = "Hello.class";
@@ -56,7 +56,7 @@ public class JarJarTest {
 		inputStream.close();
 	}
 
-	@Test
+	// @Test
 	public void runClassLoader() throws IOException, ClassNotFoundException {
 		String clas = "tested.robots.Ahead";
 		String inner = "Inner.jar";
