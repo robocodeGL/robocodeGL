@@ -30,6 +30,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
@@ -154,6 +155,8 @@ public class HiddenAccess {
 			}
 		});
 
+		System.out.println(Arrays.toString(files));
+
 		if (files != null) {
 			for (File file : files) {
 				final String name = file.toString().toLowerCase();
@@ -176,6 +179,9 @@ public class HiddenAccess {
 					urls.add(url);
 				}
 				if (name.contains("commons-imaging")) { // PNGJ
+					urls.add(url);
+				}
+				if (name.contains("hppc")) { // hppc
 					urls.add(url);
 				}
 				if (name.contains("jogl") ||
