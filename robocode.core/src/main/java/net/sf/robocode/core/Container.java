@@ -9,7 +9,6 @@ package net.sf.robocode.core;
 
 
 import net.sf.robocode.io.Logger;
-
 import org.picocontainer.Characteristics;
 import org.picocontainer.MutablePicoContainer;
 import org.picocontainer.behaviors.Caching;
@@ -20,9 +19,10 @@ import java.awt.Toolkit;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URL;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,6 +60,15 @@ public final class Container extends ContainerBase {
 		instance = new Container();
 		systemLoader = Container.class.getClassLoader();
 		engineLoader = new EngineClassLoader(systemLoader);
+
+		ClassLoader[] loaders = {
+				Object.class.getClassLoader(),
+				systemLoader,
+				engineLoader,
+		};
+
+		System.out.println("loaders=" + Arrays.toString(loaders));
+
 		final Thread currentThread = Thread.currentThread();
 
 		currentThread.setContextClassLoader(engineLoader);

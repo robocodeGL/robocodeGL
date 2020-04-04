@@ -35,6 +35,8 @@ public abstract class RobocodeMainBase implements Runnable {
 	// -----------
 
 	public static void robocodeMain(Object args) {
+		System.out.println(RobocodeMainBase.class.getClassLoader() + "; " + Container.class.getClassLoader());
+
 		// here we cross transition to EngineClassLoader classes using interface which is defined in system classLoader
 		RobocodeMainBase main = Container.getComponent(RobocodeMainBase.class);
 

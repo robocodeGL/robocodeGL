@@ -30,7 +30,6 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -84,6 +83,13 @@ public class HiddenAccess {
 			method.setAccessible(false);
 
 			ClassLoader loader = getClassLoader();
+
+			System.out.println("loader=" + loader);
+
+			// Class<?> test = loader.loadClass("com.carrotsearch.hppc.IntOpenHashSet");
+			//
+			// System.out.println(test);
+
 			Class<?> main = loader.loadClass("net.sf.robocode.core.RobocodeMainBase");
 
 			initContainer = main.getDeclaredMethod("initContainer");
@@ -125,6 +131,9 @@ public class HiddenAccess {
 		// if other modules are .jar next to robocode.jar on same path, we will create classloader which will load them
 		// otherwise we rely on that they are already on classpath
 		StringBuilder classPath = new StringBuilder(System.getProperty("java.class.path", null));
+
+		System.out.println(classPath);
+
 		ClassLoader loader = ClassLoader.getSystemClassLoader();
 		String path = HiddenAccess.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 
@@ -147,6 +156,12 @@ public class HiddenAccess {
 		File dirf = new File(dir);
 		ArrayList<URL> urls = new ArrayList<URL>();
 
+		// String[] classPaths = classPath.toString().split(File.pathSeparator);
+		// for (String path : classPaths) {
+		// 	urls.add(new File(path).toURI().toURL());
+		// }
+		// System.out.println(urls);
+
 		final File[] files = dirf.listFiles(new FilenameFilter() {
 			public boolean accept(File dir, String name) {
 				final String test = name.toLowerCase();
@@ -155,45 +170,53 @@ public class HiddenAccess {
 			}
 		});
 
-		System.out.println(Arrays.toString(files));
-
 		if (files != null) {
 			for (File file : files) {
 				final String name = file.toString().toLowerCase();
 				final URL url = file.toURI().toURL();
-				
+
 				if (name.contains("robocode.core")) { // Robocode core
 					foundCore = true;
 					urls.add(url);
-				}
-				if (name.contains("picocontainer")) { // Picocontainer used for modularization
+				} else if (name.contains("picocontainer")) { // Picocontainer used for modularization
 					urls.add(url);
-				}
-				if (name.contains("codesize")) { // Codesize tool
+				} else if (name.contains("codesize")) { // Codesize tool
 					urls.add(url);
-				}
-				if (name.contains("bcel")) { // BCEL used by Codesize
+				} else if (name.contains("bcel")) { // BCEL used by Codesize
 					urls.add(url);
-				}
-				if (name.contains("kotlin-stdlib")) { // Kotlin standard library
+				} else if (name.contains("kotlin-stdlib")) { // Kotlin standard library
 					urls.add(url);
-				}
-				if (name.contains("commons-imaging")) { // PNGJ
+				} else if (name.contains("commons-imaging")) { // PNGJ
 					urls.add(url);
-				}
-				if (name.contains("hppc")) { // hppc
+				} else if (name.contains("hppc")) { // hppc
 					urls.add(url);
-				}
-				if (name.contains("jogl") ||
-					name.contains("jogamp") ||
-					name.contains("gluegen")) { // JOGL
+				} else if (name.contains("jogl") || name.contains("jogamp") || name.contains("gluegen")) { // JOGL
 					urls.add(url);
 				}
 				classPath.append(File.pathSeparator);
 				classPath.append(file.toString());
 			}
 		}
-		return new URLClassLoader(urls.toArray(new URL[urls.size()]), loader);
+
+		// return new URLClassLoader(urls.toArray(new URL[0])) {
+		// 	@Override
+		// 	protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+		// 		if (name.startsWith("javax.") || name.startsWith("java.") || name.startsWith("robocode.")) {
+		// 			return super.loadClass(name, resolve);
+		// 		}
+		//
+		// 		Class<?> result = findLoadedClass(name);
+		//
+		// 		if (result == null) {
+		// 			result = findClass(name);
+		// 		}
+		// 		if (resolve) {
+		// 			resolveClass(result);
+		// 		}
+		// 		return result;
+		// 	}
+		// };
+		return new URLClassLoader(urls.toArray(new URL[0]), loader);
 	}
 
 	public static boolean isCriticalEvent(Event e) {

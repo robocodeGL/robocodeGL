@@ -85,6 +85,9 @@ public class RobotClassLoader extends URLClassLoader implements IRobotClassLoade
 		if (name.startsWith("java.lang") || name.startsWith("kotlin.")) {
 			// we always delegate java.lang and Kotlin stuff to parent loader
 			return super.loadClass(name, resolve);
+		} else if (name.startsWith("com.carrotsearch.hppc.")) {
+			System.out.println("Loading hppc");
+			return super.loadClass(name, resolve);
 		}
 		if (RobocodeProperties.isSecurityOn()) {
 			testPackages(name);
