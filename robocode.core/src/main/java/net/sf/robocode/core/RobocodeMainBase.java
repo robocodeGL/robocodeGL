@@ -34,6 +34,7 @@ public abstract class RobocodeMainBase implements Runnable {
 	// entrypoints called with reflection from HiddenAccess in robocode.api module
 	// -----------
 
+	@CalledViaReflection
 	public static void robocodeMain(Object args) {
 		System.out.println(RobocodeMainBase.class.getClassLoader() + "; " + Container.class.getClassLoader());
 
@@ -54,11 +55,13 @@ public abstract class RobocodeMainBase implements Runnable {
 		new Thread(group, main, "Robocode main thread").start();
 	}
 
+	@CalledViaReflection
 	public static void initContainer() {
 		// here we cross transition to EngineClassLoader classes using interface which is defined in system classLoader
 		Container.init();
 	}
 
+	@CalledViaReflection
 	public static void cleanupForRobocodeEngine() {
 		// here we cross transition to EngineClassLoader classes using interface which is defined in system classLoader
 		RobocodeMainBase main = Container.getComponent(RobocodeMainBase.class);
@@ -66,6 +69,7 @@ public abstract class RobocodeMainBase implements Runnable {
 		main.cleanup();
 	}
 
+	@CalledViaReflection
 	public static void initContainerForRobocodeEngine(File robocodeHome, IBattleListener listener) {
 		try {
 			if (robocodeHome == null) {
@@ -90,5 +94,10 @@ public abstract class RobocodeMainBase implements Runnable {
 		RobocodeMainBase main = Container.getComponent(RobocodeMainBase.class);
 
 		main.initForRobocodeEngine(listener);
+	}
+
+	@CalledViaReflection
+	public static void initAppLoader(ClassLoader loader) {
+		Container.setAppLoader(loader);
 	}
 }

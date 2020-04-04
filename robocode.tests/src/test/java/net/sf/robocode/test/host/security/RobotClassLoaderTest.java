@@ -50,7 +50,7 @@ public class RobotClassLoaderTest {
 		RobotClassLoader cl = new RobotClassLoader(classPath, goodRobot);
 		final Class<?> c = cl.loadClass("robocode.Robot", true);
 
-		Assert.assertEquals(Container.systemLoader, c.getClassLoader());
+		Assert.assertEquals(Container.getAppLoader(), c.getClassLoader());
 	}
 
 	@Test

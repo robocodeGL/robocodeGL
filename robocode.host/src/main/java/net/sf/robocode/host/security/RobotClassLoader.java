@@ -65,7 +65,7 @@ public class RobotClassLoader extends URLClassLoader implements IRobotClassLoade
 	private String[] staticRobotInstanceWarning;  
 
 	public RobotClassLoader(URL robotClassPath, String robotFullClassName) {
-		super(new URL[] { robotClassPath}, Container.systemLoader);
+		super(new URL[] { robotClassPath}, Container.getAppLoader());
 		fullClassName = robotFullClassName;
 		parent = getParent();
 		try {
@@ -84,9 +84,6 @@ public class RobotClassLoader extends URLClassLoader implements IRobotClassLoade
 	public synchronized Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
 		if (name.startsWith("java.lang") || name.startsWith("kotlin.")) {
 			// we always delegate java.lang and Kotlin stuff to parent loader
-			return super.loadClass(name, resolve);
-		} else if (name.startsWith("com.carrotsearch.hppc.")) {
-			System.out.println("Loading hppc");
 			return super.loadClass(name, resolve);
 		}
 		if (RobocodeProperties.isSecurityOn()) {
