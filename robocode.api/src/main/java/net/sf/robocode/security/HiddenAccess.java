@@ -92,6 +92,10 @@ public class HiddenAccess {
 
 			Class<?> main = loader.loadClass("net.sf.robocode.core.RobocodeMainBase");
 
+			Method initAppLoader = main.getDeclaredMethod("initAppLoader", ClassLoader.class);
+			initAppLoader.setAccessible(true);
+			initAppLoader.invoke(null, loader);
+
 			initContainer = main.getDeclaredMethod("initContainer");
 			initContainer.setAccessible(true);
 

@@ -52,6 +52,7 @@ public final class Container extends ContainerBase {
 	public static final MutablePicoContainer cache;
 	public static final MutablePicoContainer factory;
 	public static final ClassLoader systemLoader;
+	private static ClassLoader appLoader;
 	public static final ClassLoader engineLoader; // NO_UCD (use private - used by the .NET plug-in)
 	private static Set<String> known = new HashSet<String>();
 	private static final List<IModule> modules = new ArrayList<IModule>();
@@ -59,6 +60,7 @@ public final class Container extends ContainerBase {
 	static {
 		instance = new Container();
 		systemLoader = Container.class.getClassLoader();
+		appLoader = systemLoader;
 		engineLoader = new EngineClassLoader(systemLoader);
 
 		ClassLoader[] loaders = {
@@ -235,6 +237,14 @@ public final class Container extends ContainerBase {
 			}
 		}
 		return urls;
+	}
+
+	public static ClassLoader getAppLoader() {
+		return appLoader;
+	}
+
+	static void setAppLoader(ClassLoader appLoader) {
+		Container.appLoader = appLoader;
 	}
 
 	protected <T> T getBaseComponent(final Class<T> tClass) {
