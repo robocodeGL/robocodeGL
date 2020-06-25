@@ -134,7 +134,7 @@ public class TestDuplicatesAndScore extends RobocodeTestBed {
 		Assert.assertThat(results[2].getLastSurvivorBonus(), is(0));
 		Assert.assertThat(results[3].getLastSurvivorBonus(), is(0));
 
-		Assert.assertThat(results[0].getRamDamage(), is(0));
+		Assert.assertThat(results[0].getRamDamage(), is(1));
 		Assert.assertThat(results[1].getRamDamage(), is(11));
 		Assert.assertThat(results[2].getRamDamage(), is(19));
 		Assert.assertThat(results[3].getRamDamage(), is(1));
