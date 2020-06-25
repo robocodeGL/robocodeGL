@@ -89,13 +89,13 @@ public class TestDuplicatesAndScore extends RobocodeTestBed {
 
 		if (lastTurn == 1365) {
 			net.sf.robocode.test.helpers.Assert.assertNear(527.1839449, robots[0].getX());
-			net.sf.robocode.test.helpers.Assert.assertNear(341.8063907, robots[1].getX());
+			net.sf.robocode.test.helpers.Assert.assertNear(551.1643817, robots[1].getX());
 			net.sf.robocode.test.helpers.Assert.assertNear(316.4177264, robots[2].getX());
 			net.sf.robocode.test.helpers.Assert.assertNear(662.4020551, robots[3].getX());
-			net.sf.robocode.test.helpers.Assert.assertNear(129.2596444, robots[4].getX());
+			net.sf.robocode.test.helpers.Assert.assertNear(165.4042862, robots[4].getX());
 			net.sf.robocode.test.helpers.Assert.assertNear(738.1464345, robots[5].getX());
 			net.sf.robocode.test.helpers.Assert.assertNear(395.2010724, robots[6].getX());
-			net.sf.robocode.test.helpers.Assert.assertNear(333.4148840, robots[7].getX());
+			net.sf.robocode.test.helpers.Assert.assertNear(230.1259228, robots[7].getX());
 		}
 	}
 
