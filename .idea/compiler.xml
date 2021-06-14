@@ -6,6 +6,7 @@
       <module name="robocode.battle" target="1.6" />
       <module name="robocode.content" target="1.6" />
       <module name="robocode.core" target="1.6" />
+      <module name="robocode.distribution" target="1.6" />
       <module name="robocode.gl2" target="1.6" />
       <module name="robocode.host" target="1.6" />
       <module name="robocode.installer" target="1.6" />

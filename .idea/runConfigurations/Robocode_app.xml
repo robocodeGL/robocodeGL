@@ -1,5 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Robocode app" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="adopt-openjdk-13" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="net.sf.robocode.main.Robocode" />
     <module name="robocode.robocode.main.main" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.sandbox" />
