@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Robocode" type="Application" factoryName="Application">
+    <option name="ALTERNATIVE_JRE_PATH" value="$USER_HOME$/Library/Java/JavaVirtualMachines/adopt-openjdk-13.0.2/Contents/Home" />
+    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
+    <option name="MAIN_CLASS_NAME" value="robocode.Robocode" />
+    <module name="robocode.robocode.run.main" />
+    <option name="PROGRAM_PARAMETERS" value="-NSRequiresAquaSystemAppearance False" />
+    <option name="VM_PARAMETERS" value=" -Dcom.apple.mrj.application.apple.menu.about.name=RobocodeGL -Dapple.awt.application.name=RobocodeGL -Xdock:name=RobocodeGL -DROBOTPATH=$ProjectFileDir$/robots -Xmx512m -XX:+IgnoreUnrecognizedVMOptions &quot;--add-opens=java.base/sun.net.www.protocol.jar=ALL-UNNAMED&quot; &quot;--add-opens=java.base/java.lang.reflect=ALL-UNNAMED&quot; &quot;--add-opens=java.desktop/javax.swing.text=ALL-UNNAMED&quot; &quot;--add-opens=java.desktop/sun.awt=ALL-UNNAMED&quot; &quot;--add-opens=java.desktop/com.apple.eawt=ALL-UNNAMED&quot;" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
