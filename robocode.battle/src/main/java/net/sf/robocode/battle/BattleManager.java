@@ -172,7 +172,7 @@ public class BattleManager implements IBattleManager {
 	private void startNewBattleSync(final RobotSpecification[] battlingRobotsList, boolean waitTillOver, boolean enableRecording) {
 		stopSync(true);
 
-		Battle realBattle = prepareRealBattle(battlingRobotsList, enableCLIRecording);
+		Battle realBattle = prepareRealBattle(battlingRobotsList, enableRecording);
 
 		// Start the realBattle thread
 		battleThread.start();
@@ -186,7 +186,7 @@ public class BattleManager implements IBattleManager {
 		}
 	}
 
-	private Battle prepareRealBattle(RobotSpecification[] battlingRobotsList, boolean enableCLIRecording) {
+	private Battle prepareRealBattle(RobotSpecification[] battlingRobotsList, boolean enableRecording) {
 		logMessage("Preparing battle...");
 
 		final boolean recording = (properties.getOptionsCommonEnableReplayRecording()

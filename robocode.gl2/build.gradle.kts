@@ -9,14 +9,15 @@ dependencies {
     implementation(project(":robocode.api"))
     implementation(project(":robocode.core"))
     implementation(project(":robocode.battle"))
-    implementation(project(":robocode.gl2"))
-    implementation("org.picocontainer:picocontainer:2.14.2")
+    implementation(project(":robocode.sound"))
     implementation("org.jogamp.gluegen:gluegen-rt-main:${joglVersion}")
     implementation("org.jogamp.jogl:jogl-all-main:${joglVersion}")
-    runtimeOnly(project(":robocode.sound"))
+    implementation("org.picocontainer:picocontainer:2.14.2")
+    implementation("org.apache.commons:commons-imaging:1.0-alpha1")
+    testImplementation("junit:junit:4.13.1")
 }
 
-description = "Robocode UI"
+description = "Robocode GL2"
 
 java {
     withJavadocJar()
@@ -24,11 +25,18 @@ java {
 }
 
 tasks {
+    register("copyVersion", Copy::class) {
+        from("../") {
+            include("versions.md")
+        }
+        into("build/resources/main/")
+    }
+    processResources{
+        dependsOn("copyVersion")
+
+    }
     javadoc {
         source = sourceSets["main"].java
-        include("net/sf/robocode/ui/Module.java")
-    }
-    jar {
-        dependsOn("javadoc")
+        include("net/sf/robocode/core/Module.java")
     }
 }

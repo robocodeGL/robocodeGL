@@ -6,7 +6,7 @@
       <GradleProjectSettings>
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
-        <option name="gradleHome" value="$PROJECT_DIR$/../../Program Files/Gradle" />
+        <option name="gradleHome" value="$USER_HOME$/Program Files/Gradle" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -15,11 +15,13 @@
             <option value="$PROJECT_DIR$/robocode.battle" />
             <option value="$PROJECT_DIR$/robocode.content" />
             <option value="$PROJECT_DIR$/robocode.core" />
+            <option value="$PROJECT_DIR$/robocode.gl2" />
             <option value="$PROJECT_DIR$/robocode.host" />
             <option value="$PROJECT_DIR$/robocode.installer" />
             <option value="$PROJECT_DIR$/robocode.main" />
             <option value="$PROJECT_DIR$/robocode.repository" />
             <option value="$PROJECT_DIR$/robocode.roborumble" />
+            <option value="$PROJECT_DIR$/robocode.run" />
             <option value="$PROJECT_DIR$/robocode.samples" />
             <option value="$PROJECT_DIR$/robocode.sound" />
             <option value="$PROJECT_DIR$/robocode.tests" />

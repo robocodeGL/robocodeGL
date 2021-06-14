@@ -6,6 +6,7 @@ plugins {
 dependencies {
     implementation(project(":robocode.api"))
     implementation("org.picocontainer:picocontainer:2.14.2")
+    implementation("org.apache.commons:commons-imaging:1.0-alpha1")
     testImplementation("junit:junit:4.13.1")
 }
 

@@ -282,7 +282,7 @@ public class RobocodeEngine implements IRobocodeEngine {
 	 * {@inheritDoc}
 	 */
 	public void abortCurrentBattle(boolean waitTillEnd) {
-		ContainerBase.getComponent(IBattleManagerBase.class).stop(waitTillEnd);
+		ContainerBase.getComponent(IBattleManagerBase.class).stopSync(waitTillEnd);
 	}
 
 	/**
