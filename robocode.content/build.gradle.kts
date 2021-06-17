@@ -7,8 +7,8 @@ description = "Robocode Content"
 
 dependencies {
     // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-stdlib
-    runtimeOnly("org.eclipse.jdt:org.eclipse.jdt.core:3.24.0")
-    runtimeOnly("org.jetbrains.kotlin:kotlin-stdlib:1.4.30")
+//    runtimeOnly("org.eclipse.jdt:org.eclipse.jdt.core:3.24.0")
+//    runtimeOnly("org.jetbrains.kotlin:kotlin-stdlib:1.4.30")
 }
 
 tasks {
@@ -28,17 +28,17 @@ tasks {
         })
         into("../.sandbox/libs")
     }
-    register("copyCompilers", Copy::class) {
-        dependsOn(configurations.runtimeClasspath)
-        from({
-            configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") && it.name.contains("eclipse") }.map { it }
-        })
-        into("../.sandbox/compilers")
-    }
+//    register("copyCompilers", Copy::class) {
+//        dependsOn(configurations.runtimeClasspath)
+//        from({
+//            configurations.runtimeClasspath.get().filter { it.name.endsWith("jar") && it.name.contains("eclipse") }.map { it }
+//        })
+//        into("../.sandbox/compilers")
+//    }
     processResources {
         dependsOn("copyContent")
         dependsOn("copyExternalLibs")
-        dependsOn("copyCompilers")
+//        dependsOn("copyCompilers")
     }
     publishMavenJavaPublicationToSonatypeRepository {
         enabled = false
