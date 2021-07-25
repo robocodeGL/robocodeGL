@@ -82,7 +82,7 @@ public class WindowManager implements IWindowManagerExt {
 
 	private boolean isGUIEnabled = true;
 	private boolean isSlave;
-	private boolean centerRankings = true;
+	private boolean centerRankings = false; // true;
 	private boolean oldRankingHideState = true;
 	private boolean showResults = true;
 
@@ -449,14 +449,18 @@ public class WindowManager implements IWindowManagerExt {
 			Container.cache.addComponent(RankingDialog.class);
 
 			// Reset flag for centering the dialog the first time it is shown
-			centerRankings = true;
+			// centerRankings = true;
 		}
 
 		RankingDialog rankingDialog = Container.getComponent(RankingDialog.class);
 
 		if (visible) {
-			packCenterShow(rankingDialog);
-			centerRankings = false; // only center the first time Rankings are shown
+			if (!rankingDialog.isVisible()) {
+				rankingDialog.pack();
+				rankingDialog.setVisible(true);
+			}
+			// packCenterShow(rankingDialog);
+			// centerRankings = false; // only center the first time Rankings are shown
 		} else {
 			rankingDialog.dispose();
 		}
