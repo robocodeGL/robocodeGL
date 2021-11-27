@@ -1628,7 +1628,7 @@ public final class RobotPeer implements IRobotPeerBattle, IRobotPeer {
 		}
 
 		if (disableInRepository) {
-			repositoryItem.setValid(false);			
+			// repositoryItem.setValid(false);
 			message.append(" This ").append(repositoryItem.isTeam() ? "team" : "robot").append(
 					" has been banned and will not be allowed to participate in battles.");
 		}
