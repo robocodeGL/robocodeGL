@@ -347,8 +347,8 @@ public class PrepareBattles {
 		}
 		String bot = name.replaceAll(" ", "_");
 		
-		Properties[] ratingLists = new Properties[] { generalratings, miniratings, microratings, nanoratings };
-		
+		Properties[] ratingLists = new Properties[] { generalratings }; // , miniratings, microratings, nanoratings };
+
 		for (Properties ratings : ratingLists) {
 			if (ratings.getProperty(bot) != null) {
 				return true;
