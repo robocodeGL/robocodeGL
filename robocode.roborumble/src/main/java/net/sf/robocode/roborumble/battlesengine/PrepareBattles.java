@@ -265,6 +265,8 @@ public class PrepareBattles {
 
 			String[] items = battle.split(",");
 
+			System.out.println("Add from server " + Arrays.toString(items));
+
 			battlesfile.writeBattle(new RumbleBattle(new String[]{items[0], items[1]}, items[2]));
 
 			count++;
@@ -280,16 +282,22 @@ public class PrepareBattles {
 					listWithSingleItem.add(bot);
 					bots = getRandomBots(listWithSingleItem, namesAll);
 					namesNoRanking.remove(0);
-				} else if (priorityAll.size() > 0) {
-					bots = getRandomBots(priorityAll, namesAll);
-				} else if (priorityMini.size() > 0 && namesMini.size() > 1) {
-					bots = getRandomBots(priorityMini, namesMini);
-				} else if (priorityMicro.size() > 0 && namesMicro.size() > 1) {
-					bots = getRandomBots(priorityMicro, namesMicro);
-				} else if (priorityNano.size() > 0 && namesNano.size() > 1) {
-					bots = getRandomBots(priorityNano, namesNano);
+
+					System.out.println("Add no rank " + Arrays.toString(bots));
 				} else {
-					bots = getRandomBots(namesAll, namesAll);
+					if (priorityAll.size() > 0) {
+						bots = getRandomBots(priorityAll, namesAll);
+					} else if (priorityMini.size() > 0 && namesMini.size() > 1) {
+						bots = getRandomBots(priorityMini, namesMini);
+					} else if (priorityMicro.size() > 0 && namesMicro.size() > 1) {
+						bots = getRandomBots(priorityMicro, namesMicro);
+					} else if (priorityNano.size() > 0 && namesNano.size() > 1) {
+						bots = getRandomBots(priorityNano, namesNano);
+					} else {
+						bots = getRandomBots(namesAll, namesAll);
+					}
+
+					System.out.println("Add smart " + Arrays.toString(bots));
 				}
 				if (bots != null) {
 					battlesfile.writeBattle(new RumbleBattle(new String[]{bots[0], bots[1]}, runonly));
