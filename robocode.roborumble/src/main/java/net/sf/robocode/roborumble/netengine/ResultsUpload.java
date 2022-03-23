@@ -9,9 +9,19 @@ package net.sf.robocode.roborumble.netengine;
 
 
 import net.sf.robocode.roborumble.battlesengine.CompetitionsSelector;
-import static net.sf.robocode.roborumble.util.PropertiesUtil.getProperties;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Properties;
@@ -295,6 +305,7 @@ public class ResultsUpload {
 					String battle = bot1 + "," + bot2 + "," + "SERVER";
 
 					if (prioritybattles != null) {
+						System.out.println("Server prioritizes " + game + " " + battle);
 						prioritybattles.println(battle);
 					}
 				} else {
