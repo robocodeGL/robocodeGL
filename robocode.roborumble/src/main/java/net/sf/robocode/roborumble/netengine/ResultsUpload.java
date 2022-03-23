@@ -177,7 +177,8 @@ public class ResultsUpload {
 
 			boolean errsaved = false;
 
-			if (matchtype.equals("GENERAL") || matchtype.equals("SERVER")) {
+			boolean general = matchtype.equals("GENERAL");
+			if (general || matchtype.equals("SERVER")) {
 				errsaved = senddata(game, data, outtxt, true, results, i, battlesnum, prioritybattles);
 			}
 
@@ -186,18 +187,18 @@ public class ResultsUpload {
 						&& size.checkCompetitorsForSize(first[0], second[0], 1500)) {
 					data = "game=" + minibots + commonData;
 					errsaved = errsaved
-							| senddata(minibots, data, outtxt, !errsaved, results, i, battlesnum, prioritybattles);
+							| senddata(minibots, data, outtxt, !errsaved, results, i, battlesnum, general ? null : prioritybattles);
 				}
 				if (microbots.length() != 0 && !matchtype.equals("NANO")
 						&& size.checkCompetitorsForSize(first[0], second[0], 750)) {
 					data = "game=" + microbots + commonData;
 					errsaved = errsaved
-							| senddata(microbots, data, outtxt, !errsaved, results, i, battlesnum, prioritybattles);
+							| senddata(microbots, data, outtxt, !errsaved, results, i, battlesnum, general ? null : prioritybattles);
 				}
 				if (nanobots.length() != 0 && size.checkCompetitorsForSize(first[0], second[0], 250)) {
 					data = "game=" + nanobots + commonData;
 					errsaved = errsaved
-							| senddata(nanobots, data, outtxt, !errsaved, results, i, battlesnum, prioritybattles);
+							| senddata(nanobots, data, outtxt, !errsaved, results, i, battlesnum, general ? null : prioritybattles);
 				}
 			}
 			errorsfound = errorsfound || errsaved;
